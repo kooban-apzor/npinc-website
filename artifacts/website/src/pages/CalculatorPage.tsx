@@ -67,6 +67,296 @@ function calcBondAttorneyFee(bond: number): number {
 
 const VAT = 0.15;
 
+// ─── Print Report ─────────────────────────────────────────────────────────────
+interface PrintRow { label: string; value: number }
+
+function printReport(opts: {
+  title: string;
+  subtitle: string;
+  inputs: { label: string; value: string }[];
+  rows: PrintRow[];
+  total: number;
+  totalLabel: string;
+  notes?: string;
+}) {
+  const { title, subtitle, inputs, rows, total, totalLabel, notes } = opts;
+
+  const logoUrl = `${window.location.origin}/npinc/logo.png`;
+  const date = new Date().toLocaleDateString("en-ZA", { day: "2-digit", month: "long", year: "numeric" });
+  const ref = `NPI-${Date.now().toString(36).toUpperCase().slice(-6)}`;
+
+  const rowsHtml = rows.map(r => `
+    <tr>
+      <td>${r.label}</td>
+      <td class="amount">${fmt(r.value)}</td>
+    </tr>`).join("");
+
+  const inputsHtml = inputs.map(i => `
+    <div class="input-row">
+      <span class="input-label">${i.label}</span>
+      <span class="input-value">${i.value}</span>
+    </div>`).join("");
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>${title} — Nike Pillay Inc</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 11pt;
+      color: #1a1a1a;
+      background: #fff;
+      padding: 0;
+    }
+    @page {
+      margin: 18mm 18mm 18mm 18mm;
+      size: A4;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding-bottom: 18px;
+      border-bottom: 2px solid #C6A15B;
+      margin-bottom: 24px;
+    }
+    .header img { height: 44px; width: auto; }
+    .firm-details {
+      text-align: right;
+      font-size: 8.5pt;
+      color: #555;
+      line-height: 1.6;
+    }
+    .firm-details strong { color: #1a1a1a; font-size: 9pt; }
+
+    /* ── Report title block ── */
+    .title-block { margin-bottom: 20px; }
+    .report-type {
+      font-size: 7.5pt;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #C6A15B;
+      margin-bottom: 4px;
+    }
+    h1 {
+      font-size: 20pt;
+      font-weight: 700;
+      color: #111;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+    .subtitle { font-size: 9.5pt; color: #666; }
+
+    /* ── Meta row ── */
+    .meta {
+      display: flex;
+      gap: 32px;
+      background: #f8f7f4;
+      border: 1px solid #e8e4db;
+      padding: 10px 14px;
+      margin-bottom: 24px;
+      font-size: 8.5pt;
+    }
+    .meta-item { display: flex; flex-direction: column; gap: 2px; }
+    .meta-item span:first-child { color: #888; text-transform: uppercase; letter-spacing: 0.08em; font-size: 7pt; }
+    .meta-item span:last-child { font-weight: 600; color: #1a1a1a; }
+
+    /* ── Input summary ── */
+    .section-heading {
+      font-size: 7.5pt;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #888;
+      border-bottom: 1px solid #e0dbd0;
+      padding-bottom: 5px;
+      margin-bottom: 10px;
+    }
+    .inputs { margin-bottom: 22px; }
+    .input-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px solid #f0ece4;
+      font-size: 9.5pt;
+    }
+    .input-label { color: #555; }
+    .input-value { font-weight: 600; color: #1a1a1a; }
+
+    /* ── Results table ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 0;
+    }
+    thead tr { background: #1a1a1a; color: #fff; }
+    thead th {
+      padding: 8px 12px;
+      font-size: 8pt;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 600;
+      text-align: left;
+    }
+    thead th.amount { text-align: right; }
+    tbody tr { border-bottom: 1px solid #ede9e0; }
+    tbody tr:nth-child(even) { background: #faf8f4; }
+    tbody td {
+      padding: 9px 12px;
+      font-size: 10pt;
+      color: #2a2a2a;
+    }
+    td.amount { text-align: right; font-variant-numeric: tabular-nums; }
+
+    /* ── Total row ── */
+    .total-row {
+      background: #C6A15B !important;
+      border: none !important;
+    }
+    .total-row td {
+      padding: 11px 12px !important;
+      font-size: 11pt !important;
+      font-weight: 700 !important;
+      color: #fff !important;
+      border: none !important;
+    }
+
+    /* ── Sources + disclaimer ── */
+    .sources {
+      margin-top: 20px;
+      background: #f8f7f4;
+      border-left: 3px solid #C6A15B;
+      padding: 10px 14px;
+      font-size: 8pt;
+      color: #555;
+      line-height: 1.7;
+    }
+    .sources strong { color: #1a1a1a; display: block; margin-bottom: 4px; }
+
+    .disclaimer {
+      margin-top: 14px;
+      font-size: 7.5pt;
+      color: #888;
+      line-height: 1.6;
+      border-top: 1px solid #e8e4db;
+      padding-top: 10px;
+    }
+    ${notes ? `.notes { margin-top: 14px; font-size: 8.5pt; color: #444; background: #fffdf7; border: 1px solid #e8e4db; padding: 10px 14px; line-height: 1.6; }` : ""}
+
+    /* ── Footer ── */
+    .page-footer {
+      margin-top: 24px;
+      padding-top: 12px;
+      border-top: 1px solid #C6A15B;
+      display: flex;
+      justify-content: space-between;
+      font-size: 7.5pt;
+      color: #888;
+    }
+    .page-footer strong { color: #C6A15B; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <img src="${logoUrl}" alt="Nike Pillay Inc" />
+    <div class="firm-details">
+      <strong>Nike Pillay Inc</strong><br/>
+      Attorneys, Notaries &amp; Conveyancers<br/>
+      Durban, South Africa<br/>
+      082 382 0843 &nbsp;|&nbsp; 087 183 9891<br/>
+      nike@npinc.co.za
+    </div>
+  </div>
+
+  <!-- Title -->
+  <div class="title-block">
+    <div class="report-type">Quotation</div>
+    <h1>${title}</h1>
+    <div class="subtitle">${subtitle}</div>
+  </div>
+
+  <!-- Meta -->
+  <div class="meta">
+    <div class="meta-item">
+      <span>Reference</span>
+      <span>${ref}</span>
+    </div>
+    <div class="meta-item">
+      <span>Date Prepared</span>
+      <span>${date}</span>
+    </div>
+    <div class="meta-item">
+      <span>Prepared By</span>
+      <span>Nike Pillay Inc</span>
+    </div>
+  </div>
+
+  <!-- Inputs -->
+  <div class="inputs">
+    <div class="section-heading">Calculation Inputs</div>
+    ${inputsHtml}
+  </div>
+
+  <!-- Results -->
+  <div class="section-heading">Cost Breakdown</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th class="amount">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rowsHtml}
+      <tr class="total-row">
+        <td>${totalLabel}</td>
+        <td class="amount">${fmt(total)}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  ${notes ? `<div class="notes">${notes}</div>` : ""}
+
+  <!-- Rate Sources -->
+  <div class="sources">
+    <strong>Rate Sources</strong>
+    Transfer Duty: SARS official tariff, effective 1 April 2025 (confirmed unchanged for 2026/27)<br/>
+    Deeds Office Fees: Government Notice GN R.4447, Government Gazette No. 50239, effective 1 April 2024<br/>
+    Attorney Fees: Based on LSSA recommended conveyancing tariff (2024), inclusive of 15% VAT<br/>
+    Bond Repayment: Standard amortisation formula at the specified annual interest rate
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">
+    Please note that all values are quotation estimates only and subject to change. Although every effort has been made
+    to ensure accuracy, Nike Pillay Inc accepts no liability in respect of any errors contained herein. Under no
+    circumstances will Nike Pillay Inc be liable for any loss or damages whatsoever arising from the use of this
+    calculator. This document is not a binding cost estimate. Contact us for a precise quote specific to your
+    transaction.
+  </div>
+
+  <!-- Page Footer -->
+  <div class="page-footer">
+    <span>&copy; ${new Date().getFullYear()} Nike Pillay Inc. All rights reserved.</span>
+    <span>Reference: <strong>${ref}</strong></span>
+  </div>
+
+  <script>window.onload = () => { window.focus(); window.print(); };<\/script>
+</body>
+</html>`;
+
+  const win = window.open("", "_blank", "width=900,height=700");
+  if (!win) return;
+  win.document.write(html);
+  win.document.close();
+}
+
 // ─── Transfer Cost Calculator ──────────────────────────────────────────────────
 function TransferCalculator() {
   const [priceStr, setPriceStr] = useState("");
@@ -97,6 +387,27 @@ function TransferCalculator() {
     const transferDuty = calcTransferDuty(price);
     const total = attorneyFee + postages + deedsOffice + electronicGen + fica + deedsSearches + ratesClearance + transferDuty;
     setResult({ attorneyFee, postages, deedsOffice, electronicGen, fica, deedsSearches, ratesClearance, transferDuty, total, price });
+  }
+
+  function handlePrint() {
+    if (!result) return;
+    printReport({
+      title: "Transfer Cost Calculator",
+      subtitle: "Approximate transfer costs, registration fees and transfer duty",
+      inputs: [{ label: "Purchase Price", value: fmt(result.price) }],
+      rows: [
+        { label: "Transfer Attorney Fees (incl 15% VAT)", value: result.attorneyFee },
+        { label: "Postages & Petties", value: result.postages },
+        { label: "Deeds Office Fees", value: result.deedsOffice },
+        { label: "Electronic Generation Fee", value: result.electronicGen },
+        { label: "FICA", value: result.fica },
+        { label: "Deeds Office Searches", value: result.deedsSearches },
+        { label: "Rates Clearance Fees", value: result.ratesClearance },
+        { label: "Transfer Duty (SARS)", value: result.transferDuty },
+      ],
+      total: result.total,
+      totalLabel: "Total Transfer Costs (incl VAT)",
+    });
   }
 
   const rows = result ? [
@@ -132,11 +443,7 @@ function TransferCalculator() {
               />
             </div>
           </div>
-          <button
-            onClick={calculate}
-            data-testid="button-calculate-transfer"
-            className="bg-[#C6A15B] text-[#0E0E0E] px-8 py-3 text-sm font-bold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors w-full mb-8"
-          >
+          <button onClick={calculate} data-testid="button-calculate-transfer" className="bg-[#C6A15B] text-[#0E0E0E] px-8 py-3 text-sm font-bold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors w-full mb-8">
             Calculate
           </button>
           <div className="text-[#B8B8B8] text-xs leading-relaxed space-y-2">
@@ -169,23 +476,12 @@ function TransferCalculator() {
                 </div>
               </div>
               <p className="text-[#B8B8B8] text-xs mt-4 italic">Approximate transfer quotation for purchase price of {fmt(result.price)}</p>
-              <button onClick={() => window.print()} className="mt-4 flex items-center gap-2 text-[#C6A15B] text-xs uppercase tracking-widest border border-[#C6A15B]/30 px-4 py-2 hover:border-[#C6A15B] transition-colors">
+              <button onClick={handlePrint} className="mt-4 flex items-center gap-2 text-[#C6A15B] text-xs uppercase tracking-widest border border-[#C6A15B]/30 px-4 py-2 hover:border-[#C6A15B] transition-colors">
                 <Printer size={12} /> Print / Save PDF
               </button>
             </>
           ) : (
-            <div className="space-y-3">
-              {["Transfer Attorney Fees", "Postages & Petties", "Deeds Office Fees", "Electronic Generation Fee", "FICA", "Deeds Office Searches", "Rates Clearance Fees", "Transfer Duty"].map(l => (
-                <div key={l} className="flex justify-between py-3 border-b border-[#2A2A2A]">
-                  <span className="text-[#B8B8B8] text-sm">{l}</span>
-                  <span className="text-[#3A3A3A] text-sm">R</span>
-                </div>
-              ))}
-              <div className="flex justify-between py-4 bg-[#C6A15B]/5 px-3">
-                <span className="text-[#F7F4EE] font-semibold text-sm">Total Transfer Costs (incl VAT)</span>
-                <span className="text-[#3A3A3A] font-bold">R</span>
-              </div>
-            </div>
+            <EmptyResults labels={["Transfer Attorney Fees", "Postages & Petties", "Deeds Office Fees", "Electronic Generation Fee", "FICA", "Deeds Office Searches", "Rates Clearance Fees", "Transfer Duty"]} totalLabel="Total Transfer Costs (incl VAT)" />
           )}
         </div>
       </div>
@@ -221,6 +517,25 @@ function BondCalculator() {
     setResult({ attorneyFee, postages, deedsOffice, electronicGen, electronicInstruction, deedsSearches, total, bond });
   }
 
+  function handlePrint() {
+    if (!result) return;
+    printReport({
+      title: "Bond Cost Calculator",
+      subtitle: "Approximate bond registration costs when buying property",
+      inputs: [{ label: "Bond Amount", value: fmt(result.bond) }],
+      rows: [
+        { label: "Bond Attorney Fee (incl 15% VAT)", value: result.attorneyFee },
+        { label: "Postages & Petties", value: result.postages },
+        { label: "Deeds Office Fees", value: result.deedsOffice },
+        { label: "Electronic Generation Fee", value: result.electronicGen },
+        { label: "Electronic Instruction Fee", value: result.electronicInstruction },
+        { label: "Deeds Office Searches", value: result.deedsSearches },
+      ],
+      total: result.total,
+      totalLabel: "Total Bond Costs (incl VAT)",
+    });
+  }
+
   const rows = result ? [
     { label: "Bond Attorney Fee", tip: "LSSA recommended tariff, incl 15% VAT", value: result.attorneyFee },
     { label: "Postages & Petties", tip: "Courier, postage & admin disbursements", value: result.postages },
@@ -252,11 +567,7 @@ function BondCalculator() {
               />
             </div>
           </div>
-          <button
-            onClick={calculate}
-            data-testid="button-calculate-bond"
-            className="bg-[#C6A15B] text-[#0E0E0E] px-8 py-3 text-sm font-bold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors w-full mb-8"
-          >
+          <button onClick={calculate} data-testid="button-calculate-bond" className="bg-[#C6A15B] text-[#0E0E0E] px-8 py-3 text-sm font-bold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors w-full mb-8">
             Calculate
           </button>
           <div className="text-[#B8B8B8] text-xs leading-relaxed space-y-2">
@@ -289,23 +600,12 @@ function BondCalculator() {
                 </div>
               </div>
               <p className="text-[#B8B8B8] text-xs mt-4 italic">Approximate bond cost quotation for bond of {fmt(result.bond)}</p>
-              <button onClick={() => window.print()} className="mt-4 flex items-center gap-2 text-[#C6A15B] text-xs uppercase tracking-widest border border-[#C6A15B]/30 px-4 py-2 hover:border-[#C6A15B] transition-colors">
+              <button onClick={handlePrint} className="mt-4 flex items-center gap-2 text-[#C6A15B] text-xs uppercase tracking-widest border border-[#C6A15B]/30 px-4 py-2 hover:border-[#C6A15B] transition-colors">
                 <Printer size={12} /> Print / Save PDF
               </button>
             </>
           ) : (
-            <div className="space-y-3">
-              {["Bond Attorney Fee", "Postages & Petties", "Deeds Office Fees", "Electronic Generation Fee", "Electronic Instruction Fee", "Deeds Office Searches"].map(l => (
-                <div key={l} className="flex justify-between py-3 border-b border-[#2A2A2A]">
-                  <span className="text-[#B8B8B8] text-sm">{l}</span>
-                  <span className="text-[#3A3A3A] text-sm">R</span>
-                </div>
-              ))}
-              <div className="flex justify-between py-4 bg-[#C6A15B]/5 px-3">
-                <span className="text-[#F7F4EE] font-semibold text-sm">Total Bond Costs (incl VAT)</span>
-                <span className="text-[#3A3A3A] font-bold">R</span>
-              </div>
-            </div>
+            <EmptyResults labels={["Bond Attorney Fee", "Postages & Petties", "Deeds Office Fees", "Electronic Generation Fee", "Electronic Instruction Fee", "Deeds Office Searches"]} totalLabel="Total Bond Costs (incl VAT)" />
           )}
         </div>
       </div>
@@ -313,7 +613,7 @@ function BondCalculator() {
   );
 }
 
-// ─── Bond Repayment Calculator ────────────────────────────────────────────────
+// ─── Bond Repayment Calculator ─────────────────────────────────────────────────
 const YEAR_OPTIONS = [5, 10, 20, 25, 30];
 
 function RepaymentCalculator() {
@@ -324,6 +624,9 @@ function RepaymentCalculator() {
     monthly: number;
     interestRepayment: number;
     totalRepayment: number;
+    bond: number;
+    years: number;
+    rate: string;
   }>(null);
 
   function calculate() {
@@ -335,7 +638,27 @@ function RepaymentCalculator() {
     const monthly = (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
     const totalRepayment = monthly * n;
     const interestRepayment = totalRepayment - P;
-    setResult({ monthly, interestRepayment, totalRepayment });
+    setResult({ monthly, interestRepayment, totalRepayment, bond: P, years, rate: rateStr });
+  }
+
+  function handlePrint() {
+    if (!result) return;
+    printReport({
+      title: "Bond Repayment Calculator",
+      subtitle: "Approximate monthly bond payment, interest repayment and total loan cost",
+      inputs: [
+        { label: "Bond Amount", value: fmt(result.bond) },
+        { label: "Repayment Term", value: `${result.years} years` },
+        { label: "Annual Interest Rate", value: `${result.rate}%` },
+      ],
+      rows: [
+        { label: "Interest Repayment (total over loan term)", value: result.interestRepayment },
+        { label: "Total Loan Repayment (principal + interest)", value: result.totalRepayment },
+      ],
+      total: result.monthly,
+      totalLabel: "Total Monthly Cost",
+      notes: `Monthly instalment of ${fmt(result.monthly)} payable over ${result.years} years (${result.years * 12} instalments) at ${result.rate}% per annum.`,
+    });
   }
 
   return (
@@ -349,28 +672,16 @@ function RepaymentCalculator() {
             <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Bond Amount</label>
             <div className="flex">
               <span className="bg-[#2A2A2A] border border-r-0 border-[#3A3A3A] text-[#B8B8B8] px-4 flex items-center text-sm">R</span>
-              <input
-                type="number"
-                value={bondStr}
-                onChange={e => setBondStr(e.target.value)}
-                placeholder="0"
-                className="flex-1 bg-[#0E0E0E] border border-[#3A3A3A] text-[#F7F4EE] px-4 py-3 focus:border-[#C6A15B] focus:outline-none transition-colors"
-              />
+              <input type="number" value={bondStr} onChange={e => setBondStr(e.target.value)} placeholder="0"
+                className="flex-1 bg-[#0E0E0E] border border-[#3A3A3A] text-[#F7F4EE] px-4 py-3 focus:border-[#C6A15B] focus:outline-none transition-colors" />
             </div>
           </div>
           <div className="mb-5">
             <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Years to Repay</label>
             <div className="flex gap-2">
               {YEAR_OPTIONS.map(y => (
-                <button
-                  key={y}
-                  onClick={() => setYears(y)}
-                  className={`flex-1 py-2 text-sm font-semibold border transition-colors ${
-                    years === y
-                      ? "bg-[#C6A15B] text-[#0E0E0E] border-[#C6A15B]"
-                      : "bg-[#0E0E0E] text-[#B8B8B8] border-[#3A3A3A] hover:border-[#C6A15B] hover:text-[#C6A15B]"
-                  }`}
-                >
+                <button key={y} onClick={() => setYears(y)}
+                  className={`flex-1 py-2 text-sm font-semibold border transition-colors ${years === y ? "bg-[#C6A15B] text-[#0E0E0E] border-[#C6A15B]" : "bg-[#0E0E0E] text-[#B8B8B8] border-[#3A3A3A] hover:border-[#C6A15B] hover:text-[#C6A15B]"}`}>
                   {y}
                 </button>
               ))}
@@ -380,21 +691,13 @@ function RepaymentCalculator() {
             <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Interest Rate</label>
             <div className="flex">
               <span className="bg-[#2A2A2A] border border-r-0 border-[#3A3A3A] text-[#B8B8B8] px-4 flex items-center text-sm">%</span>
-              <input
-                type="number"
-                step="0.25"
-                value={rateStr}
-                onChange={e => setRateStr(e.target.value)}
-                className="flex-1 bg-[#0E0E0E] border border-[#3A3A3A] text-[#F7F4EE] px-4 py-3 focus:border-[#C6A15B] focus:outline-none transition-colors"
-              />
+              <input type="number" step="0.25" value={rateStr} onChange={e => setRateStr(e.target.value)}
+                className="flex-1 bg-[#0E0E0E] border border-[#3A3A3A] text-[#F7F4EE] px-4 py-3 focus:border-[#C6A15B] focus:outline-none transition-colors" />
             </div>
             <p className="text-[#B8B8B8] text-xs mt-1">Current SA prime rate: 11.25%</p>
           </div>
-          <button
-            onClick={calculate}
-            data-testid="button-calculate-repayment"
-            className="bg-[#C6A15B] text-[#0E0E0E] px-8 py-3 text-sm font-bold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors w-full mb-8"
-          >
+          <button onClick={calculate} data-testid="button-calculate-repayment"
+            className="bg-[#C6A15B] text-[#0E0E0E] px-8 py-3 text-sm font-bold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors w-full mb-8">
             Calculate
           </button>
           <div className="text-[#B8B8B8] text-xs leading-relaxed space-y-2">
@@ -429,25 +732,32 @@ function RepaymentCalculator() {
                   <span className="text-[#C6A15B] font-bold text-lg tabular-nums" data-testid="text-monthly-repayment">{fmt(result.monthly)}</span>
                 </div>
               </div>
-              <button onClick={() => window.print()} className="mt-4 flex items-center gap-2 text-[#C6A15B] text-xs uppercase tracking-widest border border-[#C6A15B]/30 px-4 py-2 hover:border-[#C6A15B] transition-colors">
+              <button onClick={handlePrint} className="mt-4 flex items-center gap-2 text-[#C6A15B] text-xs uppercase tracking-widest border border-[#C6A15B]/30 px-4 py-2 hover:border-[#C6A15B] transition-colors">
                 <Printer size={12} /> Print / Save PDF
               </button>
             </>
           ) : (
-            <div className="space-y-3">
-              {["Interest Repayment", "Total Loan Repayment"].map(l => (
-                <div key={l} className="flex justify-between py-3 border-b border-[#2A2A2A]">
-                  <span className="text-[#B8B8B8] text-sm">{l}</span>
-                  <span className="text-[#3A3A3A] text-sm">R</span>
-                </div>
-              ))}
-              <div className="flex justify-between py-4 bg-[#C6A15B]/5 px-3">
-                <span className="text-[#F7F4EE] font-semibold text-sm">Total Monthly Cost</span>
-                <span className="text-[#3A3A3A] font-bold">R</span>
-              </div>
-            </div>
+            <EmptyResults labels={["Interest Repayment", "Total Loan Repayment"]} totalLabel="Total Monthly Cost" />
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Shared empty state ────────────────────────────────────────────────────────
+function EmptyResults({ labels, totalLabel }: { labels: string[]; totalLabel: string }) {
+  return (
+    <div className="space-y-3">
+      {labels.map(l => (
+        <div key={l} className="flex justify-between py-3 border-b border-[#2A2A2A]">
+          <span className="text-[#B8B8B8] text-sm">{l}</span>
+          <span className="text-[#3A3A3A] text-sm">R</span>
+        </div>
+      ))}
+      <div className="flex justify-between py-4 bg-[#C6A15B]/5 px-3">
+        <span className="text-[#F7F4EE] font-semibold text-sm">{totalLabel}</span>
+        <span className="text-[#3A3A3A] font-bold">R</span>
       </div>
     </div>
   );
@@ -474,32 +784,21 @@ export default function CalculatorPage() {
           </p>
         </div>
 
-        {/* Tab bar */}
         <div className="flex border-b border-[#2A2A2A] mb-10 overflow-x-auto">
           {tabs.map(t => (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              data-testid={`tab-${t.id}`}
-              className={`px-6 py-4 text-xs uppercase tracking-widest whitespace-nowrap border-b-2 transition-colors -mb-px ${
-                tab === t.id
-                  ? "border-[#C6A15B] text-[#C6A15B]"
-                  : "border-transparent text-[#B8B8B8] hover:text-[#F7F4EE]"
-              }`}
-            >
+            <button key={t.id} onClick={() => setTab(t.id)} data-testid={`tab-${t.id}`}
+              className={`px-6 py-4 text-xs uppercase tracking-widest whitespace-nowrap border-b-2 transition-colors -mb-px ${tab === t.id ? "border-[#C6A15B] text-[#C6A15B]" : "border-transparent text-[#B8B8B8] hover:text-[#F7F4EE]"}`}>
               {t.label}
             </button>
           ))}
         </div>
 
-        {/* Tab content */}
         <div className="bg-[#151515] border border-[#2A2A2A] p-8 md:p-12">
           {tab === "transfer" && <TransferCalculator />}
           {tab === "bond" && <BondCalculator />}
           {tab === "repayment" && <RepaymentCalculator />}
         </div>
 
-        {/* Rate sources */}
         <div className="mt-6 text-[#B8B8B8] text-xs leading-relaxed border border-[#2A2A2A] p-6">
           <p className="font-semibold text-[#F7F4EE] mb-2">Rate Sources</p>
           <ul className="space-y-1">
@@ -510,15 +809,12 @@ export default function CalculatorPage() {
           </ul>
         </div>
 
-        {/* CTA */}
         <div className="mt-8 border border-[#2A2A2A] p-8 text-center">
           <h3 className="text-xl font-serif text-[#F7F4EE] mb-3">Need a Precise Quote?</h3>
           <p className="text-[#B8B8B8] text-sm mb-6">Our conveyancing team will provide a detailed cost estimate for your specific transaction.</p>
-          <a
-            href="mailto:nike@npinc.co.za"
+          <a href="mailto:nike@npinc.co.za"
             className="inline-flex items-center gap-3 bg-[#C6A15B] text-[#0E0E0E] px-8 py-4 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors"
-            data-testid="link-contact-quote"
-          >
+            data-testid="link-contact-quote">
             Get a Quote
           </a>
         </div>
