@@ -4,15 +4,15 @@ import { Link } from "wouter";
 import { ArrowRight } from "lucide-react";
 import PublicLayout from "@/components/PublicLayout";
 
-const ROLES = ["All", "Partner", "Director", "Associate", "CandidateAttorney", "Consultant", "Support"] as const;
+const ROLES = ["All", "partners", "directors", "associates", "candidate_attorneys", "consultants", "support"] as const;
 const ROLE_LABELS: Record<string, string> = {
   All: "All",
-  Partner: "Partners",
-  Director: "Directors",
-  Associate: "Associates",
-  CandidateAttorney: "Candidate Attorneys",
-  Consultant: "Consultants",
-  Support: "Support",
+  partners: "Partners",
+  directors: "Directors",
+  associates: "Associates",
+  candidate_attorneys: "Candidate Attorneys",
+  consultants: "Consultants",
+  support: "Support",
 };
 
 export default function PeoplePage() {
