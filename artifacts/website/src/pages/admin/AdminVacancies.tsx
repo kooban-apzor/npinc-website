@@ -6,7 +6,7 @@ import { Plus, Pencil, Trash2, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type Form = { slug: string; title: string; department: string; location: string; type: string; summary: string; description: string; closingDate: string; isPublished: boolean };
-const empty: Form = { slug: "", title: "", department: "", location: "Johannesburg, South Africa", type: "Full-time", summary: "", description: "", closingDate: "", isPublished: true };
+const empty: Form = { slug: "", title: "", department: "", location: "Durban, South Africa", type: "Full-time", summary: "", description: "", closingDate: "", isPublished: true };
 
 export default function AdminVacancies() {
   const { data: vacancies, isLoading } = useAdminListVacancies();

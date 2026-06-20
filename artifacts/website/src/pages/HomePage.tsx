@@ -62,7 +62,7 @@ export default function HomePage() {
             <span>B-BBEE Level 1 Provider</span>
           </div>
           <span className="hidden md:block text-[#2A2A2A]">|</span>
-          <span>Johannesburg, South Africa</span>
+          <span>Durban, South Africa</span>
           <span className="hidden md:block text-[#2A2A2A]">|</span>
           <a href="tel:0823820843" className="hover:text-[#C6A15B] transition-colors flex items-center gap-2">
             <Phone size={12} /> 082 382 0843

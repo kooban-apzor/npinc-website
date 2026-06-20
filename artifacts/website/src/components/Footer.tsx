@@ -70,7 +70,7 @@ export default function Footer() {
               <Mail size={14} className="text-[#C6A15B] shrink-0" />
               <a href="mailto:nike@npinc.co.za" className="hover:text-[#C6A15B] transition-colors">nike@npinc.co.za</a>
             </li>
-            <li className="text-[#B8B8B8]">Johannesburg, South Africa</li>
+            <li className="text-[#B8B8B8]">Durban, South Africa</li>
           </ul>
         </div>
       </div>
