@@ -37,8 +37,14 @@ export interface SiteSettings {
   id: number;
   firmName?: string;
   tagline?: string;
+  heroBadgeText?: string;
   heroHeading?: string;
   heroSubheading?: string;
+  heroImageUrl?: string;
+  heroCtaPrimaryText?: string;
+  heroCtaPrimaryLink?: string;
+  heroCtaSecondaryText?: string;
+  heroCtaSecondaryLink?: string;
   email?: string;
   phone?: string;
   phone2?: string;
@@ -47,14 +53,34 @@ export interface SiteSettings {
   linkedinUrl?: string;
   facebookUrl?: string;
   twitterUrl?: string;
+  seoHomeTitle?: string;
+  seoHomeDescription?: string;
+  seoPeopleTitle?: string;
+  seoPeopleDescription?: string;
+  seoServicesTitle?: string;
+  seoServicesDescription?: string;
+  seoInsightsTitle?: string;
+  seoInsightsDescription?: string;
+  seoCalculatorTitle?: string;
+  seoCalculatorDescription?: string;
+  seoCareersTitle?: string;
+  seoCareersDescription?: string;
+  seoContactTitle?: string;
+  seoContactDescription?: string;
   updatedAt?: string;
 }
 
 export interface UpdateSiteSettingsRequest {
   firmName?: string;
   tagline?: string;
+  heroBadgeText?: string;
   heroHeading?: string;
   heroSubheading?: string;
+  heroImageUrl?: string;
+  heroCtaPrimaryText?: string;
+  heroCtaPrimaryLink?: string;
+  heroCtaSecondaryText?: string;
+  heroCtaSecondaryLink?: string;
   email?: string;
   phone?: string;
   phone2?: string;
@@ -63,6 +89,20 @@ export interface UpdateSiteSettingsRequest {
   linkedinUrl?: string;
   facebookUrl?: string;
   twitterUrl?: string;
+  seoHomeTitle?: string;
+  seoHomeDescription?: string;
+  seoPeopleTitle?: string;
+  seoPeopleDescription?: string;
+  seoServicesTitle?: string;
+  seoServicesDescription?: string;
+  seoInsightsTitle?: string;
+  seoInsightsDescription?: string;
+  seoCalculatorTitle?: string;
+  seoCalculatorDescription?: string;
+  seoCareersTitle?: string;
+  seoCareersDescription?: string;
+  seoContactTitle?: string;
+  seoContactDescription?: string;
 }
 
 export interface Service {

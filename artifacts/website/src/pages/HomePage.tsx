@@ -1,49 +1,60 @@
-import { useListServices, useListPeople, useListArticles, useListAwards } from "@workspace/api-client-react";
+import { useListServices, useListPeople, useListArticles, useListAwards, useGetSiteSettings } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import { ArrowRight, Phone, Mail, Shield } from "lucide-react";
 import PublicLayout from "@/components/PublicLayout";
+import PageSEO from "@/components/PageSEO";
 
 export default function HomePage() {
   const { data: services } = useListServices();
   const { data: people } = useListPeople({});
   const { data: articles } = useListArticles({});
   const { data: awards } = useListAwards();
+  const { data: settings } = useGetSiteSettings();
+
+  const heroImage = settings?.heroImageUrl || "/npinc/hero-property.jpg";
+  const badgeText = settings?.heroBadgeText || "South African Commercial Law";
+  const heading = settings?.heroHeading || "Trusted by Serious Business";
+  const subheading = settings?.heroSubheading || "Nike Pillay Inc delivers authoritative, sophisticated legal counsel to corporations, investors, and entrepreneurs across South Africa.";
+  const ctaPrimaryText = settings?.heroCtaPrimaryText || "Our Practice Areas";
+  const ctaPrimaryLink = settings?.heroCtaPrimaryLink || "/services";
+  const ctaSecondaryText = settings?.heroCtaSecondaryText || "Get in Touch";
+  const ctaSecondaryLink = settings?.heroCtaSecondaryLink || "/contact";
 
   return (
     <PublicLayout>
+      <PageSEO page="home" />
       {/* Hero */}
       <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden">
         <img
-          src="/npinc/hero-property.jpg"
+          src={heroImage}
           alt=""
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0E0E0E]/80 via-[#0E0E0E]/60 to-[#0E0E0E]/90" />
         <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
           <div className="inline-block border border-[#C6A15B]/30 text-[#C6A15B] text-xs tracking-[0.25em] uppercase px-6 py-2 mb-10 font-medium">
-            South African Commercial Law
+            {badgeText}
           </div>
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-[#F7F4EE] leading-[1.05] mb-8 tracking-tight" data-testid="text-hero-heading">
-            Trusted by<br />
-            <span className="italic text-[#C6A15B]">Serious Business</span>
+            {heading}
           </h1>
           <p className="text-lg md:text-xl text-[#B8B8B8] mb-12 max-w-2xl mx-auto leading-relaxed" data-testid="text-hero-subheading">
-            Nike Pillay Inc delivers authoritative, sophisticated legal counsel to corporations, investors, and entrepreneurs across South Africa.
+            {subheading}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/services"
+              href={ctaPrimaryLink}
               data-testid="link-hero-services"
               className="inline-flex items-center gap-3 bg-[#C6A15B] text-[#0E0E0E] px-8 py-4 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors"
             >
-              Our Practice Areas <ArrowRight size={16} />
+              {ctaPrimaryText} <ArrowRight size={16} />
             </Link>
             <Link
-              href="/contact"
+              href={ctaSecondaryLink}
               data-testid="link-hero-contact"
               className="inline-flex items-center gap-3 border border-[#2A2A2A] text-[#F7F4EE] px-8 py-4 text-sm font-semibold uppercase tracking-widest hover:border-[#C6A15B] hover:text-[#C6A15B] transition-colors"
             >
-              Get in Touch
+              {ctaSecondaryText}
             </Link>
           </div>
         </div>

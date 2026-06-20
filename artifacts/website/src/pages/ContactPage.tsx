@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useSubmitContact } from "@workspace/api-client-react";
 import { Phone, Mail, MapPin } from "lucide-react";
 import PublicLayout from "@/components/PublicLayout";
+import PageSEO from "@/components/PageSEO";
 import { useToast } from "@/hooks/use-toast";
 
 export default function ContactPage() {
@@ -26,6 +27,7 @@ export default function ContactPage() {
 
   return (
     <PublicLayout>
+      <PageSEO page="contact" />
       <section className="py-24 px-6 max-w-7xl mx-auto">
         <div className="mb-16">
           <p className="text-[#C6A15B] text-xs uppercase tracking-[0.25em] mb-4">Get in Touch</p>

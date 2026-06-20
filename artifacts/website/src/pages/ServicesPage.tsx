@@ -2,12 +2,14 @@ import { useListServices } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import { ArrowRight } from "lucide-react";
 import PublicLayout from "@/components/PublicLayout";
+import PageSEO from "@/components/PageSEO";
 
 export default function ServicesPage() {
   const { data: services, isLoading } = useListServices();
 
   return (
     <PublicLayout>
+      <PageSEO page="services" />
       <section className="py-24 px-6 max-w-7xl mx-auto">
         <div className="mb-16">
           <p className="text-[#C6A15B] text-xs uppercase tracking-[0.25em] mb-4">What We Do</p>

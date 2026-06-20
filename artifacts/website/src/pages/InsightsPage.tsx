@@ -3,6 +3,7 @@ import { useListArticles, getListArticlesQueryKey } from "@workspace/api-client-
 import { Link } from "wouter";
 import { ArrowRight } from "lucide-react";
 import PublicLayout from "@/components/PublicLayout";
+import PageSEO from "@/components/PageSEO";
 
 const CATEGORIES = ["All", "LegalUpdate", "FirmNews", "StaffMovement", "Notice", "Event", "Award", "Career"] as const;
 const CATEGORY_LABELS: Record<string, string> = {
@@ -25,6 +26,7 @@ export default function InsightsPage() {
 
   return (
     <PublicLayout>
+      <PageSEO page="insights" />
       <section className="py-24 px-6 max-w-7xl mx-auto">
         <div className="mb-16">
           <p className="text-[#C6A15B] text-xs uppercase tracking-[0.25em] mb-4">Publications</p>

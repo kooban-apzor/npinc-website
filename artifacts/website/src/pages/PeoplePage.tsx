@@ -3,6 +3,7 @@ import { useListPeople, getListPeopleQueryKey } from "@workspace/api-client-reac
 import { Link } from "wouter";
 import { ArrowRight } from "lucide-react";
 import PublicLayout from "@/components/PublicLayout";
+import PageSEO from "@/components/PageSEO";
 
 const ROLES = ["All", "partners", "directors", "associates", "candidate_attorneys", "consultants", "support"] as const;
 const ROLE_LABELS: Record<string, string> = {
@@ -24,6 +25,7 @@ export default function PeoplePage() {
 
   return (
     <PublicLayout>
+      <PageSEO page="people" />
       <section className="py-24 px-6 max-w-7xl mx-auto">
         <div className="mb-16">
           <p className="text-[#C6A15B] text-xs uppercase tracking-[0.25em] mb-4">The Firm</p>

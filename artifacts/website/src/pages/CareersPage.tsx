@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { ArrowRight, MapPin, Briefcase, Clock, Upload } from "lucide-react";
 import { useState } from "react";
 import PublicLayout from "@/components/PublicLayout";
+import PageSEO from "@/components/PageSEO";
 import { useToast } from "@/hooks/use-toast";
 
 export default function CareersPage() {
@@ -28,6 +29,7 @@ export default function CareersPage() {
 
   return (
     <PublicLayout>
+      <PageSEO page="careers" />
       {/* Hero */}
       <section className="py-24 px-6 max-w-7xl mx-auto">
         <div className="mb-16">

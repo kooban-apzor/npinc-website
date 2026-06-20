@@ -1,5 +1,6 @@
 import { useState } from "react";
 import PublicLayout from "@/components/PublicLayout";
+import PageSEO from "@/components/PageSEO";
 import { Printer } from "lucide-react";
 
 type Tab = "transfer" | "bond" | "repayment";
@@ -775,6 +776,7 @@ export default function CalculatorPage() {
 
   return (
     <PublicLayout>
+      <PageSEO page="calculator" />
       <section className="py-24 px-6 max-w-6xl mx-auto">
         <div className="mb-12">
           <p className="text-[#C6A15B] text-xs uppercase tracking-[0.25em] mb-4">Tools</p>
