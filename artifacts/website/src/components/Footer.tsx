@@ -21,10 +21,12 @@ export default function Footer() {
           <ul className="space-y-3 text-sm text-[#B8B8B8]">
             {[
               ["Litigation", "/services/litigation"],
-              ["Labour Law", "/services/labour-law"],
+              ["Labour", "/services/labour"],
               ["Property & Conveyancing", "/services/property-conveyancing"],
-              ["Corporate & Commercial", "/services/corporate-commercial"],
-              ["Tax Advisory", "/services/tax-advisory"],
+              ["Corporate & Commercial Law", "/services/corporate-commercial"],
+              ["Tax", "/services/tax"],
+              ["Project Finance", "/services/project-finance"],
+              ["Estate Planning", "/services/estate-planning"],
             ].map(([label, href]) => (
               <li key={href}>
                 <Link href={href!} className="hover:text-[#C6A15B] transition-colors">
