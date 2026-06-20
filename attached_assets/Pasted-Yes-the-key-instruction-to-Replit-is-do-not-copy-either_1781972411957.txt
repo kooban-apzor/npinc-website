@@ -1,0 +1,204 @@
+Yes — the key instruction to Replit is: **do not copy either site, but blend Paceline’s visual storytelling with Cox Yeats’ corporate/legal structure**, while modernising the current NP Inc content.
+
+Paste this after your first Replit prompt:
+
+Additional design direction for look and feel:
+
+Study the design direction from these reference sites:
+
+* pacelinelaw.com
+* coxyeats.co.za
+* current site: npinc.co.za
+
+Do not copy them directly. Use them only as visual inspiration.
+
+Design interpretation:
+Paceline Law has a strong lifestyle/visual storytelling feel, with large images, warm human messaging, strong calls to action and personality. Cox Yeats has a polished South African commercial law firm feel, with strong practice-area structure, people pages, careers, awards, offices and professional credibility.
+
+The new Nike Pillay Inc website must combine:
+
+* Paceline-style visual warmth, photography, movement and storytelling
+* Cox Yeats-style legal professionalism, structured services and team credibility
+* Nike Pillay’s existing black/gold identity and current assets
+
+Visual style:
+
+* Premium, modern law firm
+* Strong use of photography
+* Large hero sections
+* Dark charcoal / black base
+* Warm gold accent colour
+* Clean white content sections for readability
+* Elegant typography
+* Editorial-style article cards
+* Team profile cards
+* Modern service cards
+* Subtle animations
+* Strong mobile layout
+
+Colour palette:
+
+* Deep charcoal: #0E0E0E
+* Soft black: #151515
+* Warm gold: #C6A15B
+* Muted gold: #9F7E3F
+* Ivory/off-white: #F7F4EE
+* White: #FFFFFF
+* Text grey: #B8B8B8
+* Border grey: #2A2A2A
+
+Typography:
+Use a premium serif font for headings and a clean sans-serif for body text.
+Suggested:
+
+* Headings: Playfair Display, Cormorant Garamond, or Libre Baskerville
+* Body: Inter, Lato, or Source Sans 3
+
+Homepage design:
+The homepage must not look flat or text-heavy.
+
+Create:
+
+1. Full-width cinematic hero section
+
+   * Use a legal/corporate/law image from the current site assets if available
+   * Dark overlay
+   * Large heading
+   * Short positioning statement
+   * Two CTA buttons
+
+2. Visual intro section
+
+   * “Who We Are”
+   * “What We Do”
+   * Use side-by-side layout with image and text
+
+3. Capabilities / Practice Areas
+
+   * Large modern grid
+   * Each card should have icon/image, title, short summary, and link
+
+4. Core Team preview
+
+   * Professional attorney cards
+   * Image, name, role, practice area
+   * CTA to view all people
+
+5. Insights / Legal Updates
+
+   * Editorial card layout
+   * Featured article larger than the others
+   * Include blogs, notices, awards and staff announcements
+
+6. Conveyancing Calculator CTA
+
+   * Separate strong visual block
+   * “Estimate your transfer and bond costs”
+   * Button to calculator
+
+7. Careers / CV CTA
+
+   * “Build your career with us”
+   * Button: View Vacancies
+   * Button: Submit CV
+
+8. Contact strip
+
+   * Phone, email, address, consultation/contact CTA
+
+People pages:
+Use a Cox Yeats-style structured people directory, but visually more modern.
+Include filters:
+
+* Partners
+* Directors
+* Associates
+* Candidate Attorneys
+* Consultants
+* Support Team
+* Practice Area
+
+Each profile page must feel premium:
+
+* Large portrait
+* Name/title
+* Qualifications
+* Admission details
+* Expertise
+* Bio
+* Contact button
+* Related articles/services
+
+Services pages:
+Use Cox Yeats-style capability depth.
+Each service page must have:
+
+* Strong hero image
+* Clear summary
+* “How we assist”
+* “Typical matters”
+* Related team members
+* Related insights
+* Contact CTA
+
+Insights:
+Use a magazine/editorial style.
+Categories:
+
+* Legal Updates
+* Firm News
+* Staff Movements
+* Notices
+* Events
+* Awards
+* Careers
+
+Admin CMS:
+Make every visible content section manageable from admin:
+
+* Hero text/images
+* Homepage sections
+* Services
+* People
+* Articles
+* Events
+* Notices
+* Awards
+* Jobs
+* CV submissions
+* Calculator rates
+* Documents
+* Navigation
+* Footer
+* SEO
+
+Hidden admin:
+Pressing Ctrl + Alt + A must reveal/open the admin login.
+The public navigation must never show Admin.
+The shortcut must not bypass security. It only opens the admin login.
+
+Important design warning:
+Do not recreate the current old site layout.
+The old site is too narrow, too dark, too static and too plain.
+Use its logo, black/gold identity and content only.
+The new site must feel premium, spacious, visual, responsive and modern.
+
+Mobile:
+Mobile must be a priority.
+Do not simply shrink the desktop layout.
+Use:
+
+* Large readable headings
+* Stacked cards
+* Thumb-friendly buttons
+* Sticky contact CTA
+* Clean hamburger menu
+* Fast-loading images
+
+The final result should feel like:
+A modern South African commercial law firm website with strong visual storytelling, strong content management, premium black/gold brand identity, and enough marketing polish to attract corporate clients, candidates and event attendees.
+
+Use the current site capture as content reference: the existing NP Inc site already has About, Our People, Our Services, News, Tools/Calculators, Events, Awards, Firm Documents and Contact sections, but it needs a more spacious, visual and CMS-driven rebuild.  Cox Yeats is useful for the structured commercial-law-firm model, including people, practice areas, careers and awards. ([coxyeats.co.za][1]) Paceline is useful for the warmer image-led storytelling and strong CTA feel. ([pacelinelaw.com][2])
+
+[1]: https://coxyeats.co.za/?utm_source=chatgpt.com "Home - CoxYeats"
+[2]: https://pacelinelaw.com/?utm_source=chatgpt.com "Paceline Law: A Lawyer for Bike People​"
