@@ -1663,6 +1663,16 @@ components:
           type: integer
         isPublished:
           type: boolean
+        joinedAt:
+          type: string
+          nullable: true
+        leftAt:
+          type: string
+          nullable: true
+        memberStatus:
+          type: string
+          nullable: true
+          enum: [just_joined, left, null]
         createdAt:
           type: string
         updatedAt:
@@ -1702,6 +1712,12 @@ components:
           type: integer
         isPublished:
           type: boolean
+        joinedAt:
+          type: string
+          nullable: true
+        leftAt:
+          type: string
+          nullable: true
       required: [slug, firstName, lastName, role]
 
     Article:

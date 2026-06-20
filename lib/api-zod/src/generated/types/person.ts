@@ -5,6 +5,7 @@
  * Nike Pillay Inc Law Firm API
  * OpenAPI spec version: 0.1.0
  */
+import type { PersonMemberStatus } from './personMemberStatus';
 
 export interface Person {
   id: number;
@@ -22,6 +23,9 @@ export interface Person {
   practiceAreas?: string[];
   sortOrder?: number;
   isPublished?: boolean;
+  joinedAt?: string | null;
+  leftAt?: string | null;
+  memberStatus?: PersonMemberStatus;
   createdAt?: string;
   updatedAt?: string;
 }

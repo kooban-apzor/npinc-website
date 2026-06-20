@@ -21,4 +21,6 @@ export interface UpsertPersonRequest {
   practiceAreas?: string[];
   sortOrder?: number;
   isPublished?: boolean;
+  joinedAt?: string | null;
+  leftAt?: string | null;
 }

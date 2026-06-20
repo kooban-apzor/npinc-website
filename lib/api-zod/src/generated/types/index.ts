@@ -24,6 +24,7 @@ export * from './listArticlesParams';
 export * from './listEventsParams';
 export * from './listPeopleParams';
 export * from './person';
+export * from './personMemberStatus';
 export * from './service';
 export * from './siteSettings';
 export * from './successResponse';

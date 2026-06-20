@@ -43,7 +43,15 @@ export default function PersonDetailPage({ slug }: Props) {
             {person.firstName[0]}{person.lastName[0]}
           </div>
           <div>
-            <p className="text-[#C6A15B] text-xs uppercase tracking-[0.25em] mb-3">{person.role}</p>
+            <div className="flex items-center gap-3 mb-3 flex-wrap">
+              <p className="text-[#C6A15B] text-xs uppercase tracking-[0.25em]">{person.role}</p>
+              {(person as never as Record<string, unknown>).memberStatus === "just_joined" && (
+                <span className="text-[0.65rem] bg-[#C6A15B]/15 text-[#C6A15B] border border-[#C6A15B]/30 px-3 py-1 uppercase tracking-widest">Just Joined</span>
+              )}
+              {(person as never as Record<string, unknown>).memberStatus === "left" && (
+                <span className="text-[0.65rem] bg-[#555]/20 text-[#B8B8B8] border border-[#555]/40 px-3 py-1 uppercase tracking-widest">Left the Practice</span>
+              )}
+            </div>
             <h1 className="text-4xl md:text-5xl font-serif text-[#F7F4EE] mb-3" data-testid="text-person-name">
               {person.title ? `${person.title} ` : ""}{person.firstName} {person.lastName}
             </h1>

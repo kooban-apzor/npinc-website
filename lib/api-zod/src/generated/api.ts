@@ -316,6 +316,9 @@ export const ListPeopleResponseItem = zod.object({
   "practiceAreas": zod.array(zod.string()).optional(),
   "sortOrder": zod.number().optional(),
   "isPublished": zod.boolean().optional(),
+  "joinedAt": zod.string().nullish(),
+  "leftAt": zod.string().nullish(),
+  "memberStatus": zod.union([zod.literal('just_joined'),zod.literal('left'),zod.literal(null)]).nullish(),
   "createdAt": zod.string().optional(),
   "updatedAt": zod.string().optional()
 })
@@ -345,6 +348,9 @@ export const GetPersonResponse = zod.object({
   "practiceAreas": zod.array(zod.string()).optional(),
   "sortOrder": zod.number().optional(),
   "isPublished": zod.boolean().optional(),
+  "joinedAt": zod.string().nullish(),
+  "leftAt": zod.string().nullish(),
+  "memberStatus": zod.union([zod.literal('just_joined'),zod.literal('left'),zod.literal(null)]).nullish(),
   "createdAt": zod.string().optional(),
   "updatedAt": zod.string().optional()
 })
@@ -369,6 +375,9 @@ export const AdminListPeopleResponseItem = zod.object({
   "practiceAreas": zod.array(zod.string()).optional(),
   "sortOrder": zod.number().optional(),
   "isPublished": zod.boolean().optional(),
+  "joinedAt": zod.string().nullish(),
+  "leftAt": zod.string().nullish(),
+  "memberStatus": zod.union([zod.literal('just_joined'),zod.literal('left'),zod.literal(null)]).nullish(),
   "createdAt": zod.string().optional(),
   "updatedAt": zod.string().optional()
 })
@@ -392,7 +401,9 @@ export const CreatePersonBody = zod.object({
   "phone": zod.string().optional(),
   "practiceAreas": zod.array(zod.string()).optional(),
   "sortOrder": zod.number().optional(),
-  "isPublished": zod.boolean().optional()
+  "isPublished": zod.boolean().optional(),
+  "joinedAt": zod.string().nullish(),
+  "leftAt": zod.string().nullish()
 })
 
 
@@ -417,7 +428,9 @@ export const UpdatePersonBody = zod.object({
   "phone": zod.string().optional(),
   "practiceAreas": zod.array(zod.string()).optional(),
   "sortOrder": zod.number().optional(),
-  "isPublished": zod.boolean().optional()
+  "isPublished": zod.boolean().optional(),
+  "joinedAt": zod.string().nullish(),
+  "leftAt": zod.string().nullish()
 })
 
 export const UpdatePersonResponse = zod.object({
@@ -436,6 +449,9 @@ export const UpdatePersonResponse = zod.object({
   "practiceAreas": zod.array(zod.string()).optional(),
   "sortOrder": zod.number().optional(),
   "isPublished": zod.boolean().optional(),
+  "joinedAt": zod.string().nullish(),
+  "leftAt": zod.string().nullish(),
+  "memberStatus": zod.union([zod.literal('just_joined'),zod.literal('left'),zod.literal(null)]).nullish(),
   "createdAt": zod.string().optional(),
   "updatedAt": zod.string().optional()
 })

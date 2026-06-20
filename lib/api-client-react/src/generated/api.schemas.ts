@@ -132,6 +132,14 @@ export interface UpsertServiceRequest {
   isPublished?: boolean;
 }
 
+export type PersonMemberStatus = typeof PersonMemberStatus[keyof typeof PersonMemberStatus] | null;
+
+
+export const PersonMemberStatus = {
+  just_joined: 'just_joined',
+  left: 'left',
+} as const;
+
 export interface Person {
   id: number;
   slug: string;
@@ -148,6 +156,9 @@ export interface Person {
   practiceAreas?: string[];
   sortOrder?: number;
   isPublished?: boolean;
+  joinedAt?: string | null;
+  leftAt?: string | null;
+  memberStatus?: PersonMemberStatus;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -167,6 +178,8 @@ export interface UpsertPersonRequest {
   practiceAreas?: string[];
   sortOrder?: number;
   isPublished?: boolean;
+  joinedAt?: string | null;
+  leftAt?: string | null;
 }
 
 export interface Article {
