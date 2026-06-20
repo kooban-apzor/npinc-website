@@ -70,9 +70,17 @@ export default function PeoplePage() {
                 data-testid={`card-person-${person.id}`}
                 className="group border border-[#2A2A2A] hover:border-[#C6A15B]/40 transition-colors p-8"
               >
-                <div className="w-16 h-16 bg-[#C6A15B]/10 border border-[#C6A15B]/20 flex items-center justify-center mb-6 text-[#C6A15B] font-serif text-2xl">
-                  {person.firstName[0]}{person.lastName[0]}
-                </div>
+                {person.photoUrl ? (
+                  <img
+                    src={person.photoUrl}
+                    alt={`${person.firstName} ${person.lastName}`}
+                    className="w-20 h-20 object-cover object-top mb-6 grayscale group-hover:grayscale-0 transition-all duration-500"
+                  />
+                ) : (
+                  <div className="w-16 h-16 bg-[#C6A15B]/10 border border-[#C6A15B]/20 flex items-center justify-center mb-6 text-[#C6A15B] font-serif text-2xl">
+                    {person.firstName[0]}{person.lastName[0]}
+                  </div>
+                )}
                 <p className="text-[#C6A15B] text-xs uppercase tracking-widest mb-1">{ROLE_LABELS[person.role] ?? person.role}</p>
                 <h2 className="text-xl font-serif text-[#F7F4EE] mb-2 group-hover:text-[#C6A15B] transition-colors">
                   {person.title ? `${person.title} ` : ""}{person.firstName} {person.lastName}

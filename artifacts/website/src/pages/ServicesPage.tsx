@@ -34,8 +34,19 @@ export default function ServicesPage() {
                 key={service.id}
                 href={`/services/${service.slug}`}
                 data-testid={`card-service-${service.id}`}
-                className="group bg-[#0E0E0E] p-10 hover:bg-[#151515] transition-colors"
+                className="group bg-[#0E0E0E] hover:bg-[#151515] transition-colors overflow-hidden"
               >
+                {service.heroImageUrl && (
+                  <div className="relative h-44 overflow-hidden">
+                    <img
+                      src={service.heroImageUrl}
+                      alt={service.title}
+                      className="w-full h-full object-cover object-center grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0E0E0E] via-[#0E0E0E]/30 to-transparent" />
+                  </div>
+                )}
+                <div className="p-10">
                 <div className="text-[#C6A15B] text-3xl font-serif mb-6 opacity-30">
                   {String(i + 1).padStart(2, "0")}
                 </div>
@@ -56,6 +67,7 @@ export default function ServicesPage() {
                 <span className="text-[#C6A15B] text-xs uppercase tracking-widest inline-flex items-center gap-2 group-hover:gap-3 transition-all">
                   View Practice Area <ArrowRight size={12} />
                 </span>
+                </div>
               </Link>
             ))}
           </div>
