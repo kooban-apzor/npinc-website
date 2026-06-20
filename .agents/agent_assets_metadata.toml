@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "bj6SbunQmijPjcqsxzkoA"
+uri = "file://artifacts/website/src/assets/hero-bg.png"
+type = "image"
+title = "Law firm hero background"

@@ -1,0 +1,3 @@
+- [OpenAPI Zod response parsing](openapi-response-zod.md) — never `.parse()` DB rows in Express responses; Drizzle returns Date/null that strict Zod schemas reject.
+- [Logo asset alias](logo-asset-alias.md) — @assets alias points to attached_assets/; logo is np-inc-logo.svg there.
+- [Admin mutations use id not slug](admin-id-mutation.md) — all PUT/DELETE admin endpoints use numeric id, not slug; admin pages must track id in modal state.

@@ -3,20 +3,26 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Nike Pillay Inc Law Firm API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Admin authentication
+  - name: public
+    description: Public read endpoints
+  - name: admin
+    description: Admin CMS (protected)
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +30,1351 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ─── Auth ────────────────────────────────────────────────────────────────────
+
+  /admin/login:
+    post:
+      operationId: adminLogin
+      tags: [auth]
+      summary: Admin login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLoginRequest"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUser"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /admin/logout:
+    post:
+      operationId: adminLogout
+      tags: [auth]
+      summary: Admin logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /admin/me:
+    get:
+      operationId: getAdminMe
+      tags: [auth]
+      summary: Get current admin user
+      responses:
+        "200":
+          description: Current admin user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUser"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # ─── Site Settings (public) ──────────────────────────────────────────────────
+
+  /site-settings:
+    get:
+      operationId: getSiteSettings
+      tags: [public]
+      summary: Get site-wide settings
+      responses:
+        "200":
+          description: Site settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteSettings"
+
+  /admin/site-settings:
+    put:
+      operationId: updateSiteSettings
+      tags: [admin]
+      summary: Update site settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSiteSettingsRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteSettings"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # ─── Services ────────────────────────────────────────────────────────────────
+
+  /services:
+    get:
+      operationId: listServices
+      tags: [public]
+      summary: List all practice areas / services
+      responses:
+        "200":
+          description: Services list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Service"
+
+  /services/{slug}:
+    get:
+      operationId: getService
+      tags: [public]
+      summary: Get a single service by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Service detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /admin/services:
+    get:
+      operationId: adminListServices
+      tags: [admin]
+      summary: Admin list services
+      responses:
+        "200":
+          description: Services list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Service"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      operationId: createService
+      tags: [admin]
+      summary: Create a service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertServiceRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /admin/services/{id}:
+    put:
+      operationId: updateService
+      tags: [admin]
+      summary: Update a service
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertServiceRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      operationId: deleteService
+      tags: [admin]
+      summary: Delete a service
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # ─── People ──────────────────────────────────────────────────────────────────
+
+  /people:
+    get:
+      operationId: listPeople
+      tags: [public]
+      summary: List all people
+      parameters:
+        - name: role
+          in: query
+          schema:
+            type: string
+        - name: serviceId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: People list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Person"
+
+  /people/{slug}:
+    get:
+      operationId: getPerson
+      tags: [public]
+      summary: Get a person by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Person detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Person"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /admin/people:
+    get:
+      operationId: adminListPeople
+      tags: [admin]
+      summary: Admin list people
+      responses:
+        "200":
+          description: People list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Person"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      operationId: createPerson
+      tags: [admin]
+      summary: Create a person
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertPersonRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Person"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /admin/people/{id}:
+    put:
+      operationId: updatePerson
+      tags: [admin]
+      summary: Update a person
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertPersonRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Person"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      operationId: deletePerson
+      tags: [admin]
+      summary: Delete a person
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # ─── Articles ─────────────────────────────────────────────────────────────────
+
+  /articles:
+    get:
+      operationId: listArticles
+      tags: [public]
+      summary: List articles
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Articles list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Article"
+
+  /articles/{slug}:
+    get:
+      operationId: getArticle
+      tags: [public]
+      summary: Get article by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Article detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /admin/articles:
+    get:
+      operationId: adminListArticles
+      tags: [admin]
+      summary: Admin list articles
+      responses:
+        "200":
+          description: Articles list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Article"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      operationId: createArticle
+      tags: [admin]
+      summary: Create an article
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertArticleRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /admin/articles/{id}:
+    put:
+      operationId: updateArticle
+      tags: [admin]
+      summary: Update an article
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertArticleRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Article"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      operationId: deleteArticle
+      tags: [admin]
+      summary: Delete an article
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # ─── Events ──────────────────────────────────────────────────────────────────
+
+  /events:
+    get:
+      operationId: listEvents
+      tags: [public]
+      summary: List events
+      parameters:
+        - name: upcoming
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Events list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Event"
+
+  /events/{slug}:
+    get:
+      operationId: getEvent
+      tags: [public]
+      summary: Get event by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Event detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /admin/events:
+    get:
+      operationId: adminListEvents
+      tags: [admin]
+      summary: Admin list events
+      responses:
+        "200":
+          description: Events list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Event"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      operationId: createEvent
+      tags: [admin]
+      summary: Create an event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertEventRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /admin/events/{id}:
+    put:
+      operationId: updateEvent
+      tags: [admin]
+      summary: Update an event
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertEventRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      operationId: deleteEvent
+      tags: [admin]
+      summary: Delete an event
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # ─── Awards ──────────────────────────────────────────────────────────────────
+
+  /awards:
+    get:
+      operationId: listAwards
+      tags: [public]
+      summary: List awards
+      responses:
+        "200":
+          description: Awards list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Award"
+
+  /admin/awards:
+    get:
+      operationId: adminListAwards
+      tags: [admin]
+      summary: Admin list awards
+      responses:
+        "200":
+          description: Awards list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Award"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      operationId: createAward
+      tags: [admin]
+      summary: Create an award
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertAwardRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Award"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /admin/awards/{id}:
+    put:
+      operationId: updateAward
+      tags: [admin]
+      summary: Update an award
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertAwardRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Award"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      operationId: deleteAward
+      tags: [admin]
+      summary: Delete an award
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # ─── Vacancies ───────────────────────────────────────────────────────────────
+
+  /vacancies:
+    get:
+      operationId: listVacancies
+      tags: [public]
+      summary: List vacancies
+      responses:
+        "200":
+          description: Vacancies list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Vacancy"
+
+  /vacancies/{slug}:
+    get:
+      operationId: getVacancy
+      tags: [public]
+      summary: Get vacancy by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Vacancy detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vacancy"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /admin/vacancies:
+    get:
+      operationId: adminListVacancies
+      tags: [admin]
+      summary: Admin list vacancies
+      responses:
+        "200":
+          description: Vacancies list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Vacancy"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      operationId: createVacancy
+      tags: [admin]
+      summary: Create a vacancy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertVacancyRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vacancy"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /admin/vacancies/{id}:
+    put:
+      operationId: updateVacancy
+      tags: [admin]
+      summary: Update a vacancy
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertVacancyRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vacancy"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      operationId: deleteVacancy
+      tags: [admin]
+      summary: Delete a vacancy
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # ─── Careers / CV Submission ─────────────────────────────────────────────────
+
+  /careers/submit:
+    post:
+      operationId: submitCv
+      tags: [public]
+      summary: Submit a CV / career enquiry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CvSubmissionRequest"
+      responses:
+        "201":
+          description: Submission received
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /admin/cv-submissions:
+    get:
+      operationId: listCvSubmissions
+      tags: [admin]
+      summary: List CV submissions
+      responses:
+        "200":
+          description: CV submissions list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CvSubmission"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /admin/cv-submissions/{id}:
+    delete:
+      operationId: deleteCvSubmission
+      tags: [admin]
+      summary: Delete a CV submission
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # ─── Documents ───────────────────────────────────────────────────────────────
+
+  /documents:
+    get:
+      operationId: listDocuments
+      tags: [public]
+      summary: List public firm documents
+      responses:
+        "200":
+          description: Documents list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Document"
+
+  /admin/documents:
+    get:
+      operationId: adminListDocuments
+      tags: [admin]
+      summary: Admin list documents
+      responses:
+        "200":
+          description: Documents list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Document"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      operationId: createDocument
+      tags: [admin]
+      summary: Create a document entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertDocumentRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /admin/documents/{id}:
+    put:
+      operationId: updateDocument
+      tags: [admin]
+      summary: Update a document
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertDocumentRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Document"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      operationId: deleteDocument
+      tags: [admin]
+      summary: Delete a document
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # ─── Calculator Rates ─────────────────────────────────────────────────────────
+
+  /calculator-rates:
+    get:
+      operationId: listCalculatorRates
+      tags: [public]
+      summary: List conveyancing calculator rates
+      responses:
+        "200":
+          description: Calculator rates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CalculatorRate"
+
+  /admin/calculator-rates:
+    get:
+      operationId: adminListCalculatorRates
+      tags: [admin]
+      summary: Admin list calculator rates
+      responses:
+        "200":
+          description: Calculator rates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CalculatorRate"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      operationId: createCalculatorRate
+      tags: [admin]
+      summary: Create a calculator rate entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertCalculatorRateRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CalculatorRate"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /admin/calculator-rates/{id}:
+    put:
+      operationId: updateCalculatorRate
+      tags: [admin]
+      summary: Update a calculator rate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertCalculatorRateRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CalculatorRate"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      operationId: deleteCalculatorRate
+      tags: [admin]
+      summary: Delete a calculator rate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # ─── Contact ─────────────────────────────────────────────────────────────────
+
+  /contact:
+    post:
+      operationId: submitContact
+      tags: [public]
+      summary: Submit a contact form enquiry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactRequest"
+      responses:
+        "201":
+          description: Enquiry received
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /admin/contact-enquiries:
+    get:
+      operationId: listContactEnquiries
+      tags: [admin]
+      summary: List contact enquiries
+      responses:
+        "200":
+          description: Contact enquiries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContactEnquiry"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /admin/contact-enquiries/{id}:
+    delete:
+      operationId: deleteContactEnquiry
+      tags: [admin]
+      summary: Delete a contact enquiry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  # ─── Admin Password Change ────────────────────────────────────────────────────
+
+  /admin/change-password:
+    post:
+      operationId: changeAdminPassword
+      tags: [admin]
+      summary: Change admin password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordRequest"
+      responses:
+        "200":
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +1382,584 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+      required: [success]
+
+    AdminLoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required: [username, password]
+
+    AdminUser:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+      required: [id, username]
+
+    ChangePasswordRequest:
+      type: object
+      properties:
+        currentPassword:
+          type: string
+        newPassword:
+          type: string
+      required: [currentPassword, newPassword]
+
+    SiteSettings:
+      type: object
+      properties:
+        id:
+          type: integer
+        firmName:
+          type: string
+        tagline:
+          type: string
+        heroHeading:
+          type: string
+        heroSubheading:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        phone2:
+          type: string
+        address:
+          type: string
+        bbbeeLevel:
+          type: string
+        linkedinUrl:
+          type: string
+        facebookUrl:
+          type: string
+        twitterUrl:
+          type: string
+        updatedAt:
+          type: string
+      required: [id]
+
+    UpdateSiteSettingsRequest:
+      type: object
+      properties:
+        firmName:
+          type: string
+        tagline:
+          type: string
+        heroHeading:
+          type: string
+        heroSubheading:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        phone2:
+          type: string
+        address:
+          type: string
+        bbbeeLevel:
+          type: string
+        linkedinUrl:
+          type: string
+        facebookUrl:
+          type: string
+        twitterUrl:
+          type: string
+
+    Service:
+      type: object
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        title:
+          type: string
+        summary:
+          type: string
+        heroImageUrl:
+          type: string
+        howWeAssist:
+          type: string
+        typicalMatters:
+          type: array
+          items:
+            type: string
+        relatedTeamSlugs:
+          type: array
+          items:
+            type: string
+        sortOrder:
+          type: integer
+        isPublished:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required: [id, slug, title]
+
+    UpsertServiceRequest:
+      type: object
+      properties:
+        slug:
+          type: string
+        title:
+          type: string
+        summary:
+          type: string
+        heroImageUrl:
+          type: string
+        howWeAssist:
+          type: string
+        typicalMatters:
+          type: array
+          items:
+            type: string
+        relatedTeamSlugs:
+          type: array
+          items:
+            type: string
+        sortOrder:
+          type: integer
+        isPublished:
+          type: boolean
+      required: [slug, title]
+
+    Person:
+      type: object
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        role:
+          type: string
+        title:
+          type: string
+        photoUrl:
+          type: string
+        qualifications:
+          type: string
+        admissions:
+          type: string
+        bio:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        practiceAreas:
+          type: array
+          items:
+            type: string
+        sortOrder:
+          type: integer
+        isPublished:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required: [id, slug, firstName, lastName, role]
+
+    UpsertPersonRequest:
+      type: object
+      properties:
+        slug:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        role:
+          type: string
+        title:
+          type: string
+        photoUrl:
+          type: string
+        qualifications:
+          type: string
+        admissions:
+          type: string
+        bio:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        practiceAreas:
+          type: array
+          items:
+            type: string
+        sortOrder:
+          type: integer
+        isPublished:
+          type: boolean
+      required: [slug, firstName, lastName, role]
+
+    Article:
+      type: object
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        title:
+          type: string
+        category:
+          type: string
+        summary:
+          type: string
+        content:
+          type: string
+        imageUrl:
+          type: string
+        author:
+          type: string
+        publishedAt:
+          type: string
+        isPublished:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required: [id, slug, title, category]
+
+    UpsertArticleRequest:
+      type: object
+      properties:
+        slug:
+          type: string
+        title:
+          type: string
+        category:
+          type: string
+        summary:
+          type: string
+        content:
+          type: string
+        imageUrl:
+          type: string
+        author:
+          type: string
+        publishedAt:
+          type: string
+        isPublished:
+          type: boolean
+      required: [slug, title, category]
+
+    Event:
+      type: object
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        location:
+          type: string
+        eventDate:
+          type: string
+        eventEndDate:
+          type: string
+        imageUrl:
+          type: string
+        registrationUrl:
+          type: string
+        isPublished:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required: [id, slug, title, eventDate]
+
+    UpsertEventRequest:
+      type: object
+      properties:
+        slug:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        location:
+          type: string
+        eventDate:
+          type: string
+        eventEndDate:
+          type: string
+        imageUrl:
+          type: string
+        registrationUrl:
+          type: string
+        isPublished:
+          type: boolean
+      required: [slug, title, eventDate]
+
+    Award:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        awardingBody:
+          type: string
+        year:
+          type: string
+        description:
+          type: string
+        imageUrl:
+          type: string
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required: [id, title]
+
+    UpsertAwardRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        awardingBody:
+          type: string
+        year:
+          type: string
+        description:
+          type: string
+        imageUrl:
+          type: string
+        sortOrder:
+          type: integer
+      required: [title]
+
+    Vacancy:
+      type: object
+      properties:
+        id:
+          type: integer
+        slug:
+          type: string
+        title:
+          type: string
+        department:
+          type: string
+        location:
+          type: string
+        type:
+          type: string
+        summary:
+          type: string
+        description:
+          type: string
+        isPublished:
+          type: boolean
+        closingDate:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required: [id, slug, title]
+
+    UpsertVacancyRequest:
+      type: object
+      properties:
+        slug:
+          type: string
+        title:
+          type: string
+        department:
+          type: string
+        location:
+          type: string
+        type:
+          type: string
+        summary:
+          type: string
+        description:
+          type: string
+        isPublished:
+          type: boolean
+        closingDate:
+          type: string
+      required: [slug, title]
+
+    CvSubmissionRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        position:
+          type: string
+        coverLetter:
+          type: string
+      required: [name, email]
+
+    CvSubmission:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        position:
+          type: string
+        coverLetter:
+          type: string
+        createdAt:
+          type: string
+      required: [id, name, email]
+
+    Document:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        category:
+          type: string
+        fileUrl:
+          type: string
+        description:
+          type: string
+        isPublic:
+          type: boolean
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required: [id, title, fileUrl]
+
+    UpsertDocumentRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        category:
+          type: string
+        fileUrl:
+          type: string
+        description:
+          type: string
+        isPublic:
+          type: boolean
+        sortOrder:
+          type: integer
+      required: [title, fileUrl]
+
+    CalculatorRate:
+      type: object
+      properties:
+        id:
+          type: integer
+        rateType:
+          type: string
+        label:
+          type: string
+        value:
+          type: string
+        effectiveFrom:
+          type: string
+        notes:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required: [id, rateType, label, value]
+
+    UpsertCalculatorRateRequest:
+      type: object
+      properties:
+        rateType:
+          type: string
+        label:
+          type: string
+        value:
+          type: string
+        effectiveFrom:
+          type: string
+        notes:
+          type: string
+      required: [rateType, label, value]
+
+    ContactRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        subject:
+          type: string
+        message:
+          type: string
+      required: [name, email, message]
+
+    ContactEnquiry:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        subject:
+          type: string
+        message:
+          type: string
+        createdAt:
+          type: string
+      required: [id, name, email, message]
