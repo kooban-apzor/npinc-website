@@ -69,7 +69,7 @@ export default function ContactPage() {
                   <MapPin size={16} className="text-[#C6A15B] mt-0.5 shrink-0" />
                   <div>
                     <p className="text-[#B8B8B8] text-xs uppercase tracking-widest mb-1">Location</p>
-                    <p className="text-[#F7F4EE]">Johannesburg, South Africa</p>
+                    <p className="text-[#F7F4EE] leading-relaxed">10 Aubrey Drive<br />Glenashley<br />Durban, 4320</p>
                   </div>
                 </div>
               </div>
