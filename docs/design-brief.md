@@ -21,6 +21,93 @@ The result must feel like: _A modern South African commercial law firm website w
 
 ---
 
+## Reference Site Analysis (First-Hand Observations)
+
+These sites were visually surveyed in June 2026. Screenshots saved in `attached_assets/screenshots/`. Do not copy — extract lessons only.
+
+---
+
+### Paceline Law — pacelinelaw.com
+
+**What it is:** Single-attorney niche firm (bicycle accident law). Small site, big personality.
+
+**What we observed:**
+- Full-viewport hero with a real outdoor portrait photo of the attorney — confident, human, approachable. Bold all-caps serif headline: "A LAWYER FOR BIKE PEOPLE". Short positioning line below. Single outlined CTA button ("Contact Kyle").
+- Below the hero: side-by-side split — large lifestyle action photo (cyclists on a mountain road) right, conversational personality-driven text left. Generous whitespace. The text uses a metaphor ("By riding in a paceline, cyclists reduce wind drag by 50% — hiring a lawyer should work the same way") — shows warmth, wit, and positioning clarity.
+- Blog page: full-width section hero with an action cycling photo and dark overlay, bold "BLOG" heading, sub-headline, CTA button. Below: 2-column article card grid — each card has a large image, article title, author, date, excerpt.
+- Category sidebar on blog.
+- Colour scheme: blue and white (not relevant to NP Inc), but the _approach_ — strong accent + clean white — is the reference.
+
+**Borrow for NP Inc:**
+- The concept of a bold, personality-driven headline in the hero (not a generic tagline)
+- Real human photography prominently placed above the fold
+- Side-by-side image + text intro section with serious whitespace
+- Blog/Insights page: full-section hero image + 2-column card grid with large images
+- Warm, direct copy tone in CTAs
+
+**Do NOT copy:** The colour palette, the cycling brand personality, or the single-attorney scale — NP Inc is a multi-person commercial firm.
+
+---
+
+### Cox Yeats — coxyeats.co.za
+
+**What it is:** Established South African commercial law firm. Durban, Johannesburg, Cape Town offices.
+
+**What we observed:**
+- **Homepage hero:** Full-viewport cinematic image of a law office corridor/library — dark, moody, dramatic. Dark overlay. White text wordmark "CoxYeats" (text logo, not icon). Headline: "Independent Legal Insight" in clean sans-serif. Short descriptor line. Single outlined CTA "About Us". Rotating/sliding hero (carousel dots visible).
+- **Navigation:** Clean white top bar. Text wordmark logo left. Nav links centre: Home, About Us, Expertise, Our People, News & Insights, Contact. Right side: "Careers" as an outlined pill button + search icon. Nav is simple and clean — no mega-menus visible from homepage.
+- **Expertise page:** Pure black background. Large heading "Expertise & Legal Services" (white serif). Below: a 3-column grid of practice areas — each item is a full-width bordered row with the area name left-aligned and a right arrow → Clean, structured, comprehensive. Practice areas include: Administrative & Procurement, Business Rescue/Restructuring/Insolvency, Competition Law, Construction/Engineering/Infrastructure, Corporate & Commercial, Corporate Investigations/Fraud/Cybercrime, Dispute Resolution, Employment Law, Energy & Natural Resources, Environmental Law, Finance & Banking, Healthcare, Insurance, Maritime/Transport/International Trade, Mergers & Acquisitions, Notarial Practice, Occupational Health & Safety, Real Estate & Property Law, Regulatory & Compliance, Trusts & Estates.
+- **Our People page:** Full-width mosaic banner — five individual portrait photos of attorneys side by side, each in a separate column with dark neutral background treatment. "Our People" heading overlaid bottom-left in white. Below the banner: bold intro stat line ("Over 60 legal professionals across three offices…"). Then: horizontal filter tab bar — Partners | Associates | Candidate Legal Practitioners (CLPs) | Consultants. Below: 4-column card grid of headshot photos (dark neutral background, professional studio portraits). Very premium feel.
+- **News & Insights page:** Black background. Large heading. Then: categorised link list — Legal Updates →, Latest News →, Latest Videos →, Event Galleries →, Awards & Accolades →. Minimal but functional.
+- **Footer:** Three office addresses (Durban, Johannesburg, Cape Town) in columns. LinkedIn icon. "Careers" button (outlined). "Contact Us" button (filled). Copyright line with PAIA and Disclaimer links.
+
+**Borrow for NP Inc:**
+- The mosaic/collage people page hero — multiple attorney portrait photos in adjacent columns — for the Our People section header
+- 4-column attorney card grid on the people listing page
+- Horizontal role filter tab bar (Partners, Directors, Associates, Candidate Attorneys, Consultants, Support)
+- 3-column practice area list with arrows on the Services/Expertise index page
+- "Careers" as a standalone CTA button in the navigation (pill-style, outlined)
+- Search icon in nav
+- Footer with office address(es) + LinkedIn + two CTA buttons
+- Structured News & Insights categories page (link-list by category)
+- Studio-quality portrait photography with dark neutral backgrounds for attorney cards
+
+**Do NOT copy:** The rotating hero carousel (use a single cinematic static hero instead), the all-black-everything palette (NP Inc needs ivory/white content sections too), or the text-only wordmark (NP Inc has a strong gold monogram icon logo to keep).
+
+---
+
+### NP Inc — npinc.co.za (Current Site)
+
+**What it is:** The existing NP Inc website. Content and structure reference — NOT a design reference.
+
+**What we observed:**
+- **Logo:** Gold NP stylised monogram — a beautiful, distinctive icon. Keep exactly as-is. Placed top-left on a black navbar.
+- **Navigation:** Black bar, all-caps text links: ABOUT, OUR PEOPLE, OUR SERVICES, NEWS, TOOLS, CONTACT US. Flat, no dropdown. No CTA button.
+- **Homepage hero:** Full-width image slideshow. Slides use black-and-white or dark photography (property/building imagery). Service name overlaid at the bottom of each slide (e.g. "Property and Conveyancing"). Not a cinematic hero — more of a content carousel.
+- **"Who We Are / What We Do":** Two text-only boxes on a black background, centred. No images alongside. Very heavy, very plain. The copy is good: "We are a niche commercial and corporate law firm focused on helping businesses achieve efficient results by finding and applying practical solutions to complex business challenges." / "We aim to interrupt existing thinking patterns in commercial, corporate, tax, compliance and transaction advisory related legal work." Also: "We are a proud B-BBEE Level 1 Provider."
+- **Our People page:** Black background throughout. Headings "OUR PEOPLE", "OUR DIRECTOR", "OUR ASSOCIATES" — all caps bold gold text. Director: rounded-corner black-and-white portrait photo left, bio + contact info right. Associates: bio text only (no visible photo in the screenshot). Very plain single-column-ish layout.
+- **Services page:** "Our Services" heading (gold serif), then alternating image/text sections per practice area: Litigation (gavel image), Labour (labour law signage image), Property & Conveyancing, Corporate & Commercial, Tax Compliance & Transaction Advisory. Each section has a list of sub-services as bullets. Images are stock-photo quality, black-and-white or desaturated.
+- **Current practice areas:** Litigation, Labour, Property & Conveyancing, Corporate & Commercial, Tax Compliance & Transaction Advisory — these are the content building blocks for the new services section.
+
+**Keep from NP Inc:**
+- The gold NP monogram logo (top-left placement)
+- The black/gold brand identity
+- The B-BBEE Level 1 Provider credential — must be visible on the new site (footer or about section)
+- The firm's positioning copy ("niche commercial and corporate law firm", "interrupt existing thinking patterns")
+- The five practice areas as the content seed for the services section
+- Contact details: phone numbers (082 382 0843, 087 183 9891), email (nike@npinc.co.za)
+
+**Fix/replace from NP Inc:**
+- Hero: replace the slideshow with a single cinematic full-viewport hero with real photography, large heading, strong positioning line, and two CTAs
+- "Who We Are / What We Do": add large imagery alongside the text (Paceline-style side-by-side), move to white/ivory background section
+- People page: completely redesign — mosaic header (Cox Yeats style), filter tabs, card grid
+- Services: give each practice area its own dedicated page (not a long single-column list)
+- The all-black palette everywhere: introduce ivory/white content sections for readability and visual breathing room
+- Navigation: add a Careers CTA pill button (Cox Yeats style), add Insights / News as a top-level item
+- No search functionality currently — add search icon to nav
+
+---
+
 ## Brand Identity
 
 Use the existing NP Inc logo and black/gold identity. Do not invent new branding — modernise what exists.
