@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useAdminLogin, getGetAdminMeQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import logoPath from "@assets/np-inc-logo.svg";
+const logoPath = "/npinc/logo.png";
 
 export default function AdminLoginPage() {
   const [username, setUsername] = useState("");

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X } from "lucide-react";
-import logoPath from "@assets/np-inc-logo.svg";
+const logoPath = "/npinc/logo.png";
 
 const navLinks = [
   { href: "/services", label: "Practice Areas" },

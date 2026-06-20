@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { Mail, Phone } from "lucide-react";
-import logoPath from "@assets/np-inc-logo.svg";
+const logoPath = "/npinc/logo.png";
 
 export default function Footer() {
   return (
