@@ -20,10 +20,11 @@ export default function AdminCalculatorRates() {
   const invalidate = () => qc.invalidateQueries({ queryKey: getAdminListCalculatorRatesQueryKey() });
   const openCreate = () => setModal({ mode: "create", form: { ...empty } });
   const openEdit = (r: NonNullable<typeof rates>[0]) => setModal({ mode: "edit", id: r.id, form: { rateType: r.rateType, label: r.label, value: String(r.value), effectiveFrom: r.effectiveFrom ?? "", notes: r.notes ?? "" } });
-  const buildPayload = (form: Form) => ({
-    ...form,
-    effectiveFrom: form.effectiveFrom.trim() === "" ? null : form.effectiveFrom,
-  });
+  const buildPayload = (form: Form) => {
+    const payload: Record<string, unknown> = { ...form };
+    if ((payload.effectiveFrom as string).trim() === "") delete payload.effectiveFrom;
+    return payload;
+  };
 
   const handleSave = () => {
     if (!modal) return;

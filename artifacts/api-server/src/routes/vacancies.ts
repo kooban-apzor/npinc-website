@@ -4,7 +4,6 @@ import { db, vacanciesTable } from "@workspace/db";
 import {
   ListVacanciesResponse,
   GetVacancyParams,
-  GetVacancyResponse,
   AdminListVacanciesResponse,
   CreateVacancyBody,
   UpdateVacancyParams,
@@ -58,7 +57,7 @@ router.post("/admin/vacancies", requireAdmin, async (req, res): Promise<void> =>
     return;
   }
   const [row] = await db.insert(vacanciesTable).values(parsed.data).returning();
-  res.status(201).json(GetVacancyResponse.parse(row));
+  res.status(201).json(row);
 });
 
 router.put("/admin/vacancies/:id", requireAdmin, async (req, res): Promise<void> => {

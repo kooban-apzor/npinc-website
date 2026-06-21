@@ -5,7 +5,6 @@ import {
   ListArticlesQueryParams,
   ListArticlesResponse,
   GetArticleParams,
-  GetArticleResponse,
   AdminListArticlesResponse,
   CreateArticleBody,
   UpdateArticleParams,
@@ -71,7 +70,7 @@ router.post("/admin/articles", requireAdmin, async (req, res): Promise<void> => 
     return;
   }
   const [row] = await db.insert(articlesTable).values(parsed.data).returning();
-  res.status(201).json(GetArticleResponse.parse(row));
+  res.status(201).json(row);
 });
 
 router.put("/admin/articles/:id", requireAdmin, async (req, res): Promise<void> => {

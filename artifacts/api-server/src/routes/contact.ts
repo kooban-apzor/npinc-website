@@ -21,7 +21,7 @@ router.post("/contact", async (req, res): Promise<void> => {
   res.status(201).json(row);
 });
 
-router.get("/admin/enquiries", requireAdmin, async (_req, res): Promise<void> => {
+router.get("/admin/contact-enquiries", requireAdmin, async (_req, res): Promise<void> => {
   const rows = await db
     .select()
     .from(contactEnquiriesTable)
@@ -29,7 +29,7 @@ router.get("/admin/enquiries", requireAdmin, async (_req, res): Promise<void> =>
   res.json(rows);
 });
 
-router.delete("/admin/enquiries/:id", requireAdmin, async (req, res): Promise<void> => {
+router.delete("/admin/contact-enquiries/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = DeleteContactEnquiryParams.safeParse(req.params);
   if (!params.success) {
     res.status(400).json({ error: params.error.message });

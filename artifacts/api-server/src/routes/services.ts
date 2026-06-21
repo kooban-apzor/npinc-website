@@ -4,7 +4,6 @@ import { db, servicesTable } from "@workspace/db";
 import {
   ListServicesResponse,
   GetServiceParams,
-  GetServiceResponse,
   AdminListServicesResponse,
   CreateServiceBody,
   UpdateServiceParams,
@@ -58,7 +57,7 @@ router.post("/admin/services", requireAdmin, async (req, res): Promise<void> => 
     return;
   }
   const [row] = await db.insert(servicesTable).values(parsed.data).returning();
-  res.status(201).json(GetServiceResponse.parse(row));
+  res.status(201).json(row);
 });
 
 router.put("/admin/services/:id", requireAdmin, async (req, res): Promise<void> => {

@@ -5,7 +5,6 @@ import {
   ListEventsQueryParams,
   ListEventsResponse,
   GetEventParams,
-  GetEventResponse,
   AdminListEventsResponse,
   CreateEventBody,
   UpdateEventParams,
@@ -72,7 +71,7 @@ router.post("/admin/events", requireAdmin, async (req, res): Promise<void> => {
     return;
   }
   const [row] = await db.insert(eventsTable).values(parsed.data).returning();
-  res.status(201).json(GetEventResponse.parse(row));
+  res.status(201).json(row);
 });
 
 router.put("/admin/events/:id", requireAdmin, async (req, res): Promise<void> => {
