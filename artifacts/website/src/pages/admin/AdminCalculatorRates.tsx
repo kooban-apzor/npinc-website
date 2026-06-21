@@ -20,12 +20,17 @@ export default function AdminCalculatorRates() {
   const invalidate = () => qc.invalidateQueries({ queryKey: getAdminListCalculatorRatesQueryKey() });
   const openCreate = () => setModal({ mode: "create", form: { ...empty } });
   const openEdit = (r: NonNullable<typeof rates>[0]) => setModal({ mode: "edit", id: r.id, form: { rateType: r.rateType, label: r.label, value: String(r.value), effectiveFrom: r.effectiveFrom ?? "", notes: r.notes ?? "" } });
+  const buildPayload = (form: Form) => ({
+    ...form,
+    effectiveFrom: form.effectiveFrom.trim() === "" ? null : form.effectiveFrom,
+  });
+
   const handleSave = () => {
     if (!modal) return;
     if (modal.mode === "create") {
-      create.mutate({ data: modal.form as never }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Rate created" }); }, onError: () => toast({ title: "Error", variant: "destructive" }) });
+      create.mutate({ data: buildPayload(modal.form) as never }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Rate created" }); }, onError: () => toast({ title: "Error", variant: "destructive" }) });
     } else {
-      update.mutate({ id: modal.id!, data: modal.form as never }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Rate updated" }); }, onError: () => toast({ title: "Error", variant: "destructive" }) });
+      update.mutate({ id: modal.id!, data: buildPayload(modal.form) as never }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Rate updated" }); }, onError: () => toast({ title: "Error", variant: "destructive" }) });
     }
   };
   const handleDelete = (id: number) => {

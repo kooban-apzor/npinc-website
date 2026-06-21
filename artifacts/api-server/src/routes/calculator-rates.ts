@@ -31,7 +31,9 @@ router.post("/admin/calculator-rates", requireAdmin, async (req, res): Promise<v
     res.status(400).json({ error: parsed.error.message });
     return;
   }
-  const [row] = await db.insert(calculatorRatesTable).values(parsed.data).returning();
+  const data = { ...parsed.data } as Record<string, unknown>;
+  if (data.effectiveFrom === "" || data.effectiveFrom === null) delete data.effectiveFrom;
+  const [row] = await db.insert(calculatorRatesTable).values(data as never).returning();
   res.status(201).json(row);
 });
 
@@ -46,9 +48,12 @@ router.put("/admin/calculator-rates/:id", requireAdmin, async (req, res): Promis
     res.status(400).json({ error: parsed.error.message });
     return;
   }
+  const data = { ...parsed.data } as Record<string, unknown>;
+  // Coerce empty strings to null for timestamp columns
+  if (data.effectiveFrom === "" || data.effectiveFrom === null) delete data.effectiveFrom;
   const [row] = await db
     .update(calculatorRatesTable)
-    .set(parsed.data)
+    .set(data as never)
     .where(eq(calculatorRatesTable.id, params.data.id))
     .returning();
   if (!row) {

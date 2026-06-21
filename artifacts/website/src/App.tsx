@@ -1,8 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
-import { Switch, Route, Router as WouterRouter } from "wouter";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
+import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useToast } from "@/hooks/use-toast";
+import { ApiError } from "@workspace/api-client-react";
 
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/HomePage";
@@ -35,8 +37,33 @@ import AdminCalculatorRates from "@/pages/admin/AdminCalculatorRates";
 import AdminEnquiries from "@/pages/admin/AdminEnquiries";
 import AdminSiteSettings from "@/pages/admin/AdminSiteSettings";
 
+function isAdminOnlyError(error: unknown): boolean {
+  if (!(error instanceof ApiError)) return false;
+  if (error.status !== 401) return false;
+  const path = window.location.pathname;
+  return path.startsWith("/admin") && path !== "/admin/login";
+}
+
+const SESSION_EXPIRED_KEY = "npinc_session_expired";
+
 const queryClient = new QueryClient({
-  defaultOptions: { queries: { retry: 1, staleTime: 30000 } }
+  defaultOptions: { queries: { retry: 1, staleTime: 30000 } },
+  queryCache: new QueryCache({
+    onError: (error) => {
+      if (isAdminOnlyError(error)) {
+        sessionStorage.setItem(SESSION_EXPIRED_KEY, "1");
+        window.dispatchEvent(new CustomEvent("npinc:session-expired"));
+      }
+    },
+  }),
+  mutationCache: new MutationCache({
+    onError: (error) => {
+      if (isAdminOnlyError(error)) {
+        sessionStorage.setItem(SESSION_EXPIRED_KEY, "1");
+        window.dispatchEvent(new CustomEvent("npinc:session-expired"));
+      }
+    },
+  }),
 });
 
 function AdminLoginModal({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -57,6 +84,29 @@ function AdminLoginModal({ open, onClose }: { open: boolean; onClose: () => void
       </div>
     </div>
   );
+}
+
+function SessionExpiryHandler() {
+  const { toast } = useToast();
+  const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    const handler = () => {
+      queryClient.clear();
+      toast({
+        title: "Session expired",
+        description: "Your admin session has ended. Please log in again.",
+        variant: "destructive",
+        duration: 6000,
+      });
+      setLocation("/admin/login");
+    };
+
+    window.addEventListener("npinc:session-expired", handler);
+    return () => window.removeEventListener("npinc:session-expired", handler);
+  }, [toast, setLocation]);
+
+  return null;
 }
 
 function AppRoutes() {
@@ -121,6 +171,7 @@ function App() {
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
           <AppRoutes />
+          <SessionExpiryHandler />
         </WouterRouter>
         <AdminLoginModal open={adminModalOpen} onClose={() => setAdminModalOpen(false)} />
         <Toaster />
