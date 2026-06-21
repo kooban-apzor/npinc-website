@@ -1,15 +1,38 @@
 import { useState, useRef } from "react";
 import {
-  useAdminListPeople, useCreatePerson, useUpdatePerson, useDeletePerson, getAdminListPeopleQueryKey,
-  useCreateArticle,
+  useAdminListPeople, useCreatePerson, useUpdatePerson, getAdminListPeopleQueryKey,
+  useCreateArticle, getListArticlesQueryKey, getListPeopleQueryKey,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { adminModalPanelClass } from "@/components/admin-panel-classes";
+import AdminDateField from "@/components/admin/AdminDateField";
 import AdminLayout from "@/components/AdminLayout";
+import { createStaffMovementArticlePayload, todayISO, type StaffMovementForm } from "@/lib/staff-movements";
 import { Plus, Pencil, Trash2, X, UserCheck, UserMinus, Upload, ImageOff, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const PRESET_ROLES = ["Partner", "Director", "Associate", "CandidateAttorney", "Consultant", "Support"];
+const ROLE_OPTIONS = [
+  { value: "partners", label: "Partner" },
+  { value: "directors", label: "Director" },
+  { value: "associates", label: "Associate" },
+  { value: "candidate_attorneys", label: "Candidate Attorney" },
+  { value: "consultants", label: "Consultant" },
+  { value: "support", label: "Support" },
+] as const;
+const PRESET_ROLE_VALUES = ROLE_OPTIONS.map(r => r.value);
+const LEGACY_ROLE_MAP: Record<string, string> = {
+  Partner: "partners",
+  Director: "directors",
+  Associate: "associates",
+  CandidateAttorney: "candidate_attorneys",
+  Consultant: "consultants",
+  Support: "support",
+};
 const CUSTOM_ROLE_VALUE = "__custom__";
+
+function normalizeRole(role: string): string {
+  return LEGACY_ROLE_MAP[role] ?? role;
+}
 
 type Form = {
   slug: string; firstName: string; lastName: string; role: string;
@@ -22,19 +45,11 @@ type Form = {
 type DraftArticle = { enabled: boolean; type: "joined" | "departed" | null };
 
 const emptyForm = (nextOrder: number): Form => ({
-  slug: "", firstName: "", lastName: "", role: "Associate", title: "",
+  slug: "", firstName: "", lastName: "", role: "associates", title: "",
   qualifications: "", admissions: "", bio: "", email: "", phone: "",
   photoUrl: "", practiceAreas: "", sortOrder: nextOrder, isPublished: true,
   joinedAt: "", leftAt: "",
 });
-
-function todayISO() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function slugify(s: string) {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-}
 
 // ─── Grayscale photo upload ───────────────────────────────────────────────────
 // Output is always 300×300 square (center-top crop) to match the existing
@@ -140,14 +155,21 @@ export default function AdminPeople() {
   const { data: people, isLoading } = useAdminListPeople();
   const create = useCreatePerson();
   const update = useUpdatePerson();
-  const remove = useDeletePerson();
   const createArticle = useCreateArticle();
   const qc = useQueryClient();
   const { toast } = useToast();
 
   const [modal, setModal] = useState<{ mode: "create" | "edit"; id?: number; form: Form; draft: DraftArticle } | null>(null);
+  const [departModal, setDepartModal] = useState<{
+    person: NonNullable<typeof people>[0];
+    leftAt: string;
+    publishMovement: boolean;
+  } | null>(null);
 
-  const invalidate = () => qc.invalidateQueries({ queryKey: getAdminListPeopleQueryKey() });
+  const invalidate = () => {
+    qc.invalidateQueries({ queryKey: getAdminListPeopleQueryKey() });
+    qc.invalidateQueries({ queryKey: getListPeopleQueryKey() });
+  };
 
   const nextSortOrder = () => {
     const orders = (people ?? []).map(p => p.sortOrder);
@@ -158,7 +180,7 @@ export default function AdminPeople() {
   const openEdit = (p: NonNullable<typeof people>[0]) => setModal({
     mode: "edit", id: p.id,
     form: {
-      slug: p.slug, firstName: p.firstName, lastName: p.lastName, role: p.role,
+      slug: p.slug, firstName: p.firstName, lastName: p.lastName, role: normalizeRole(p.role),
       title: p.title ?? "", qualifications: p.qualifications ?? "",
       admissions: p.admissions ?? "", bio: p.bio ?? "",
       email: p.email ?? "", phone: p.phone ?? "", photoUrl: p.photoUrl ?? "",
@@ -185,34 +207,18 @@ export default function AdminPeople() {
     setDraft({ enabled: true, type: "departed" });
   };
 
-  const createDraftArticle = (form: Form, type: "joined" | "departed") => {
-    const fullName = `${form.firstName} ${form.lastName}`.trim();
-    const today = todayISO();
-    const isJoin = type === "joined";
-    const title = isJoin
-      ? `NP Inc Welcomes ${fullName}`
-      : `${fullName} Departs NP Inc`;
-    const summary = isJoin
-      ? `Nike Pillay Inc is pleased to welcome ${fullName} to the team${form.role ? ` as ${form.role}` : ""}.`
-      : `Nike Pillay Inc bids farewell to ${fullName}${form.role ? `, ${form.role}` : ""}, and wishes them well in their future endeavours.`;
-    const content = isJoin
-      ? `Nike Pillay Inc is delighted to announce the appointment of ${fullName}${form.role ? ` as ${form.role}` : ""}.\n\n[Add details about their background, expertise, and what they bring to the firm.]\n\n${form.qualifications ? `Qualifications: ${form.qualifications}\n\n` : ""}We look forward to the contribution ${form.firstName} will make to our team and clients.`
-      : `Nike Pillay Inc announces that ${fullName}${form.role ? `, ${form.role}` : ""}, has departed the firm.\n\n[Add a note about their time at the firm and any farewell message.]\n\nWe thank ${form.firstName} for their valued contribution and wish them every success in the future.`;
-
-    createArticle.mutate({
-      data: {
-        slug: slugify(`${fullName}-${isJoin ? "joins" : "departs"}-np-inc-${today}`),
-        title,
-        category: "StaffMovement",
-        summary,
-        content,
-        author: "NP Inc",
-        publishedAt: today,
-        isPublished: false,
-      } as never,
-    }, {
-      onSuccess: () => toast({ title: "Draft article created", description: `"${title}" saved as a draft in Insights.` }),
-      onError: () => toast({ title: "Could not create article draft", variant: "destructive" }),
+  const publishStaffMovement = (form: StaffMovementForm, type: "joined" | "departed", publishedAt?: string) => {
+    const payload = createStaffMovementArticlePayload(form, type, publishedAt);
+    createArticle.mutate({ data: payload as never }, {
+      onSuccess: () => {
+        qc.invalidateQueries({ queryKey: getListArticlesQueryKey() });
+        qc.invalidateQueries({ queryKey: getListArticlesQueryKey({ category: "StaffMovement" }) });
+        toast({
+          title: "Staff movement published",
+          description: `"${payload.title}" is live under Insights → Staff Movements. Edit it in Admin → Insights if needed.`,
+        });
+      },
+      onError: () => toast({ title: "Could not create staff movement post", variant: "destructive" }),
     });
   };
 
@@ -227,9 +233,15 @@ export default function AdminPeople() {
     };
     const afterSave = () => {
       invalidate();
+      const draft = modal.draft;
+      const form = modal.form;
       setModal(null);
-      if (modal.draft.enabled && modal.draft.type) {
-        createDraftArticle(modal.form, modal.draft.type);
+      if (draft.enabled && draft.type) {
+        publishStaffMovement(
+          { firstName: form.firstName, lastName: form.lastName, role: normalizeRole(form.role), qualifications: form.qualifications },
+          draft.type,
+          draft.type === "departed" ? form.leftAt || todayISO() : form.joinedAt || todayISO(),
+        );
       }
     };
     if (modal.mode === "create") {
@@ -245,20 +257,53 @@ export default function AdminPeople() {
     }
   };
 
-  const handleDelete = (id: number) => {
-    if (!confirm("Delete this person?")) return;
-    remove.mutate({ id }, {
-      onSuccess: () => { invalidate(); toast({ title: "Person deleted" }); },
-      onError: () => toast({ title: "Error", variant: "destructive" })
+  const openDepartModal = (p: NonNullable<typeof people>[0]) => {
+    setDepartModal({
+      person: p,
+      leftAt: p.leftAt ? p.leftAt.slice(0, 10) : todayISO(),
+      publishMovement: true,
     });
+  };
+
+  const handleConfirmDeparture = () => {
+    if (!departModal || !departModal.leftAt) return;
+    const { person, leftAt, publishMovement } = departModal;
+    update.mutate(
+      { id: person.id, data: { leftAt } as never },
+      {
+        onSuccess: () => {
+          invalidate();
+          setDepartModal(null);
+          toast({ title: "Person marked as departed" });
+          if (publishMovement) {
+            publishStaffMovement(
+              {
+                firstName: person.firstName,
+                lastName: person.lastName,
+                role: normalizeRole(person.role),
+                qualifications: person.qualifications ?? undefined,
+              },
+              "departed",
+              leftAt,
+            );
+          }
+        },
+        onError: () => toast({ title: "Error", variant: "destructive" }),
+      },
+    );
   };
 
   const statusBadge = (p: NonNullable<typeof people>[0]) => {
     if ((p as never as Record<string, unknown>).memberStatus === "just_joined") {
       return <span className="text-[0.6rem] bg-[#C6A15B]/15 text-[#C6A15B] border border-[#C6A15B]/30 px-2 py-0.5 uppercase tracking-widest">Just Joined</span>;
     }
-    if ((p as never as Record<string, unknown>).memberStatus === "left") {
-      return <span className="text-[0.6rem] bg-[#555]/20 text-[#B8B8B8] border border-[#555]/40 px-2 py-0.5 uppercase tracking-widest">Left Practice</span>;
+    if (p.leftAt) {
+      const lastDay = p.leftAt.slice(0, 10);
+      const today = todayISO();
+      if (today <= lastDay) {
+        return <span className="text-[0.6rem] bg-[#555]/20 text-[#B8B8B8] border border-[#555]/40 px-2 py-0.5 uppercase tracking-widest">Departing {lastDay}</span>;
+      }
+      return <span className="text-[0.6rem] bg-[#555]/20 text-[#B8B8B8] border border-[#555]/40 px-2 py-0.5 uppercase tracking-widest">Departed</span>;
     }
     return null;
   };
@@ -297,12 +342,12 @@ export default function AdminPeople() {
                       <h3 className="text-[#F7F4EE] font-serif">{p.firstName} {p.lastName}</h3>
                       {statusBadge(p)}
                     </div>
-                    <p className="text-[#B8B8B8] text-xs">{p.role} · #{p.sortOrder} · {p.isPublished ? <span className="text-green-400">Published</span> : <span className="text-red-400">Draft</span>}</p>
+                    <p className="text-[#B8B8B8] text-xs">{ROLE_OPTIONS.find(r => r.value === normalizeRole(p.role))?.label ?? p.role} · #{p.sortOrder} · {p.isPublished ? <span className="text-green-400">Published</span> : <span className="text-red-400">Draft</span>}</p>
                   </div>
                 </div>
                 <div className="flex gap-3">
                   <button onClick={() => openEdit(p)} data-testid={`button-edit-person-${p.id}`} className="text-[#B8B8B8] hover:text-[#C6A15B] p-2"><Pencil size={15} /></button>
-                  <button onClick={() => handleDelete(p.id)} data-testid={`button-delete-person-${p.id}`} className="text-[#B8B8B8] hover:text-red-400 p-2"><Trash2 size={15} /></button>
+                  <button onClick={() => openDepartModal(p)} data-testid={`button-delete-person-${p.id}`} aria-label="Remove from team" title="Remove from team" className="text-[#B8B8B8] hover:text-red-400 p-2"><Trash2 size={15} /></button>
                 </div>
               </div>
             ))}
@@ -312,7 +357,7 @@ export default function AdminPeople() {
 
       {modal && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#151515] border border-[#2A2A2A] p-8 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+          <div className={adminModalPanelClass}>
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-2xl font-serif text-[#F7F4EE]">{modal.mode === "create" ? "Add Person" : "Edit Person"}</h2>
               <button onClick={() => setModal(null)} className="text-[#B8B8B8] hover:text-[#F7F4EE]"><X size={20} /></button>
@@ -327,7 +372,7 @@ export default function AdminPeople() {
                 <div>
                   <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Role</label>
                   <select
-                    value={PRESET_ROLES.includes(modal.form.role) ? modal.form.role : CUSTOM_ROLE_VALUE}
+                    value={PRESET_ROLE_VALUES.includes(normalizeRole(modal.form.role) as typeof PRESET_ROLE_VALUES[number]) ? normalizeRole(modal.form.role) : CUSTOM_ROLE_VALUE}
                     onChange={e => {
                       if (e.target.value === CUSTOM_ROLE_VALUE) {
                         setForm({ role: "" });
@@ -337,10 +382,10 @@ export default function AdminPeople() {
                     }}
                     className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none"
                   >
-                    {PRESET_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+                    {ROLE_OPTIONS.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
                     <option value={CUSTOM_ROLE_VALUE}>Custom…</option>
                   </select>
-                  {(!PRESET_ROLES.includes(modal.form.role)) && (
+                  {(!PRESET_ROLE_VALUES.includes(normalizeRole(modal.form.role) as typeof PRESET_ROLE_VALUES[number])) && (
                     <input
                       type="text"
                       value={modal.form.role}
@@ -442,7 +487,7 @@ export default function AdminPeople() {
               <div className="border-t border-[#2A2A2A] pt-6">
                 <p className="text-[#C6A15B] text-xs uppercase tracking-widest mb-3">Staff Status</p>
                 <p className="text-[#B8B8B8] text-xs leading-relaxed mb-5">
-                  "Just Joined" shows a gold badge for 90 days. "Left the Practice" keeps them visible for 90 days then hides them automatically.
+                  "Just Joined" shows a gold badge for 90 days. Staff leave the public team list the day after their last office day. Departure Staff Movements posts expire after 30 days; join posts after 90 days.
                 </p>
 
                 <div className="grid grid-cols-2 gap-4 mb-5">
@@ -457,22 +502,18 @@ export default function AdminPeople() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Join Date</label>
-                    <input type="date" value={modal.form.joinedAt} onChange={e => setForm({ joinedAt: e.target.value })}
-                      className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
-                    {modal.form.joinedAt && (
-                      <button type="button" onClick={() => setForm({ joinedAt: "" })} className="text-[#555] text-xs mt-1 hover:text-[#B8B8B8]">Clear</button>
-                    )}
-                  </div>
-                  <div>
-                    <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Departure Date</label>
-                    <input type="date" value={modal.form.leftAt} onChange={e => setForm({ leftAt: e.target.value })}
-                      className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
-                    {modal.form.leftAt && (
-                      <button type="button" onClick={() => setForm({ leftAt: "" })} className="text-[#555] text-xs mt-1 hover:text-[#B8B8B8]">Clear</button>
-                    )}
-                  </div>
+                  <AdminDateField
+                    label="Join Date"
+                    value={modal.form.joinedAt}
+                    onChange={v => setForm({ joinedAt: v })}
+                    onClear={() => setForm({ joinedAt: "" })}
+                  />
+                  <AdminDateField
+                    label="Departure Date"
+                    value={modal.form.leftAt}
+                    onChange={v => setForm({ leftAt: v })}
+                    onClear={() => setForm({ leftAt: "" })}
+                  />
                 </div>
 
                 {/* Draft article checkbox — appears only when a status button was clicked */}
@@ -488,12 +529,12 @@ export default function AdminPeople() {
                     <label htmlFor="draft-article" className="cursor-pointer">
                       <span className="flex items-center gap-2 text-[#C6A15B] text-xs uppercase tracking-widest mb-1">
                         <FileText size={12} />
-                        Create a Staff Movements article draft
+                        Publish a Staff Movements insight
                       </span>
                       <p className="text-[#B8B8B8] text-xs leading-relaxed">
                         {modal.draft.type === "joined"
-                          ? `A pre-filled "Welcome ${modal.form.firstName || "…"}" draft will be saved to Insights — ready for you to review and publish.`
-                          : `A pre-filled departure note for ${modal.form.firstName || "…"} will be saved as a draft in Insights.`}
+                          ? `A pre-filled welcome post for ${modal.form.firstName || "…"} will go live on the public Insights page under Staff Movements.`
+                          : `A pre-filled departure notice for ${modal.form.firstName || "…"} will go live on the public Insights page under Staff Movements.`}
                       </p>
                     </label>
                   </div>
@@ -508,6 +549,61 @@ export default function AdminPeople() {
               </button>
               <button onClick={() => setModal(null)}
                 className="border border-[#2A2A2A] text-[#B8B8B8] px-8 py-3 text-sm hover:border-[#C6A15B] transition-colors">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {departModal && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className={adminModalPanelClass}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-serif text-[#F7F4EE]">
+                Remove {departModal.person.firstName} {departModal.person.lastName} from team
+              </h2>
+              <button onClick={() => setDepartModal(null)} className="text-[#B8B8B8] hover:text-[#F7F4EE]"><X size={20} /></button>
+            </div>
+            <p className="text-[#B8B8B8] text-sm leading-relaxed mb-6">
+              They will remain on the public staff list through their last office day, then drop off automatically.
+              Optionally publish a Staff Movements insight (visible for 30 days).
+            </p>
+            <div className="space-y-5">
+              <AdminDateField
+                label="Last Office Day"
+                value={departModal.leftAt}
+                onChange={v => setDepartModal(m => m && ({ ...m, leftAt: v }))}
+                required
+              />
+              <div className="bg-[#0E0E0E] border border-[#C6A15B]/20 px-4 py-4 flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="depart-publish-movement"
+                  checked={departModal.publishMovement}
+                  onChange={e => setDepartModal(m => m && ({ ...m, publishMovement: e.target.checked }))}
+                  className="w-4 h-4 accent-[#C6A15B] mt-0.5 shrink-0"
+                />
+                <label htmlFor="depart-publish-movement" className="cursor-pointer">
+                  <span className="flex items-center gap-2 text-[#C6A15B] text-xs uppercase tracking-widest mb-1">
+                    <FileText size={12} />
+                    Publish a Staff Movements insight
+                  </span>
+                  <p className="text-[#B8B8B8] text-xs leading-relaxed">
+                    A pre-filled departure notice for {departModal.person.firstName} will go live on the public Insights page under Staff Movements.
+                  </p>
+                </label>
+              </div>
+            </div>
+            <div className="flex gap-4 mt-8">
+              <button
+                onClick={handleConfirmDeparture}
+                data-testid="button-confirm-departure"
+                disabled={!departModal.leftAt || update.isPending}
+                className="bg-[#C6A15B] text-[#0E0E0E] px-8 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors disabled:opacity-50"
+              >
+                Confirm departure
+              </button>
+              <button onClick={() => setDepartModal(null)} className="border border-[#2A2A2A] text-[#B8B8B8] px-8 py-3 text-sm hover:border-[#C6A15B] transition-colors">
                 Cancel
               </button>
             </div>

@@ -19,16 +19,24 @@ declare module "express-session" {
 
 const router: IRouter = Router();
 
-// ─── Seed default admin on startup ───────────────────────────────────────────
+// ─── Seed / sync admin from env ──────────────────────────────────────────────
 export async function seedAdminUser(): Promise<void> {
-  const existing = await db.select({ id: adminUsersTable.id }).from(adminUsersTable).limit(1);
-  if (existing.length > 0) return;
-
   const username = process.env["ADMIN_USERNAME"] ?? "admin";
   const password = process.env["ADMIN_PASSWORD"] ?? "admin123";
   const hash = await bcrypt.hash(password, 12);
 
-  await db.insert(adminUsersTable).values({ username, passwordHash: hash });
+  const existing = await db.select().from(adminUsersTable).limit(1);
+
+  if (existing.length === 0) {
+    await db.insert(adminUsersTable).values({ username, passwordHash: hash });
+    return;
+  }
+
+  // .env is the source of truth on deploy — sync so restarts pick up password changes
+  await db
+    .update(adminUsersTable)
+    .set({ username, passwordHash: hash })
+    .where(eq(adminUsersTable.id, existing[0]!.id));
 }
 
 // ─── In-memory failed-attempt tracker ────────────────────────────────────────

@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useAdminListEvents, useCreateEvent, useUpdateEvent, useDeleteEvent, getAdminListEventsQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { adminModalPanelClass } from "@/components/admin-panel-classes";
 import AdminLayout from "@/components/AdminLayout";
+import AdminDateField from "@/components/admin/AdminDateField";
 import { Plus, Pencil, Trash2, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -19,7 +21,7 @@ export default function AdminEvents() {
 
   const invalidate = () => qc.invalidateQueries({ queryKey: getAdminListEventsQueryKey() });
   const openCreate = () => setModal({ mode: "create", form: { ...empty } });
-  const openEdit = (e: NonNullable<typeof events>[0]) => setModal({ mode: "edit", id: e.id, form: { slug: e.slug, title: e.title, description: e.description ?? "", location: e.location ?? "", eventDate: e.eventDate, eventEndDate: e.eventEndDate ?? "", registrationUrl: e.registrationUrl ?? "", isPublished: e.isPublished } });
+  const openEdit = (e: NonNullable<typeof events>[0]) => setModal({ mode: "edit", id: e.id, form: { slug: e.slug, title: e.title, description: e.description ?? "", location: e.location ?? "", eventDate: e.eventDate?.slice(0, 10) ?? e.eventDate, eventEndDate: e.eventEndDate ? e.eventEndDate.slice(0, 10) : "", registrationUrl: e.registrationUrl ?? "", isPublished: e.isPublished } });
   const handleSave = () => {
     if (!modal) return;
     const data = { ...modal.form, eventEndDate: modal.form.eventEndDate || undefined, registrationUrl: modal.form.registrationUrl || undefined } as never;
@@ -57,16 +59,29 @@ export default function AdminEvents() {
       </div>
       {modal && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#151515] border border-[#2A2A2A] p-8 w-full max-w-xl max-h-[90vh] overflow-y-auto">
+          <div className={adminModalPanelClass}>
             <div className="flex items-center justify-between mb-6"><h2 className="text-xl font-serif text-[#F7F4EE]">{modal.mode === "create" ? "Add Event" : "Edit Event"}</h2><button onClick={() => setModal(null)}><X size={20} className="text-[#B8B8B8]" /></button></div>
             <div className="space-y-4">
-              {[{ l: "Slug", k: "slug" }, { l: "Title", k: "title" }, { l: "Description", k: "description", ta: true }, { l: "Location", k: "location" }, { l: "Event Date (YYYY-MM-DD)", k: "eventDate" }, { l: "End Date (YYYY-MM-DD)", k: "eventEndDate" }, { l: "Registration URL", k: "registrationUrl" }].map(({ l, k, ta }) => (
+              {[{ l: "Slug", k: "slug" }, { l: "Title", k: "title" }, { l: "Description", k: "description", ta: true }, { l: "Location", k: "location" }, { l: "Registration URL", k: "registrationUrl" }].map(({ l, k, ta }) => (
                 <div key={k}>
                   <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">{l}</label>
                   {ta ? <textarea rows={3} value={(modal.form as never)[k]} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, [k]: e.target.value } }))} className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none resize-none" />
                   : <input type="text" value={(modal.form as never)[k]} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, [k]: e.target.value } }))} className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />}
                 </div>
               ))}
+              <div className="grid grid-cols-2 gap-4">
+                <AdminDateField
+                  label="Event Date"
+                  value={modal.form.eventDate}
+                  onChange={v => setModal(m => m && ({ ...m, form: { ...m.form, eventDate: v } }))}
+                />
+                <AdminDateField
+                  label="End Date"
+                  value={modal.form.eventEndDate}
+                  onChange={v => setModal(m => m && ({ ...m, form: { ...m.form, eventEndDate: v } }))}
+                  onClear={() => setModal(m => m && ({ ...m, form: { ...m.form, eventEndDate: "" } }))}
+                />
+              </div>
               <div className="flex items-center gap-3"><input type="checkbox" checked={modal.form.isPublished} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, isPublished: e.target.checked } }))} className="w-4 h-4 accent-[#C6A15B]" /><span className="text-[#B8B8B8] text-sm">Published</span></div>
             </div>
             <div className="flex gap-4 mt-8">

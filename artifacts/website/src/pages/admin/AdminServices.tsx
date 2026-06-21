@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAdminListServices, useCreateService, useUpdateService, useDeleteService, getAdminListServicesQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { adminModalPanelClass } from "@/components/admin-panel-classes";
 import AdminLayout from "@/components/AdminLayout";
 import { Plus, Pencil, Trash2, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -74,7 +75,7 @@ export default function AdminServices() {
 
       {modal && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#151515] border border-[#2A2A2A] p-8 w-full max-w-xl max-h-[90vh] overflow-y-auto">
+          <div className={adminModalPanelClass}>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-serif text-[#F7F4EE]">{modal.mode === "create" ? "Add Service" : "Edit Service"}</h2>
               <button onClick={() => setModal(null)} className="text-[#B8B8B8] hover:text-[#F7F4EE]"><X size={20} /></button>

@@ -2,6 +2,7 @@ export * from "./admin-users";
 export * from "./site-settings";
 export * from "./services";
 export * from "./people";
+export * from "./people-roles";
 export * from "./articles";
 export * from "./events";
 export * from "./awards";

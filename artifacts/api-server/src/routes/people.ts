@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { eq, asc } from "drizzle-orm";
-import { db, peopleTable } from "@workspace/db";
+import { db, peopleTable, normalizePersonRole } from "@workspace/db";
 import {
   ListPeopleQueryParams,
   GetPersonParams,
@@ -15,11 +15,16 @@ const router: IRouter = Router();
 
 const THREE_MONTHS_MS = 90 * 24 * 60 * 60 * 1000;
 
-function computeMemberStatus(row: typeof peopleTable.$inferSelect): "just_joined" | "left" | null {
+function isStillOnStaff(leftAt: Date | null, now = new Date()): boolean {
+  if (!leftAt) return true;
+  const today = now.toISOString().slice(0, 10);
+  const lastDay = leftAt.toISOString().slice(0, 10);
+  return today <= lastDay;
+}
+
+function computeMemberStatus(row: typeof peopleTable.$inferSelect): "just_joined" | null {
   const now = Date.now();
-  if (row.leftAt) {
-    return (now - row.leftAt.getTime()) <= THREE_MONTHS_MS ? "left" : null;
-  }
+  if (row.leftAt) return null;
   if (row.joinedAt) {
     return (now - row.joinedAt.getTime()) <= THREE_MONTHS_MS ? "just_joined" : null;
   }
@@ -49,16 +54,11 @@ router.get("/people", async (req, res): Promise<void> => {
     .where(eq(peopleTable.isPublished, true))
     .orderBy(asc(peopleTable.sortOrder));
 
-  const now = Date.now();
-
-  // Exclude people who left more than 3 months ago
-  let filtered = rows.filter(r => {
-    if (r.leftAt) return (now - r.leftAt.getTime()) <= THREE_MONTHS_MS;
-    return true;
-  });
+  let filtered = rows.filter(r => isStillOnStaff(r.leftAt));
 
   if (queryParams.data.role) {
-    filtered = filtered.filter(r => r.role === queryParams.data.role);
+    const role = normalizePersonRole(queryParams.data.role);
+    filtered = filtered.filter(r => normalizePersonRole(r.role) === role);
   }
   if (queryParams.data.practiceArea) {
     filtered = filtered.filter(
@@ -77,6 +77,10 @@ router.get("/people/:slug", async (req, res): Promise<void> => {
   }
   const [row] = await db.select().from(peopleTable).where(eq(peopleTable.slug, params.data.slug));
   if (!row) { res.status(404).json({ error: "Person not found" }); return; }
+  if (!isStillOnStaff(row.leftAt)) {
+    res.status(404).json({ error: "Person not found" });
+    return;
+  }
   res.json(withStatus(row));
 });
 
@@ -89,6 +93,7 @@ router.post("/admin/people", requireAdmin, async (req, res): Promise<void> => {
   const parsed = CreatePersonBody.safeParse(req.body);
   if (!parsed.success) { res.status(400).json({ error: parsed.error.message }); return; }
   const data = { ...parsed.data } as Record<string, unknown>;
+  if (typeof data.role === "string") data.role = normalizePersonRole(data.role);
   if (data.joinedAt) data.joinedAt = toDateOrNull(data.joinedAt);
   if (data.leftAt) data.leftAt = toDateOrNull(data.leftAt);
   const [row] = await db.insert(peopleTable).values(data as never).returning();
@@ -101,7 +106,7 @@ router.put("/admin/people/:id", requireAdmin, async (req, res): Promise<void> =>
   const parsed = UpdatePersonBody.safeParse(req.body);
   if (!parsed.success) { res.status(400).json({ error: parsed.error.message }); return; }
   const data = { ...parsed.data } as Record<string, unknown>;
-  // Convert ISO strings to Date objects; allow null to clear the field
+  if (typeof data.role === "string") data.role = normalizePersonRole(data.role);
   if ("joinedAt" in data) data.joinedAt = data.joinedAt ? toDateOrNull(data.joinedAt) : null;
   if ("leftAt" in data) data.leftAt = data.leftAt ? toDateOrNull(data.leftAt) : null;
   const [row] = await db.update(peopleTable).set(data as never).where(eq(peopleTable.id, params.data.id)).returning();

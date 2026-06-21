@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAdminListDocuments, useCreateDocument, useUpdateDocument, useDeleteDocument, getAdminListDocumentsQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { adminModalPanelClass } from "@/components/admin-panel-classes";
 import AdminLayout from "@/components/AdminLayout";
 import { Plus, Pencil, Trash2, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -57,7 +58,7 @@ export default function AdminDocuments() {
       </div>
       {modal && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#151515] border border-[#2A2A2A] p-8 w-full max-w-md">
+          <div className={adminModalPanelClass}>
             <div className="flex items-center justify-between mb-6"><h2 className="text-xl font-serif text-[#F7F4EE]">{modal.mode === "create" ? "Add Document" : "Edit Document"}</h2><button onClick={() => setModal(null)}><X size={20} className="text-[#B8B8B8]" /></button></div>
             <div className="space-y-4">
               {[{ l: "Title", k: "title" }, { l: "Category", k: "category" }, { l: "Description", k: "description" }, { l: "File URL", k: "fileUrl" }, { l: "Sort Order", k: "sortOrder", num: true }].map(({ l, k, num }) => (

@@ -1,0 +1,40 @@
+FROM node:24-slim AS builder
+
+WORKDIR /app
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+ENV npm_config_user_agent="pnpm/9.0.0 pnpm/9"
+
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml .npmrc ./
+COPY tsconfig.base.json tsconfig.json ./
+COPY lib/ ./lib/
+COPY artifacts/api-server/ ./artifacts/api-server/
+
+RUN pnpm install --frozen-lockfile --ignore-scripts
+RUN pnpm --filter @workspace/api-server run build
+
+FROM node:24-slim AS runner
+
+WORKDIR /app
+
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+ENV npm_config_user_agent="pnpm/9.0.0"
+
+COPY --from=builder /app/package.json /app/pnpm-workspace.yaml /app/pnpm-lock.yaml /app/.npmrc ./
+COPY --from=builder /app/tsconfig.base.json /app/tsconfig.json ./
+COPY --from=builder /app/lib/ ./lib/
+COPY --from=builder /app/artifacts/api-server/ ./artifacts/api-server/
+
+RUN pnpm install --frozen-lockfile --ignore-scripts --prod
+
+ENV NODE_ENV=production
+ENV PORT=8080
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD node -e "fetch('http://127.0.0.1:8080/api/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+
+CMD ["node", "--enable-source-maps", "artifacts/api-server/dist/index.mjs"]

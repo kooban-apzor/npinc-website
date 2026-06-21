@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useAdminListArticles, useCreateArticle, useUpdateArticle, useDeleteArticle, getAdminListArticlesQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { adminModalPanelClass } from "@/components/admin-panel-classes";
 import AdminLayout from "@/components/AdminLayout";
+import AdminDateField from "@/components/admin/AdminDateField";
 import { Plus, Pencil, Trash2, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -61,16 +63,22 @@ export default function AdminArticles() {
       </div>
       {modal && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#151515] border border-[#2A2A2A] p-8 w-full max-w-xl max-h-[90vh] overflow-y-auto">
+          <div className={adminModalPanelClass}>
             <div className="flex items-center justify-between mb-6"><h2 className="text-xl font-serif text-[#F7F4EE]">{modal.mode === "create" ? "Add Article" : "Edit Article"}</h2><button onClick={() => setModal(null)} className="text-[#B8B8B8] hover:text-[#F7F4EE]"><X size={20} /></button></div>
             <div className="space-y-4">
-              {[{ l: "Slug", k: "slug" }, { l: "Title", k: "title" }, { l: "Summary", k: "summary", ta: true }, { l: "Content", k: "content", ta: true }, { l: "Author", k: "author" }, { l: "Published At (YYYY-MM-DD)", k: "publishedAt" }].map(({ l, k, ta }) => (
+              {[{ l: "Slug", k: "slug" }, { l: "Title", k: "title" }, { l: "Summary", k: "summary", ta: true }, { l: "Content", k: "content", ta: true }, { l: "Author", k: "author" }].map(({ l, k, ta }) => (
                 <div key={k}>
                   <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">{l}</label>
                   {ta ? <textarea rows={4} value={(modal.form as never)[k]} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, [k]: e.target.value } }))} className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none resize-none" />
                   : <input type="text" value={(modal.form as never)[k]} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, [k]: e.target.value } }))} className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />}
                 </div>
               ))}
+              <AdminDateField
+                label="Published At"
+                value={modal.form.publishedAt}
+                onChange={v => setModal(m => m && ({ ...m, form: { ...m.form, publishedAt: v } }))}
+                onClear={() => setModal(m => m && ({ ...m, form: { ...m.form, publishedAt: "" } }))}
+              />
               <div>
                 <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Category</label>
                 <select value={modal.form.category} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, category: e.target.value } }))} className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none">

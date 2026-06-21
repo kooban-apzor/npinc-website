@@ -1,0 +1,35 @@
+name: npinc
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.api
+    container_name: npinc-api
+    env_file: ../.env
+    networks:
+      - npinc
+      - infra_shared
+    expose:
+      - "8080"
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.web
+    container_name: npinc-web
+    ports:
+      - "127.0.0.1:3100:80"
+    depends_on:
+      - api
+    networks:
+      - npinc
+    restart: unless-stopped
+
+networks:
+  npinc:
+    name: npinc_internal
+  infra_shared:
+    external: true
+    name: infra_shared

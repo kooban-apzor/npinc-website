@@ -88,9 +88,6 @@ export default function PeoplePage() {
                   {(person as never as Record<string, unknown>).memberStatus === "just_joined" && (
                     <span className="text-[0.6rem] bg-[#C6A15B]/15 text-[#C6A15B] border border-[#C6A15B]/30 px-2 py-0.5 uppercase tracking-widest">Just Joined</span>
                   )}
-                  {(person as never as Record<string, unknown>).memberStatus === "left" && (
-                    <span className="text-[0.6rem] bg-[#555]/20 text-[#B8B8B8] border border-[#555]/40 px-2 py-0.5 uppercase tracking-widest">Left Practice</span>
-                  )}
                 </div>
                 <h2 className="text-xl font-serif text-[#F7F4EE] mb-2 group-hover:text-[#C6A15B] transition-colors">
                   {person.title ? `${person.title} ` : ""}{person.firstName} {person.lastName}

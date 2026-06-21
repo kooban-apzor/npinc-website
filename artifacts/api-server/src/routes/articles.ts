@@ -3,19 +3,35 @@ import { eq, desc } from "drizzle-orm";
 import { db, articlesTable } from "@workspace/db";
 import {
   ListArticlesQueryParams,
-  ListArticlesResponse,
   GetArticleParams,
-  AdminListArticlesResponse,
   CreateArticleBody,
   UpdateArticleParams,
   UpdateArticleBody,
-  UpdateArticleResponse,
   DeleteArticleParams,
-  DeleteArticleResponse,
 } from "@workspace/api-zod";
 import { requireAdmin } from "../middlewares/require-admin";
 
 const router: IRouter = Router();
+
+const JOIN_MOVEMENT_MS = 90 * 24 * 60 * 60 * 1000;
+const DEPART_MOVEMENT_MS = 30 * 24 * 60 * 60 * 1000;
+
+function toDateOrNull(val: unknown): Date | null {
+  if (!val) return null;
+  const d = new Date(val as string);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function isStaffMovementVisible(
+  row: typeof articlesTable.$inferSelect,
+  now = Date.now(),
+): boolean {
+  if (row.category !== "StaffMovement" || !row.publishedAt) return true;
+  const age = now - row.publishedAt.getTime();
+  if (row.slug.includes("-departs-")) return age <= DEPART_MOVEMENT_MS;
+  if (row.slug.includes("-joins-")) return age <= JOIN_MOVEMENT_MS;
+  return true;
+}
 
 router.get("/articles", async (req, res): Promise<void> => {
   const queryParams = ListArticlesQueryParams.safeParse(req.query);
@@ -30,9 +46,9 @@ router.get("/articles", async (req, res): Promise<void> => {
     .where(eq(articlesTable.isPublished, true))
     .orderBy(desc(articlesTable.publishedAt));
 
-  let filtered = rows;
+  let filtered = rows.filter(r => isStaffMovementVisible(r));
   if (queryParams.data.category) {
-    filtered = rows.filter((r) => r.category === queryParams.data.category);
+    filtered = filtered.filter((r) => r.category === queryParams.data.category);
   }
 
   res.json(filtered);
@@ -48,7 +64,7 @@ router.get("/articles/:slug", async (req, res): Promise<void> => {
     .select()
     .from(articlesTable)
     .where(eq(articlesTable.slug, params.data.slug));
-  if (!row) {
+  if (!row || !row.isPublished || !isStaffMovementVisible(row)) {
     res.status(404).json({ error: "Article not found" });
     return;
   }
@@ -69,7 +85,9 @@ router.post("/admin/articles", requireAdmin, async (req, res): Promise<void> => 
     res.status(400).json({ error: parsed.error.message });
     return;
   }
-  const [row] = await db.insert(articlesTable).values(parsed.data).returning();
+  const data = { ...parsed.data } as Record<string, unknown>;
+  if (data.publishedAt) data.publishedAt = toDateOrNull(data.publishedAt);
+  const [row] = await db.insert(articlesTable).values(data as never).returning();
   res.status(201).json(row);
 });
 
@@ -78,7 +96,11 @@ router.put("/admin/articles/:id", requireAdmin, async (req, res): Promise<void> 
   if (!params.success) { res.status(400).json({ error: params.error.message }); return; }
   const parsed = UpdateArticleBody.safeParse(req.body);
   if (!parsed.success) { res.status(400).json({ error: parsed.error.message }); return; }
-  const [row] = await db.update(articlesTable).set(parsed.data as never).where(eq(articlesTable.id, params.data.id)).returning();
+  const data = { ...parsed.data } as Record<string, unknown>;
+  if ("publishedAt" in data) {
+    data.publishedAt = data.publishedAt ? toDateOrNull(data.publishedAt) : null;
+  }
+  const [row] = await db.update(articlesTable).set(data as never).where(eq(articlesTable.id, params.data.id)).returning();
   if (!row) { res.status(404).json({ error: "Article not found" }); return; }
   res.json(row);
 });

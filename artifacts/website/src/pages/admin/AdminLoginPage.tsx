@@ -3,6 +3,7 @@ import { useAdminLogin, getGetAdminMeQueryKey } from "@workspace/api-client-reac
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { ShieldAlert, Lock } from "lucide-react";
+
 const logoPath = "/npinc/logo.png";
 
 type Mode = "login" | "reset";
