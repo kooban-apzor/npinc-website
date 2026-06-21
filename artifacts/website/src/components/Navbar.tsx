@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 const logoPath = "/npinc/logo.png";
 
 const navLinks = [
+  { href: "/", label: "Home" },
   { href: "/services", label: "Practice Areas" },
   { href: "/people", label: "Our People" },
   { href: "/insights", label: "Insights" },
