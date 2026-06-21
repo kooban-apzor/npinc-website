@@ -1,23 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useAdminLogin, getGetAdminMeQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 const logoPath = "/npinc/logo.png";
 
-const SESSION_EXPIRED_KEY = "npinc_session_expired";
-
 export default function AdminLoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [sessionExpired, setSessionExpired] = useState(false);
-
-  useEffect(() => {
-    if (sessionStorage.getItem(SESSION_EXPIRED_KEY)) {
-      setSessionExpired(true);
-      sessionStorage.removeItem(SESSION_EXPIRED_KEY);
-    }
-  }, []);
   const login = useAdminLogin();
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
@@ -44,12 +34,6 @@ export default function AdminLoginPage() {
           <p className="text-[#B8B8B8] text-xs uppercase tracking-widest">Admin Access</p>
         </div>
 
-        {sessionExpired && (
-          <div className="mb-6 border border-amber-700/50 bg-amber-950/40 px-4 py-3 text-sm text-amber-300 text-center" data-testid="banner-session-expired">
-            Your session has expired — please sign in again.
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-5" data-testid="form-admin-login">
           <div>
             <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-3">Username</label>
@@ -59,6 +43,7 @@ export default function AdminLoginPage() {
               onChange={e => setUsername(e.target.value)}
               required
               data-testid="input-admin-username"
+              autoComplete="username"
               className="w-full bg-[#151515] border border-[#2A2A2A] text-[#F7F4EE] px-4 py-4 focus:border-[#C6A15B] focus:outline-none transition-colors"
             />
           </div>
@@ -70,6 +55,7 @@ export default function AdminLoginPage() {
               onChange={e => setPassword(e.target.value)}
               required
               data-testid="input-admin-password"
+              autoComplete="current-password"
               className="w-full bg-[#151515] border border-[#2A2A2A] text-[#F7F4EE] px-4 py-4 focus:border-[#C6A15B] focus:outline-none transition-colors"
             />
           </div>

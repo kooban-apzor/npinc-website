@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link, useLocation } from "wouter";
 import { useGetAdminMe, useAdminLogout } from "@workspace/api-client-react";
 import {
@@ -21,18 +22,47 @@ const navItems = [
   { href: "/admin/enquiries", label: "Enquiries", icon: MessageSquare },
 ];
 
+const IDLE_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+
 interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const [location] = useLocation();
-  const { data: me } = useGetAdminMe({ query: { retry: false } });
+  const { data: me, isError } = useGetAdminMe({ query: { retry: false, staleTime: Infinity, refetchOnWindowFocus: false } });
   const logout = useAdminLogout();
+  const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Silently go home when the server says the session is no longer valid
+  useEffect(() => {
+    if (isError) {
+      window.location.replace("/");
+    }
+  }, [isError]);
+
+  // 30-minute idle timer — reset on any user activity, redirect home silently when it fires
+  useEffect(() => {
+    const resetTimer = () => {
+      if (idleTimer.current) clearTimeout(idleTimer.current);
+      idleTimer.current = setTimeout(() => {
+        window.location.replace("/");
+      }, IDLE_TIMEOUT_MS);
+    };
+
+    const events = ["mousemove", "mousedown", "keydown", "touchstart", "scroll", "click"];
+    events.forEach(ev => window.addEventListener(ev, resetTimer, { passive: true }));
+    resetTimer();
+
+    return () => {
+      events.forEach(ev => window.removeEventListener(ev, resetTimer));
+      if (idleTimer.current) clearTimeout(idleTimer.current);
+    };
+  }, []);
 
   const handleLogout = () => {
     logout.mutate({}, {
-      onSuccess: () => { window.location.href = "/"; }
+      onSuccess: () => { window.location.replace("/"); }
     });
   };
 
