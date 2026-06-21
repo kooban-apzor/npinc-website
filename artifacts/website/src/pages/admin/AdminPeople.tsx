@@ -35,9 +35,11 @@ function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-// ─── Grayscale photo upload ──────────────────────────────────────────────────
+// ─── Grayscale photo upload ───────────────────────────────────────────────────
+// Output is always 300×300 square (center-top crop) to match the existing
+// person photo standard used throughout the public site.
 
-const MAX_PX = 800;
+const TARGET_SIZE = 300;
 
 function toGrayscaleDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -45,16 +47,23 @@ function toGrayscaleDataUrl(file: File): Promise<string> {
     const objectUrl = URL.createObjectURL(file);
     img.onload = () => {
       URL.revokeObjectURL(objectUrl);
-      const scale = Math.min(1, MAX_PX / Math.max(img.naturalWidth, img.naturalHeight));
-      const w = Math.round(img.naturalWidth * scale);
-      const h = Math.round(img.naturalHeight * scale);
+
+      // Scale so the shorter dimension fills TARGET_SIZE (cover mode)
+      const scale = TARGET_SIZE / Math.min(img.naturalWidth, img.naturalHeight);
+      const scaledW = Math.round(img.naturalWidth * scale);
+      const scaledH = Math.round(img.naturalHeight * scale);
+
+      // Center-horizontal, top-biased crop (keeps face in frame)
+      const sx = Math.round((scaledW - TARGET_SIZE) / 2);
+      const sy = Math.round((scaledH - TARGET_SIZE) * 0.15); // 15% from top
+
       const canvas = document.createElement("canvas");
-      canvas.width = w;
-      canvas.height = h;
+      canvas.width = TARGET_SIZE;
+      canvas.height = TARGET_SIZE;
       const ctx = canvas.getContext("2d")!;
       ctx.filter = "grayscale(100%)";
-      ctx.drawImage(img, 0, 0, w, h);
-      resolve(canvas.toDataURL("image/jpeg", 0.82));
+      ctx.drawImage(img, -sx, -sy, scaledW, scaledH);
+      resolve(canvas.toDataURL("image/jpeg", 0.88));
     };
     img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error("Image load failed")); };
     img.src = objectUrl;

@@ -39,8 +39,18 @@ export default function PersonDetailPage({ slug }: Props) {
         </Link>
 
         <div className="flex flex-col md:flex-row gap-12 mb-16">
-          <div className="w-24 h-24 bg-[#C6A15B]/10 border border-[#C6A15B]/20 flex items-center justify-center text-[#C6A15B] font-serif text-4xl shrink-0">
-            {person.firstName[0]}{person.lastName[0]}
+          <div className="shrink-0">
+            {person.photoUrl ? (
+              <img
+                src={person.photoUrl}
+                alt={`${person.firstName} ${person.lastName}`}
+                className="w-40 h-40 object-cover object-top grayscale"
+              />
+            ) : (
+              <div className="w-24 h-24 bg-[#C6A15B]/10 border border-[#C6A15B]/20 flex items-center justify-center text-[#C6A15B] font-serif text-4xl">
+                {person.firstName[0]}{person.lastName[0]}
+              </div>
+            )}
           </div>
           <div>
             <div className="flex items-center gap-3 mb-3 flex-wrap">
