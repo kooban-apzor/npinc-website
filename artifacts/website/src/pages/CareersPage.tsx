@@ -177,7 +177,7 @@ export default function CareersPage() {
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-3">Cover Letter / Message</label>
+                <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-3">Message</label>
                 <textarea
                   value={form.coverLetter}
                   onChange={e => setForm(f => ({ ...f, coverLetter: e.target.value }))}
