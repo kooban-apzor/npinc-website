@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useAdminListPeople, useCreatePerson, useUpdatePerson, useDeletePerson, getAdminListPeopleQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import AdminLayout from "@/components/AdminLayout";
-import { Plus, Pencil, Trash2, X, UserCheck, UserMinus } from "lucide-react";
+import { Plus, Pencil, Trash2, X, UserCheck, UserMinus, Upload, ImageOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const ROLES = ["Partner", "Director", "Associate", "CandidateAttorney", "Consultant", "Support"];
@@ -24,6 +24,124 @@ const empty: Form = {
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
+}
+
+const MAX_PX = 800;
+
+function toGrayscaleDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      const scale = Math.min(1, MAX_PX / Math.max(img.naturalWidth, img.naturalHeight));
+      const w = Math.round(img.naturalWidth * scale);
+      const h = Math.round(img.naturalHeight * scale);
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d")!;
+      ctx.filter = "grayscale(100%)";
+      ctx.drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL("image/jpeg", 0.82));
+    };
+    img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error("Image load failed")); };
+    img.src = objectUrl;
+  });
+}
+
+function PhotoUpload({ value, onChange }: { value: string; onChange: (url: string) => void }) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+  const [converting, setConverting] = useState(false);
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!fileRef.current) fileRef.current = e.target;
+    if (fileRef.current) fileRef.current.value = "";
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Please select an image file.", variant: "destructive" });
+      return;
+    }
+    setConverting(true);
+    try {
+      const dataUrl = await toGrayscaleDataUrl(file);
+      onChange(dataUrl);
+    } catch {
+      toast({ title: "Could not process image. Please try another file.", variant: "destructive" });
+    } finally {
+      setConverting(false);
+    }
+  };
+
+  const isDataUrl = value.startsWith("data:");
+  const hasPhoto = Boolean(value);
+
+  return (
+    <div>
+      <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Photo</label>
+
+      {hasPhoto ? (
+        <div className="flex items-start gap-4">
+          <div className="relative shrink-0">
+            <img
+              src={value}
+              alt="Preview"
+              className="w-24 h-24 object-cover grayscale border border-[#2A2A2A]"
+            />
+            {isDataUrl && (
+              <span className="absolute -top-1 -right-1 bg-[#C6A15B] text-[#0E0E0E] text-[9px] px-1 leading-tight uppercase tracking-widest">
+                B&W
+              </span>
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              disabled={converting}
+              className="flex items-center gap-2 border border-[#2A2A2A] hover:border-[#C6A15B]/50 text-[#B8B8B8] hover:text-[#C6A15B] px-3 py-2 text-xs transition-colors disabled:opacity-50"
+            >
+              <Upload size={12} />
+              {converting ? "Converting to B&W…" : "Replace photo"}
+            </button>
+            <button
+              type="button"
+              onClick={() => onChange("")}
+              className="flex items-center gap-2 border border-[#2A2A2A] hover:border-red-400/40 text-[#B8B8B8] hover:text-red-400 px-3 py-2 text-xs transition-colors"
+            >
+              <ImageOff size={12} />
+              Remove photo
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div
+          className="border border-dashed border-[#2A2A2A] hover:border-[#C6A15B]/50 p-6 text-center cursor-pointer transition-colors"
+          onClick={() => fileRef.current?.click()}
+        >
+          {converting ? (
+            <p className="text-[#B8B8B8] text-sm">Converting to black & white…</p>
+          ) : (
+            <>
+              <Upload size={18} className="text-[#C6A15B] mx-auto mb-2" />
+              <p className="text-[#B8B8B8] text-sm">Click to upload a photo</p>
+              <p className="text-[#B8B8B8]/50 text-xs mt-1">Automatically converted to black & white on save</p>
+            </>
+          )}
+        </div>
+      )}
+
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFile}
+      />
+    </div>
+  );
 }
 
 export default function AdminPeople() {
@@ -95,11 +213,11 @@ export default function AdminPeople() {
     return null;
   };
 
-  const fields: { label: string; key: keyof Form; ta?: boolean; num?: boolean }[] = [
+  const textFields: { label: string; key: keyof Form; ta?: boolean; num?: boolean }[] = [
     { label: "Slug", key: "slug" }, { label: "First Name", key: "firstName" }, { label: "Last Name", key: "lastName" },
     { label: "Title (Mr/Ms/Dr)", key: "title" }, { label: "Qualifications", key: "qualifications" },
     { label: "Admissions", key: "admissions" }, { label: "Bio", key: "bio", ta: true },
-    { label: "Email", key: "email" }, { label: "Phone", key: "phone" }, { label: "Photo URL", key: "photoUrl" },
+    { label: "Email", key: "email" }, { label: "Phone", key: "phone" },
     { label: "Practice Areas (comma-separated)", key: "practiceAreas" }, { label: "Sort Order", key: "sortOrder", num: true },
   ];
 
@@ -122,12 +240,21 @@ export default function AdminPeople() {
           <div className="space-y-3">
             {(people ?? []).map(p => (
               <div key={p.id} data-testid={`row-person-${p.id}`} className="flex items-center justify-between bg-[#151515] border border-[#2A2A2A] px-6 py-4">
-                <div>
-                  <div className="flex items-center gap-3 mb-1">
-                    <h3 className="text-[#F7F4EE] font-serif">{p.firstName} {p.lastName}</h3>
-                    {statusBadge(p)}
+                <div className="flex items-center gap-4">
+                  {p.photoUrl ? (
+                    <img src={p.photoUrl} alt="" className="w-10 h-10 object-cover grayscale shrink-0 border border-[#2A2A2A]" />
+                  ) : (
+                    <div className="w-10 h-10 bg-[#2A2A2A] shrink-0 flex items-center justify-center text-[#555]">
+                      <ImageOff size={14} />
+                    </div>
+                  )}
+                  <div>
+                    <div className="flex items-center gap-3 mb-1">
+                      <h3 className="text-[#F7F4EE] font-serif">{p.firstName} {p.lastName}</h3>
+                      {statusBadge(p)}
+                    </div>
+                    <p className="text-[#B8B8B8] text-xs">{p.role} · {p.isPublished ? <span className="text-green-400">Published</span> : <span className="text-red-400">Draft</span>}</p>
                   </div>
-                  <p className="text-[#B8B8B8] text-xs">{p.role} · {p.isPublished ? <span className="text-green-400">Published</span> : <span className="text-red-400">Draft</span>}</p>
                 </div>
                 <div className="flex gap-3">
                   <button onClick={() => openEdit(p)} data-testid={`button-edit-person-${p.id}`} className="text-[#B8B8B8] hover:text-[#C6A15B] p-2"><Pencil size={15} /></button>
@@ -157,8 +284,14 @@ export default function AdminPeople() {
                 </select>
               </div>
 
-              {/* Standard fields */}
-              {fields.map(({ label, key, ta, num }) => (
+              {/* Photo upload */}
+              <PhotoUpload
+                value={modal.form.photoUrl}
+                onChange={url => setForm({ photoUrl: url })}
+              />
+
+              {/* Text fields (Photo URL removed) */}
+              {textFields.map(({ label, key, ta, num }) => (
                 <div key={key}>
                   <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">{label}</label>
                   {ta ? (
@@ -187,7 +320,6 @@ export default function AdminPeople() {
                 </p>
 
                 <div className="grid grid-cols-2 gap-4 mb-5">
-                  {/* Quick action buttons */}
                   <button
                     type="button"
                     onClick={() => setForm({ joinedAt: todayISO(), leftAt: "" })}
