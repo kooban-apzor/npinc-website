@@ -1,8 +1,11 @@
 import { useState, useRef } from "react";
-import { useAdminListPeople, useCreatePerson, useUpdatePerson, useDeletePerson, getAdminListPeopleQueryKey } from "@workspace/api-client-react";
+import {
+  useAdminListPeople, useCreatePerson, useUpdatePerson, useDeletePerson, getAdminListPeopleQueryKey,
+  useCreateArticle,
+} from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import AdminLayout from "@/components/AdminLayout";
-import { Plus, Pencil, Trash2, X, UserCheck, UserMinus, Upload, ImageOff } from "lucide-react";
+import { Plus, Pencil, Trash2, X, UserCheck, UserMinus, Upload, ImageOff, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const ROLES = ["Partner", "Director", "Associate", "CandidateAttorney", "Consultant", "Support"];
@@ -15,16 +18,24 @@ type Form = {
   joinedAt: string; leftAt: string;
 };
 
-const empty: Form = {
+type DraftArticle = { enabled: boolean; type: "joined" | "departed" | null };
+
+const emptyForm = (nextOrder: number): Form => ({
   slug: "", firstName: "", lastName: "", role: "Associate", title: "",
   qualifications: "", admissions: "", bio: "", email: "", phone: "",
-  photoUrl: "", practiceAreas: "", sortOrder: 0, isPublished: true,
+  photoUrl: "", practiceAreas: "", sortOrder: nextOrder, isPublished: true,
   joinedAt: "", leftAt: "",
-};
+});
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
+
+function slugify(s: string) {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+// ─── Grayscale photo upload ──────────────────────────────────────────────────
 
 const MAX_PX = 800;
 
@@ -57,7 +68,6 @@ function PhotoUpload({ value, onChange }: { value: string; onChange: (url: strin
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!fileRef.current) fileRef.current = e.target;
     if (fileRef.current) fileRef.current.value = "";
     if (!file) return;
     if (!file.type.startsWith("image/")) {
@@ -75,87 +85,66 @@ function PhotoUpload({ value, onChange }: { value: string; onChange: (url: strin
     }
   };
 
-  const isDataUrl = value.startsWith("data:");
-  const hasPhoto = Boolean(value);
-
   return (
     <div>
       <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Photo</label>
-
-      {hasPhoto ? (
+      {value ? (
         <div className="flex items-start gap-4">
           <div className="relative shrink-0">
-            <img
-              src={value}
-              alt="Preview"
-              className="w-24 h-24 object-cover grayscale border border-[#2A2A2A]"
-            />
-            {isDataUrl && (
-              <span className="absolute -top-1 -right-1 bg-[#C6A15B] text-[#0E0E0E] text-[9px] px-1 leading-tight uppercase tracking-widest">
-                B&W
-              </span>
+            <img src={value} alt="Preview" className="w-24 h-24 object-cover grayscale border border-[#2A2A2A]" />
+            {value.startsWith("data:") && (
+              <span className="absolute -top-1 -right-1 bg-[#C6A15B] text-[#0E0E0E] text-[9px] px-1 leading-tight uppercase tracking-widest">B&W</span>
             )}
           </div>
           <div className="flex flex-col gap-2">
-            <button
-              type="button"
-              onClick={() => fileRef.current?.click()}
-              disabled={converting}
-              className="flex items-center gap-2 border border-[#2A2A2A] hover:border-[#C6A15B]/50 text-[#B8B8B8] hover:text-[#C6A15B] px-3 py-2 text-xs transition-colors disabled:opacity-50"
-            >
-              <Upload size={12} />
-              {converting ? "Converting to B&W…" : "Replace photo"}
+            <button type="button" onClick={() => fileRef.current?.click()} disabled={converting}
+              className="flex items-center gap-2 border border-[#2A2A2A] hover:border-[#C6A15B]/50 text-[#B8B8B8] hover:text-[#C6A15B] px-3 py-2 text-xs transition-colors disabled:opacity-50">
+              <Upload size={12} />{converting ? "Converting…" : "Replace photo"}
             </button>
-            <button
-              type="button"
-              onClick={() => onChange("")}
-              className="flex items-center gap-2 border border-[#2A2A2A] hover:border-red-400/40 text-[#B8B8B8] hover:text-red-400 px-3 py-2 text-xs transition-colors"
-            >
-              <ImageOff size={12} />
-              Remove photo
+            <button type="button" onClick={() => onChange("")}
+              className="flex items-center gap-2 border border-[#2A2A2A] hover:border-red-400/40 text-[#B8B8B8] hover:text-red-400 px-3 py-2 text-xs transition-colors">
+              <ImageOff size={12} />Remove photo
             </button>
           </div>
         </div>
       ) : (
-        <div
-          className="border border-dashed border-[#2A2A2A] hover:border-[#C6A15B]/50 p-6 text-center cursor-pointer transition-colors"
-          onClick={() => fileRef.current?.click()}
-        >
-          {converting ? (
-            <p className="text-[#B8B8B8] text-sm">Converting to black & white…</p>
-          ) : (
+        <div className="border border-dashed border-[#2A2A2A] hover:border-[#C6A15B]/50 p-5 text-center cursor-pointer transition-colors"
+          onClick={() => fileRef.current?.click()}>
+          {converting ? <p className="text-[#B8B8B8] text-sm">Converting to black & white…</p> : (
             <>
               <Upload size={18} className="text-[#C6A15B] mx-auto mb-2" />
               <p className="text-[#B8B8B8] text-sm">Click to upload a photo</p>
-              <p className="text-[#B8B8B8]/50 text-xs mt-1">Automatically converted to black & white on save</p>
+              <p className="text-[#B8B8B8]/50 text-xs mt-1">Automatically converted to black & white</p>
             </>
           )}
         </div>
       )}
-
-      <input
-        ref={fileRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={handleFile}
-      />
+      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
     </div>
   );
 }
+
+// ─── Main component ──────────────────────────────────────────────────────────
 
 export default function AdminPeople() {
   const { data: people, isLoading } = useAdminListPeople();
   const create = useCreatePerson();
   const update = useUpdatePerson();
   const remove = useDeletePerson();
+  const createArticle = useCreateArticle();
   const qc = useQueryClient();
   const { toast } = useToast();
-  const [modal, setModal] = useState<{ mode: "create" | "edit"; id?: number; form: Form } | null>(null);
+
+  const [modal, setModal] = useState<{ mode: "create" | "edit"; id?: number; form: Form; draft: DraftArticle } | null>(null);
 
   const invalidate = () => qc.invalidateQueries({ queryKey: getAdminListPeopleQueryKey() });
 
-  const openCreate = () => setModal({ mode: "create", form: { ...empty } });
+  const nextSortOrder = () => {
+    const orders = (people ?? []).map(p => p.sortOrder);
+    return orders.length ? Math.max(...orders) + 1 : 1;
+  };
+
+  const openCreate = () => setModal({ mode: "create", form: emptyForm(nextSortOrder()), draft: { enabled: false, type: null } });
   const openEdit = (p: NonNullable<typeof people>[0]) => setModal({
     mode: "edit", id: p.id,
     form: {
@@ -167,11 +156,55 @@ export default function AdminPeople() {
       sortOrder: p.sortOrder, isPublished: p.isPublished,
       joinedAt: p.joinedAt ? p.joinedAt.slice(0, 10) : "",
       leftAt: p.leftAt ? p.leftAt.slice(0, 10) : "",
-    }
+    },
+    draft: { enabled: false, type: null },
   });
 
   const setForm = (patch: Partial<Form>) =>
     setModal(m => m ? { ...m, form: { ...m.form, ...patch } } : null);
+
+  const setDraft = (patch: Partial<DraftArticle>) =>
+    setModal(m => m ? { ...m, draft: { ...m.draft, ...patch } } : null);
+
+  const markJoined = () => {
+    setForm({ joinedAt: todayISO(), leftAt: "" });
+    setDraft({ enabled: true, type: "joined" });
+  };
+  const markDeparted = () => {
+    setForm({ leftAt: todayISO() });
+    setDraft({ enabled: true, type: "departed" });
+  };
+
+  const createDraftArticle = (form: Form, type: "joined" | "departed") => {
+    const fullName = `${form.firstName} ${form.lastName}`.trim();
+    const today = todayISO();
+    const isJoin = type === "joined";
+    const title = isJoin
+      ? `NP Inc Welcomes ${fullName}`
+      : `${fullName} Departs NP Inc`;
+    const summary = isJoin
+      ? `Nike Pillay Inc is pleased to welcome ${fullName} to the team${form.role ? ` as ${form.role}` : ""}.`
+      : `Nike Pillay Inc bids farewell to ${fullName}${form.role ? `, ${form.role}` : ""}, and wishes them well in their future endeavours.`;
+    const content = isJoin
+      ? `Nike Pillay Inc is delighted to announce the appointment of ${fullName}${form.role ? ` as ${form.role}` : ""}.\n\n[Add details about their background, expertise, and what they bring to the firm.]\n\n${form.qualifications ? `Qualifications: ${form.qualifications}\n\n` : ""}We look forward to the contribution ${form.firstName} will make to our team and clients.`
+      : `Nike Pillay Inc announces that ${fullName}${form.role ? `, ${form.role}` : ""}, has departed the firm.\n\n[Add a note about their time at the firm and any farewell message.]\n\nWe thank ${form.firstName} for their valued contribution and wish them every success in the future.`;
+
+    createArticle.mutate({
+      data: {
+        slug: slugify(`${fullName}-${isJoin ? "joins" : "departs"}-np-inc-${today}`),
+        title,
+        category: "StaffMovement",
+        summary,
+        content,
+        author: "NP Inc",
+        publishedAt: today,
+        isPublished: false,
+      } as never,
+    }, {
+      onSuccess: () => toast({ title: "Draft article created", description: `"${title}" saved as a draft in Insights.` }),
+      onError: () => toast({ title: "Could not create article draft", variant: "destructive" }),
+    });
+  };
 
   const handleSave = () => {
     if (!modal) return;
@@ -182,14 +215,21 @@ export default function AdminPeople() {
       joinedAt: modal.form.joinedAt || null,
       leftAt: modal.form.leftAt || null,
     };
+    const afterSave = () => {
+      invalidate();
+      setModal(null);
+      if (modal.draft.enabled && modal.draft.type) {
+        createDraftArticle(modal.form, modal.draft.type);
+      }
+    };
     if (modal.mode === "create") {
       create.mutate({ data: data as never }, {
-        onSuccess: () => { invalidate(); setModal(null); toast({ title: "Person created" }); },
+        onSuccess: () => { afterSave(); toast({ title: "Person created" }); },
         onError: () => toast({ title: "Error", variant: "destructive" })
       });
     } else {
       update.mutate({ id: modal.id!, data: data as never }, {
-        onSuccess: () => { invalidate(); setModal(null); toast({ title: "Person updated" }); },
+        onSuccess: () => { afterSave(); toast({ title: "Person updated" }); },
         onError: () => toast({ title: "Error", variant: "destructive" })
       });
     }
@@ -213,14 +253,6 @@ export default function AdminPeople() {
     return null;
   };
 
-  const textFields: { label: string; key: keyof Form; ta?: boolean; num?: boolean }[] = [
-    { label: "Slug", key: "slug" }, { label: "First Name", key: "firstName" }, { label: "Last Name", key: "lastName" },
-    { label: "Title (Mr/Ms/Dr)", key: "title" }, { label: "Qualifications", key: "qualifications" },
-    { label: "Admissions", key: "admissions" }, { label: "Bio", key: "bio", ta: true },
-    { label: "Email", key: "email" }, { label: "Phone", key: "phone" },
-    { label: "Practice Areas (comma-separated)", key: "practiceAreas" }, { label: "Sort Order", key: "sortOrder", num: true },
-  ];
-
   return (
     <AdminLayout>
       <div className="p-8 md:p-12">
@@ -229,7 +261,8 @@ export default function AdminPeople() {
             <h1 className="text-3xl font-serif text-[#F7F4EE]">People</h1>
             <p className="text-[#B8B8B8] mt-1">Manage team members and profiles.</p>
           </div>
-          <button onClick={openCreate} data-testid="button-create-person" className="flex items-center gap-2 bg-[#C6A15B] text-[#0E0E0E] px-5 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors">
+          <button onClick={openCreate} data-testid="button-create-person"
+            className="flex items-center gap-2 bg-[#C6A15B] text-[#0E0E0E] px-5 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors">
             <Plus size={16} /> Add Person
           </button>
         </div>
@@ -239,7 +272,8 @@ export default function AdminPeople() {
         ) : (
           <div className="space-y-3">
             {(people ?? []).map(p => (
-              <div key={p.id} data-testid={`row-person-${p.id}`} className="flex items-center justify-between bg-[#151515] border border-[#2A2A2A] px-6 py-4">
+              <div key={p.id} data-testid={`row-person-${p.id}`}
+                className="flex items-center justify-between bg-[#151515] border border-[#2A2A2A] px-6 py-4">
                 <div className="flex items-center gap-4">
                   {p.photoUrl ? (
                     <img src={p.photoUrl} alt="" className="w-10 h-10 object-cover grayscale shrink-0 border border-[#2A2A2A]" />
@@ -253,7 +287,7 @@ export default function AdminPeople() {
                       <h3 className="text-[#F7F4EE] font-serif">{p.firstName} {p.lastName}</h3>
                       {statusBadge(p)}
                     </div>
-                    <p className="text-[#B8B8B8] text-xs">{p.role} · {p.isPublished ? <span className="text-green-400">Published</span> : <span className="text-red-400">Draft</span>}</p>
+                    <p className="text-[#B8B8B8] text-xs">{p.role} · #{p.sortOrder} · {p.isPublished ? <span className="text-green-400">Published</span> : <span className="text-red-400">Draft</span>}</p>
                   </div>
                 </div>
                 <div className="flex gap-3">
@@ -268,75 +302,131 @@ export default function AdminPeople() {
 
       {modal && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#151515] border border-[#2A2A2A] p-8 w-full max-w-xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-serif text-[#F7F4EE]">{modal.mode === "create" ? "Add Person" : "Edit Person"}</h2>
+          <div className="bg-[#151515] border border-[#2A2A2A] p-8 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-serif text-[#F7F4EE]">{modal.mode === "create" ? "Add Person" : "Edit Person"}</h2>
               <button onClick={() => setModal(null)} className="text-[#B8B8B8] hover:text-[#F7F4EE]"><X size={20} /></button>
             </div>
 
-            <div className="space-y-4">
-              {/* Role */}
-              <div>
-                <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Role</label>
-                <select value={modal.form.role} onChange={e => setForm({ role: e.target.value })}
-                  className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none">
-                  {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
-                </select>
+            <div className="space-y-5">
+              {/* Photo */}
+              <PhotoUpload value={modal.form.photoUrl} onChange={url => setForm({ photoUrl: url })} />
+
+              {/* Row: Role + Sort Order */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Role</label>
+                  <select value={modal.form.role} onChange={e => setForm({ role: e.target.value })}
+                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none">
+                    {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Display Order</label>
+                  <input type="number" value={modal.form.sortOrder}
+                    onChange={e => setForm({ sortOrder: Number(e.target.value) })}
+                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
+                  <p className="text-[#555] text-xs mt-1">Lower number = appears earlier in the list</p>
+                </div>
               </div>
 
-              {/* Photo upload */}
-              <PhotoUpload
-                value={modal.form.photoUrl}
-                onChange={url => setForm({ photoUrl: url })}
-              />
-
-              {/* Text fields (Photo URL removed) */}
-              {textFields.map(({ label, key, ta, num }) => (
-                <div key={key}>
-                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">{label}</label>
-                  {ta ? (
-                    <textarea rows={3} value={modal.form[key] as string} onChange={e => setForm({ [key]: e.target.value })}
-                      className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none resize-none" />
-                  ) : (
-                    <input type={num ? "number" : "text"} value={modal.form[key] as string | number}
-                      onChange={e => setForm({ [key]: num ? Number(e.target.value) : e.target.value })}
-                      className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
-                  )}
+              {/* Row: First Name + Last Name */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">First Name</label>
+                  <input type="text" value={modal.form.firstName} onChange={e => setForm({ firstName: e.target.value })}
+                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
                 </div>
-              ))}
+                <div>
+                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Last Name</label>
+                  <input type="text" value={modal.form.lastName} onChange={e => setForm({ lastName: e.target.value })}
+                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
+                </div>
+              </div>
+
+              {/* Row: Title + Slug */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Title (Mr/Ms/Dr)</label>
+                  <input type="text" value={modal.form.title} onChange={e => setForm({ title: e.target.value })}
+                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
+                </div>
+                <div>
+                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Slug</label>
+                  <input type="text" value={modal.form.slug} onChange={e => setForm({ slug: e.target.value })}
+                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
+                </div>
+              </div>
+
+              {/* Row: Email + Phone */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Email</label>
+                  <input type="text" value={modal.form.email} onChange={e => setForm({ email: e.target.value })}
+                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
+                </div>
+                <div>
+                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Phone</label>
+                  <input type="text" value={modal.form.phone} onChange={e => setForm({ phone: e.target.value })}
+                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
+                </div>
+              </div>
+
+              {/* Row: Qualifications + Admissions */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Qualifications</label>
+                  <input type="text" value={modal.form.qualifications} onChange={e => setForm({ qualifications: e.target.value })}
+                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
+                </div>
+                <div>
+                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Admissions</label>
+                  <input type="text" value={modal.form.admissions} onChange={e => setForm({ admissions: e.target.value })}
+                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
+                </div>
+              </div>
+
+              {/* Bio */}
+              <div>
+                <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Bio</label>
+                <textarea rows={4} value={modal.form.bio} onChange={e => setForm({ bio: e.target.value })}
+                  className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none resize-none" />
+              </div>
+
+              {/* Practice Areas */}
+              <div>
+                <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Practice Areas <span className="normal-case text-[#555]">(comma-separated)</span></label>
+                <input type="text" value={modal.form.practiceAreas} onChange={e => setForm({ practiceAreas: e.target.value })}
+                  className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none"
+                  placeholder="e.g. Litigation, Labour, Corporate & Commercial" />
+              </div>
 
               {/* Published */}
               <div className="flex items-center gap-3">
-                <input type="checkbox" id="published" checked={modal.form.isPublished} onChange={e => setForm({ isPublished: e.target.checked })} className="w-4 h-4 accent-[#C6A15B]" />
-                <label htmlFor="published" className="text-[#B8B8B8] text-sm">Published</label>
+                <input type="checkbox" id="published" checked={modal.form.isPublished}
+                  onChange={e => setForm({ isPublished: e.target.checked })} className="w-4 h-4 accent-[#C6A15B]" />
+                <label htmlFor="published" className="text-[#B8B8B8] text-sm">Published (visible on public site)</label>
               </div>
 
-              {/* Staff status section */}
-              <div className="border-t border-[#2A2A2A] pt-5 mt-2">
-                <p className="text-[#C6A15B] text-xs uppercase tracking-widest mb-4">Staff Status</p>
+              {/* ─── Staff Status ─── */}
+              <div className="border-t border-[#2A2A2A] pt-6">
+                <p className="text-[#C6A15B] text-xs uppercase tracking-widest mb-3">Staff Status</p>
                 <p className="text-[#B8B8B8] text-xs leading-relaxed mb-5">
-                  "Just Joined" shows a gold badge on their profile for 90 days after the join date.<br />
-                  "Left the Practice" shows a badge and keeps them visible for 90 days, then hides them automatically.
+                  "Just Joined" shows a gold badge for 90 days. "Left the Practice" keeps them visible for 90 days then hides them automatically.
                 </p>
 
                 <div className="grid grid-cols-2 gap-4 mb-5">
-                  <button
-                    type="button"
-                    onClick={() => setForm({ joinedAt: todayISO(), leftAt: "" })}
-                    className="flex items-center justify-center gap-2 border border-[#C6A15B]/40 text-[#C6A15B] px-4 py-3 text-xs uppercase tracking-widest hover:bg-[#C6A15B]/10 transition-colors"
-                  >
+                  <button type="button" onClick={markJoined}
+                    className="flex items-center justify-center gap-2 border border-[#C6A15B]/40 text-[#C6A15B] px-4 py-3 text-xs uppercase tracking-widest hover:bg-[#C6A15B]/10 transition-colors">
                     <UserCheck size={14} /> Just Joined Today
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setForm({ leftAt: todayISO() })}
-                    className="flex items-center justify-center gap-2 border border-[#555]/40 text-[#B8B8B8] px-4 py-3 text-xs uppercase tracking-widest hover:bg-[#555]/10 transition-colors"
-                  >
+                  <button type="button" onClick={markDeparted}
+                    className="flex items-center justify-center gap-2 border border-[#555]/40 text-[#B8B8B8] px-4 py-3 text-xs uppercase tracking-widest hover:bg-[#555]/10 transition-colors">
                     <UserMinus size={14} /> Mark as Departed
                   </button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Join Date</label>
                     <input type="date" value={modal.form.joinedAt} onChange={e => setForm({ joinedAt: e.target.value })}
@@ -354,12 +444,42 @@ export default function AdminPeople() {
                     )}
                   </div>
                 </div>
+
+                {/* Draft article checkbox — appears only when a status button was clicked */}
+                {modal.draft.type && (
+                  <div className="bg-[#0E0E0E] border border-[#C6A15B]/20 px-4 py-4 flex items-start gap-3">
+                    <input
+                      type="checkbox"
+                      id="draft-article"
+                      checked={modal.draft.enabled}
+                      onChange={e => setDraft({ enabled: e.target.checked })}
+                      className="w-4 h-4 accent-[#C6A15B] mt-0.5 shrink-0"
+                    />
+                    <label htmlFor="draft-article" className="cursor-pointer">
+                      <span className="flex items-center gap-2 text-[#C6A15B] text-xs uppercase tracking-widest mb-1">
+                        <FileText size={12} />
+                        Create a Staff Movements article draft
+                      </span>
+                      <p className="text-[#B8B8B8] text-xs leading-relaxed">
+                        {modal.draft.type === "joined"
+                          ? `A pre-filled "Welcome ${modal.form.firstName || "…"}" draft will be saved to Insights — ready for you to review and publish.`
+                          : `A pre-filled departure note for ${modal.form.firstName || "…"} will be saved as a draft in Insights.`}
+                      </p>
+                    </label>
+                  </div>
+                )}
               </div>
             </div>
 
             <div className="flex gap-4 mt-8">
-              <button onClick={handleSave} data-testid="button-save-person" className="bg-[#C6A15B] text-[#0E0E0E] px-8 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors">Save</button>
-              <button onClick={() => setModal(null)} className="border border-[#2A2A2A] text-[#B8B8B8] px-8 py-3 text-sm hover:border-[#C6A15B] transition-colors">Cancel</button>
+              <button onClick={handleSave} data-testid="button-save-person"
+                className="bg-[#C6A15B] text-[#0E0E0E] px-10 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors">
+                Save
+              </button>
+              <button onClick={() => setModal(null)}
+                className="border border-[#2A2A2A] text-[#B8B8B8] px-8 py-3 text-sm hover:border-[#C6A15B] transition-colors">
+                Cancel
+              </button>
             </div>
           </div>
         </div>
