@@ -8,7 +8,8 @@ import AdminLayout from "@/components/AdminLayout";
 import { Plus, Pencil, Trash2, X, UserCheck, UserMinus, Upload, ImageOff, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const ROLES = ["Partner", "Director", "Associate", "CandidateAttorney", "Consultant", "Support"];
+const PRESET_ROLES = ["Partner", "Director", "Associate", "CandidateAttorney", "Consultant", "Support"];
+const CUSTOM_ROLE_VALUE = "__custom__";
 
 type Form = {
   slug: string; firstName: string; lastName: string; role: string;
@@ -325,10 +326,30 @@ export default function AdminPeople() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Role</label>
-                  <select value={modal.form.role} onChange={e => setForm({ role: e.target.value })}
-                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none">
-                    {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+                  <select
+                    value={PRESET_ROLES.includes(modal.form.role) ? modal.form.role : CUSTOM_ROLE_VALUE}
+                    onChange={e => {
+                      if (e.target.value === CUSTOM_ROLE_VALUE) {
+                        setForm({ role: "" });
+                      } else {
+                        setForm({ role: e.target.value });
+                      }
+                    }}
+                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none"
+                  >
+                    {PRESET_ROLES.map(r => <option key={r} value={r}>{r}</option>)}
+                    <option value={CUSTOM_ROLE_VALUE}>Custom…</option>
                   </select>
+                  {(!PRESET_ROLES.includes(modal.form.role)) && (
+                    <input
+                      type="text"
+                      value={modal.form.role}
+                      onChange={e => setForm({ role: e.target.value })}
+                      placeholder="Enter custom role title"
+                      autoFocus
+                      className="mt-2 w-full bg-[#0E0E0E] border border-[#C6A15B]/40 text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none placeholder:text-[#555]"
+                    />
+                  )}
                 </div>
                 <div>
                   <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Display Order</label>
