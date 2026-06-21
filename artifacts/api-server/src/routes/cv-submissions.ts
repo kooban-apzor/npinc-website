@@ -1,8 +1,8 @@
 import { Router, type IRouter } from "express";
+import multer from "multer";
 import { eq, desc } from "drizzle-orm";
 import { db, cvSubmissionsTable } from "@workspace/db";
 import {
-  SubmitCvBody,
   ListCvSubmissionsResponse,
   DeleteCvSubmissionParams,
   DeleteCvSubmissionResponse,
@@ -10,15 +10,32 @@ import {
 import { requireAdmin } from "../middlewares/require-admin";
 
 const router: IRouter = Router();
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024, files: 5 } });
 
-router.post("/cv-submissions", async (req, res): Promise<void> => {
-  const parsed = SubmitCvBody.safeParse(req.body);
-  if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
+router.post("/careers/submit", upload.array("files", 5), async (req, res): Promise<void> => {
+  const { name, email, phone, position, coverLetter } = req.body as Record<string, string>;
+  if (!name || !email) {
+    res.status(422).json({ error: "name and email are required" });
     return;
   }
-  const [row] = await db.insert(cvSubmissionsTable).values(parsed.data).returning();
-  res.status(201).json(row);
+
+  const files = req.files as Express.Multer.File[] | undefined;
+  const attachments = (files ?? []).map((f) => ({
+    filename: f.originalname,
+    mimetype: f.mimetype,
+    data: f.buffer.toString("base64"),
+  }));
+
+  const [row] = await db.insert(cvSubmissionsTable).values({
+    name,
+    email,
+    phone: phone || undefined,
+    position: position || undefined,
+    coverLetter: coverLetter || undefined,
+    attachments,
+  }).returning();
+
+  res.status(201).json({ success: true });
 });
 
 router.get("/admin/cv-submissions", requireAdmin, async (_req, res): Promise<void> => {

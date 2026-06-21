@@ -5,6 +5,7 @@
  * Nike Pillay Inc Law Firm API
  * OpenAPI spec version: 0.1.0
  */
+import type { CvSubmissionAttachmentsItem } from './cvSubmissionAttachmentsItem';
 
 export interface CvSubmission {
   id: number;
@@ -13,5 +14,6 @@ export interface CvSubmission {
   phone?: string;
   position?: string;
   coverLetter?: string;
+  attachments?: CvSubmissionAttachmentsItem[];
   createdAt?: string;
 }

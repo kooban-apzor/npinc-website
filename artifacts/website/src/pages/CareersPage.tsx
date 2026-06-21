@@ -1,30 +1,69 @@
-import { useListVacancies, useSubmitCv, getListVacanciesQueryKey } from "@workspace/api-client-react";
+import { useListVacancies, getListVacanciesQueryKey } from "@workspace/api-client-react";
 import { Link } from "wouter";
-import { ArrowRight, MapPin, Briefcase, Clock, Upload } from "lucide-react";
-import { useState } from "react";
+import { ArrowRight, MapPin, Briefcase, Clock, Paperclip, X, Upload } from "lucide-react";
+import { useState, useRef } from "react";
 import PublicLayout from "@/components/PublicLayout";
 import PageSEO from "@/components/PageSEO";
 import { useToast } from "@/hooks/use-toast";
 
+const MAX_FILES = 5;
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+const ACCEPTED = ".pdf,.doc,.docx,.txt,.rtf";
+
 export default function CareersPage() {
   const { data: vacancies, isLoading } = useListVacancies({ query: { queryKey: getListVacanciesQueryKey() } });
-  const submitCv = useSubmitCv();
   const { toast } = useToast();
   const [form, setForm] = useState({ name: "", email: "", phone: "", position: "", coverLetter: "" });
+  const [files, setFiles] = useState<File[]>([]);
   const [submitted, setSubmitted] = useState(false);
+  const [pending, setPending] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const addFiles = (incoming: FileList | null) => {
+    if (!incoming) return;
+    const toAdd = Array.from(incoming).filter((f) => {
+      if (f.size > MAX_FILE_SIZE) {
+        toast({ title: `${f.name} is too large`, description: "Maximum file size is 10 MB.", variant: "destructive" });
+        return false;
+      }
+      return true;
+    });
+    setFiles((prev) => {
+      const combined = [...prev, ...toAdd];
+      if (combined.length > MAX_FILES) {
+        toast({ title: "Too many files", description: `Maximum ${MAX_FILES} files per submission.`, variant: "destructive" });
+        return combined.slice(0, MAX_FILES);
+      }
+      return combined;
+    });
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const removeFile = (idx: number) => setFiles((prev) => prev.filter((_, i) => i !== idx));
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.email) return;
-    submitCv.mutate({ data: form }, {
-      onSuccess: () => {
-        setSubmitted(true);
-        toast({ title: "Application submitted", description: "We'll be in touch soon." });
-      },
-      onError: () => {
-        toast({ title: "Submission failed", description: "Please try again.", variant: "destructive" });
-      }
-    });
+    setPending(true);
+    try {
+      const fd = new FormData();
+      fd.append("name", form.name);
+      fd.append("email", form.email);
+      if (form.phone) fd.append("phone", form.phone);
+      if (form.position) fd.append("position", form.position);
+      if (form.coverLetter) fd.append("coverLetter", form.coverLetter);
+      files.forEach((f) => fd.append("files", f));
+
+      const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+      const res = await fetch(`${base}/api/careers/submit`, { method: "POST", body: fd });
+      if (!res.ok) throw new Error("Server error");
+      setSubmitted(true);
+      toast({ title: "Application submitted", description: "We'll be in touch soon." });
+    } catch {
+      toast({ title: "Submission failed", description: "Please try again.", variant: "destructive" });
+    } finally {
+      setPending(false);
+    }
   };
 
   return (
@@ -49,7 +88,7 @@ export default function CareersPage() {
             </div>
           ) : (vacancies ?? []).length === 0 ? (
             <div className="border border-[#2A2A2A] p-12 text-center text-[#B8B8B8]">
-              No current vacancies. Submit your CV below for future consideration.
+              No current vacancies. Submit your application below for future consideration.
             </div>
           ) : (
             <div className="space-y-4">
@@ -78,14 +117,14 @@ export default function CareersPage() {
           )}
         </div>
 
-        {/* CV submission */}
+        {/* Application form */}
         <div className="border border-[#2A2A2A] p-10 md:p-16">
-          <div className="flex items-center gap-3 mb-8">
+          <div className="flex items-center gap-3 mb-3">
             <Upload size={20} className="text-[#C6A15B]" />
-            <h2 className="text-2xl font-serif text-[#F7F4EE]">Submit Your CV</h2>
+            <h2 className="text-2xl font-serif text-[#F7F4EE]">Submit an Application</h2>
           </div>
           <p className="text-[#B8B8B8] mb-10 leading-relaxed">
-            Don't see a suitable opening? Submit your CV and we'll be in touch when a suitable opportunity arises.
+            Don't see a suitable opening? Submit your details and supporting documents — we'll be in touch when the right opportunity arises. You may attach your CV, academic transcripts, a covering letter, or any other relevant documents (up to {MAX_FILES} files, 10 MB each).
           </p>
 
           {submitted ? (
@@ -147,14 +186,55 @@ export default function CareersPage() {
                   className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-4 py-3 focus:border-[#C6A15B] focus:outline-none transition-colors resize-none"
                 />
               </div>
+
+              {/* File attachments */}
+              <div className="md:col-span-2">
+                <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-3">
+                  Supporting Documents <span className="normal-case text-[#B8B8B8]/60">(CV, transcripts, cover letter — up to {MAX_FILES} files)</span>
+                </label>
+                <div
+                  className="border border-dashed border-[#2A2A2A] hover:border-[#C6A15B]/50 transition-colors p-6 text-center cursor-pointer"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Paperclip size={20} className="text-[#C6A15B] mx-auto mb-2" />
+                  <p className="text-[#B8B8B8] text-sm">Click to attach documents</p>
+                  <p className="text-[#B8B8B8]/50 text-xs mt-1">PDF, Word, or plain text · 10 MB per file</p>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept={ACCEPTED}
+                  className="hidden"
+                  onChange={e => addFiles(e.target.files)}
+                  data-testid="input-cv-files"
+                />
+                {files.length > 0 && (
+                  <ul className="mt-3 space-y-2">
+                    {files.map((f, i) => (
+                      <li key={i} className="flex items-center justify-between bg-[#151515] border border-[#2A2A2A] px-4 py-3 text-sm">
+                        <span className="flex items-center gap-2 text-[#F7F4EE] truncate">
+                          <Paperclip size={13} className="text-[#C6A15B] shrink-0" />
+                          {f.name}
+                          <span className="text-[#B8B8B8]/60 text-xs shrink-0">({(f.size / 1024).toFixed(0)} KB)</span>
+                        </span>
+                        <button type="button" onClick={() => removeFile(i)} className="text-[#B8B8B8] hover:text-red-400 transition-colors ml-4 shrink-0">
+                          <X size={14} />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
               <div className="md:col-span-2">
                 <button
                   type="submit"
-                  disabled={submitCv.isPending}
+                  disabled={pending}
                   data-testid="button-cv-submit"
                   className="bg-[#C6A15B] text-[#0E0E0E] px-10 py-4 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors disabled:opacity-50"
                 >
-                  {submitCv.isPending ? "Submitting..." : "Submit Application"}
+                  {pending ? "Submitting..." : "Submit Application"}
                 </button>
               </div>
             </form>

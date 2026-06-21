@@ -15,6 +15,7 @@ export * from './changePasswordRequest';
 export * from './contactEnquiry';
 export * from './contactRequest';
 export * from './cvSubmission';
+export * from './cvSubmissionAttachmentsItem';
 export * from './cvSubmissionRequest';
 export * from './document';
 export * from './error';

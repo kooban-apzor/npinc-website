@@ -1946,6 +1946,18 @@ components:
           type: string
         coverLetter:
           type: string
+        attachments:
+          type: array
+          items:
+            type: object
+            properties:
+              filename:
+                type: string
+              mimetype:
+                type: string
+              data:
+                type: string
+            required: [filename, mimetype, data]
         createdAt:
           type: string
       required: [id, name, email]

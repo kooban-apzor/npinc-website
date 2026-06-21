@@ -972,6 +972,11 @@ export const ListCvSubmissionsResponseItem = zod.object({
   "phone": zod.string().optional(),
   "position": zod.string().optional(),
   "coverLetter": zod.string().optional(),
+  "attachments": zod.array(zod.object({
+  "filename": zod.string(),
+  "mimetype": zod.string(),
+  "data": zod.string()
+})).optional(),
   "createdAt": zod.string().optional()
 })
 export const ListCvSubmissionsResponse = zod.array(ListCvSubmissionsResponseItem)

@@ -292,6 +292,12 @@ export interface CvSubmissionRequest {
   coverLetter?: string;
 }
 
+export type CvSubmissionAttachmentsItem = {
+  filename: string;
+  mimetype: string;
+  data: string;
+};
+
 export interface CvSubmission {
   id: number;
   name: string;
@@ -299,6 +305,7 @@ export interface CvSubmission {
   phone?: string;
   position?: string;
   coverLetter?: string;
+  attachments?: CvSubmissionAttachmentsItem[];
   createdAt?: string;
 }
 
