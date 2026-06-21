@@ -33,6 +33,11 @@ export interface ChangePasswordRequest {
   newPassword: string;
 }
 
+export interface ResetPasswordRequest {
+  secretPhrase: string;
+  newPassword: string;
+}
+
 export interface SiteSettings {
   id: number;
   firmName?: string;

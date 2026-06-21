@@ -1354,7 +1354,7 @@ paths:
     post:
       operationId: changeAdminPassword
       tags: [admin]
-      summary: Change admin password
+      summary: Change admin password (requires current password)
       requestBody:
         required: true
         content:
@@ -1370,6 +1370,31 @@ paths:
                 $ref: "#/components/schemas/SuccessResponse"
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /admin/reset-password:
+    post:
+      operationId: resetAdminPassword
+      tags: [admin]
+      summary: Reset admin password using secret phrase (no login required)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPasswordRequest"
+      responses:
+        "200":
+          description: Password reset
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          description: Invalid secret phrase
           content:
             application/json:
               schema:
@@ -1426,6 +1451,15 @@ components:
         newPassword:
           type: string
       required: [currentPassword, newPassword]
+
+    ResetPasswordRequest:
+      type: object
+      properties:
+        secretPhrase:
+          type: string
+        newPassword:
+          type: string
+      required: [secretPhrase, newPassword]
 
     SiteSettings:
       type: object

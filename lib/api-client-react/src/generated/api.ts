@@ -38,6 +38,7 @@ import type {
   ListEventsParams,
   ListPeopleParams,
   Person,
+  ResetPasswordRequest,
   Service,
   SiteSettings,
   SuccessResponse,
@@ -4295,7 +4296,7 @@ export const getChangeAdminPasswordUrl = () => {
 }
 
 /**
- * @summary Change admin password
+ * @summary Change admin password (requires current password)
  */
 export const changeAdminPassword = async (changePasswordRequest: ChangePasswordRequest, options?: RequestInit): Promise<SuccessResponse> => {
 
@@ -4344,7 +4345,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type ChangeAdminPasswordMutationError = ErrorType<Error>
 
     /**
- * @summary Change admin password
+ * @summary Change admin password (requires current password)
  */
 export const useChangeAdminPassword = <TError = ErrorType<Error>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof changeAdminPassword>>, TError,{data: BodyType<ChangePasswordRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
@@ -4355,5 +4356,76 @@ export const useChangeAdminPassword = <TError = ErrorType<Error>,
         TContext
       > => {
       return useMutation(getChangeAdminPasswordMutationOptions(options));
+    }
+
+export const getResetAdminPasswordUrl = () => {
+
+
+
+
+  return `/api/admin/reset-password`
+}
+
+/**
+ * @summary Reset admin password using secret phrase (no login required)
+ */
+export const resetAdminPassword = async (resetPasswordRequest: ResetPasswordRequest, options?: RequestInit): Promise<SuccessResponse> => {
+
+  return customFetch<SuccessResponse>(getResetAdminPasswordUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      resetPasswordRequest,)
+  }
+);}
+
+
+
+
+export const getResetAdminPasswordMutationOptions = <TError = ErrorType<Error>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetAdminPassword>>, TError,{data: BodyType<ResetPasswordRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof resetAdminPassword>>, TError,{data: BodyType<ResetPasswordRequest>}, TContext> => {
+
+const mutationKey = ['resetAdminPassword'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resetAdminPassword>>, {data: BodyType<ResetPasswordRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  resetAdminPassword(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ResetAdminPasswordMutationResult = NonNullable<Awaited<ReturnType<typeof resetAdminPassword>>>
+    export type ResetAdminPasswordMutationBody = BodyType<ResetPasswordRequest>
+    export type ResetAdminPasswordMutationError = ErrorType<Error>
+
+    /**
+ * @summary Reset admin password using secret phrase (no login required)
+ */
+export const useResetAdminPassword = <TError = ErrorType<Error>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetAdminPassword>>, TError,{data: BodyType<ResetPasswordRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof resetAdminPassword>>,
+        TError,
+        {data: BodyType<ResetPasswordRequest>},
+        TContext
+      > => {
+      return useMutation(getResetAdminPasswordMutationOptions(options));
     }
 

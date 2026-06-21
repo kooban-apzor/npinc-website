@@ -1209,7 +1209,7 @@ export const DeleteContactEnquiryResponse = zod.object({
 
 
 /**
- * @summary Change admin password
+ * @summary Change admin password (requires current password)
  */
 export const ChangeAdminPasswordBody = zod.object({
   "currentPassword": zod.string(),
@@ -1217,6 +1217,20 @@ export const ChangeAdminPasswordBody = zod.object({
 })
 
 export const ChangeAdminPasswordResponse = zod.object({
+  "success": zod.boolean(),
+  "message": zod.string().optional()
+})
+
+
+/**
+ * @summary Reset admin password using secret phrase (no login required)
+ */
+export const ResetAdminPasswordBody = zod.object({
+  "secretPhrase": zod.string(),
+  "newPassword": zod.string()
+})
+
+export const ResetAdminPasswordResponse = zod.object({
   "success": zod.boolean(),
   "message": zod.string().optional()
 })
