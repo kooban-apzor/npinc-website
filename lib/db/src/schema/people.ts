@@ -1,4 +1,4 @@
-import { pgTable, serial, text, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer, boolean, timestamp, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import { PERSON_ROLES } from "./people-roles";
@@ -25,7 +25,11 @@ export const peopleTable = pgTable("people", {
   leftAt: timestamp("left_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
-});
+}, (table) => [
+  index("people_is_published_idx").on(table.isPublished),
+  index("people_role_idx").on(table.role),
+  index("people_sort_order_idx").on(table.sortOrder),
+]);
 
 export const insertPersonSchema = createInsertSchema(peopleTable).omit({ id: true, createdAt: true, updatedAt: true });
 export type InsertPerson = z.infer<typeof insertPersonSchema>;

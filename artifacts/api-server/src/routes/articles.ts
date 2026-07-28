@@ -87,8 +87,16 @@ router.post("/admin/articles", requireAdmin, async (req, res): Promise<void> => 
   }
   const data = { ...parsed.data } as Record<string, unknown>;
   if (data.publishedAt) data.publishedAt = toDateOrNull(data.publishedAt);
-  const [row] = await db.insert(articlesTable).values(data as never).returning();
-  res.status(201).json(row);
+  try {
+    const [row] = await db.insert(articlesTable).values(data as never).returning();
+    res.status(201).json(row);
+  } catch (err: unknown) {
+    if (err instanceof Error && "code" in err && (err as { code: string }).code === "23505") {
+      res.status(400).json({ error: "An article with this slug already exists. Slugs must be unique." });
+      return;
+    }
+    throw err;
+  }
 });
 
 router.put("/admin/articles/:id", requireAdmin, async (req, res): Promise<void> => {
@@ -100,9 +108,17 @@ router.put("/admin/articles/:id", requireAdmin, async (req, res): Promise<void> 
   if ("publishedAt" in data) {
     data.publishedAt = data.publishedAt ? toDateOrNull(data.publishedAt) : null;
   }
-  const [row] = await db.update(articlesTable).set(data as never).where(eq(articlesTable.id, params.data.id)).returning();
-  if (!row) { res.status(404).json({ error: "Article not found" }); return; }
-  res.json(row);
+  try {
+    const [row] = await db.update(articlesTable).set(data as never).where(eq(articlesTable.id, params.data.id)).returning();
+    if (!row) { res.status(404).json({ error: "Article not found" }); return; }
+    res.json(row);
+  } catch (err: unknown) {
+    if (err instanceof Error && "code" in err && (err as { code: string }).code === "23505") {
+      res.status(400).json({ error: "An article with this slug already exists. Slugs must be unique." });
+      return;
+    }
+    throw err;
+  }
 });
 
 router.delete("/admin/articles/:id", requireAdmin, async (req, res): Promise<void> => {

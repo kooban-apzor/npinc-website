@@ -56,8 +56,16 @@ router.post("/admin/services", requireAdmin, async (req, res): Promise<void> => 
     res.status(400).json({ error: "Invalid request body." });
     return;
   }
-  const [row] = await db.insert(servicesTable).values(parsed.data as never).returning();
-  res.status(201).json(row);
+  try {
+    const [row] = await db.insert(servicesTable).values(parsed.data as never).returning();
+    res.status(201).json(row);
+  } catch (err: unknown) {
+    if (err instanceof Error && "code" in err && (err as { code: string }).code === "23505") {
+      res.status(400).json({ error: "A service with this slug already exists. Slugs must be unique." });
+      return;
+    }
+    throw err;
+  }
 });
 
 router.put("/admin/services/:id", requireAdmin, async (req, res): Promise<void> => {
@@ -65,9 +73,17 @@ router.put("/admin/services/:id", requireAdmin, async (req, res): Promise<void> 
   if (!params.success) { res.status(400).json({ error: "Invalid parameters." }); return; }
   const parsed = UpdateServiceBody.safeParse(req.body);
   if (!parsed.success) { res.status(400).json({ error: "Invalid request body." }); return; }
-  const [row] = await db.update(servicesTable).set(parsed.data as never).where(eq(servicesTable.id, params.data.id)).returning();
-  if (!row) { res.status(404).json({ error: "Service not found" }); return; }
-  res.json(row);
+  try {
+    const [row] = await db.update(servicesTable).set(parsed.data as never).where(eq(servicesTable.id, params.data.id)).returning();
+    if (!row) { res.status(404).json({ error: "Service not found" }); return; }
+    res.json(row);
+  } catch (err: unknown) {
+    if (err instanceof Error && "code" in err && (err as { code: string }).code === "23505") {
+      res.status(400).json({ error: "A service with this slug already exists. Slugs must be unique." });
+      return;
+    }
+    throw err;
+  }
 });
 
 router.delete("/admin/services/:id", requireAdmin, async (req, res): Promise<void> => {

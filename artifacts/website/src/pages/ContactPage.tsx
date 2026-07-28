@@ -17,6 +17,7 @@ export default function ContactPage() {
     submitContact.mutate({ data: form }, {
       onSuccess: () => {
         setSubmitted(true);
+        setForm({ name: "", email: "", phone: "", subject: "", message: "" });
         toast({ title: "Enquiry received", description: "We'll be in touch shortly." });
       },
       onError: () => {

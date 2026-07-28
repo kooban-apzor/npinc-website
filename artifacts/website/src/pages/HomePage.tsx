@@ -4,6 +4,27 @@ import { ArrowRight, Phone, Mail, Shield } from "lucide-react";
 import PublicLayout from "@/components/PublicLayout";
 import PageSEO from "@/components/PageSEO";
 
+const ROLE_LABELS: Record<string, string> = {
+  partners: "Partner",
+  directors: "Director",
+  associates: "Associate",
+  candidate_attorneys: "Candidate Attorney",
+  consultants: "Consultant",
+  support: "Support",
+};
+const LEGACY_ROLE_MAP: Record<string, string> = {
+  Partner: "partners",
+  Director: "directors",
+  Associate: "associates",
+  CandidateAttorney: "candidate_attorneys",
+  Candidate_Attorneys: "candidate_attorneys",
+  Consultant: "consultants",
+  Support: "support",
+};
+function normalizeRole(role: string): string {
+  return LEGACY_ROLE_MAP[role] ?? role;
+}
+
 export default function HomePage() {
   const { data: services } = useListServices();
   const { data: people } = useListPeople({});
@@ -145,7 +166,7 @@ export default function HomePage() {
                       {person.firstName[0]}{person.lastName[0]}
                     </div>
                   )}
-                  <p className="text-[#C6A15B] text-xs uppercase tracking-widest mb-1">{person.role}</p>
+                  <p className="text-[#C6A15B] text-xs uppercase tracking-widest mb-1">{ROLE_LABELS[normalizeRole(person.role)] ?? person.role}</p>
                   <h3 className="text-xl font-serif text-[#F7F4EE] mb-2">
                     {person.title ? `${person.title} ` : ""}{person.firstName} {person.lastName}
                   </h3>

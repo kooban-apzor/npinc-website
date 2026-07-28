@@ -477,8 +477,8 @@ function TransferCalculator() {
                 </div>
               </div>
               <p className="text-[#B8B8B8] text-xs mt-4 italic">Approximate transfer quotation for purchase price of {fmt(result.price)}</p>
-              <button onClick={handlePrint} className="mt-4 flex items-center gap-2 text-[#C6A15B] text-xs uppercase tracking-widest border border-[#C6A15B]/30 px-4 py-2 hover:border-[#C6A15B] transition-colors">
-                <Printer size={12} /> Print / Save PDF
+              <button onClick={handlePrint} className="mt-4 flex items-center gap-2 bg-[#C6A15B] text-[#0E0E0E] text-sm font-semibold uppercase tracking-widest px-6 py-3 hover:bg-[#9F7E3F] transition-colors">
+                <Printer size={16} /> Print / Save PDF
               </button>
             </>
           ) : (
@@ -601,8 +601,8 @@ function BondCalculator() {
                 </div>
               </div>
               <p className="text-[#B8B8B8] text-xs mt-4 italic">Approximate bond cost quotation for bond of {fmt(result.bond)}</p>
-              <button onClick={handlePrint} className="mt-4 flex items-center gap-2 text-[#C6A15B] text-xs uppercase tracking-widest border border-[#C6A15B]/30 px-4 py-2 hover:border-[#C6A15B] transition-colors">
-                <Printer size={12} /> Print / Save PDF
+              <button onClick={handlePrint} className="mt-4 flex items-center gap-2 bg-[#C6A15B] text-[#0E0E0E] text-sm font-semibold uppercase tracking-widest px-6 py-3 hover:bg-[#9F7E3F] transition-colors">
+                <Printer size={16} /> Print / Save PDF
               </button>
             </>
           ) : (
@@ -733,8 +733,8 @@ function RepaymentCalculator() {
                   <span className="text-[#C6A15B] font-bold text-lg tabular-nums" data-testid="text-monthly-repayment">{fmt(result.monthly)}</span>
                 </div>
               </div>
-              <button onClick={handlePrint} className="mt-4 flex items-center gap-2 text-[#C6A15B] text-xs uppercase tracking-widest border border-[#C6A15B]/30 px-4 py-2 hover:border-[#C6A15B] transition-colors">
-                <Printer size={12} /> Print / Save PDF
+              <button onClick={handlePrint} className="mt-4 flex items-center gap-2 bg-[#C6A15B] text-[#0E0E0E] text-sm font-semibold uppercase tracking-widest px-6 py-3 hover:bg-[#9F7E3F] transition-colors">
+                <Printer size={16} /> Print / Save PDF
               </button>
             </>
           ) : (

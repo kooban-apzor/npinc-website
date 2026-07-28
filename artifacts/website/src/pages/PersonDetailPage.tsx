@@ -3,6 +3,27 @@ import { Link } from "wouter";
 import { ArrowLeft, Mail, Phone } from "lucide-react";
 import PublicLayout from "@/components/PublicLayout";
 
+const ROLE_LABELS: Record<string, string> = {
+  partners: "Partner",
+  directors: "Director",
+  associates: "Associate",
+  candidate_attorneys: "Candidate Attorney",
+  consultants: "Consultant",
+  support: "Support",
+};
+const LEGACY_ROLE_MAP: Record<string, string> = {
+  Partner: "partners",
+  Director: "directors",
+  Associate: "associates",
+  CandidateAttorney: "candidate_attorneys",
+  Candidate_Attorneys: "candidate_attorneys",
+  Consultant: "consultants",
+  Support: "support",
+};
+function normalizeRole(role: string): string {
+  return LEGACY_ROLE_MAP[role] ?? role;
+}
+
 interface Props { slug: string; }
 
 export default function PersonDetailPage({ slug }: Props) {
@@ -54,7 +75,7 @@ export default function PersonDetailPage({ slug }: Props) {
           </div>
           <div>
             <div className="flex items-center gap-3 mb-3 flex-wrap">
-              <p className="text-[#C6A15B] text-xs uppercase tracking-[0.25em]">{person.role}</p>
+              <p className="text-[#C6A15B] text-xs uppercase tracking-[0.25em]">{ROLE_LABELS[normalizeRole(person.role)] ?? person.role}</p>
               {(person as never as Record<string, unknown>).memberStatus === "just_joined" && (
                 <span className="text-[0.65rem] bg-[#C6A15B]/15 text-[#C6A15B] border border-[#C6A15B]/30 px-3 py-1 uppercase tracking-widest">Just Joined</span>
               )}

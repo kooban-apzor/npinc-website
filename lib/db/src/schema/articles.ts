@@ -1,4 +1,4 @@
-import { pgTable, serial, text, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, boolean, timestamp, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 
@@ -17,7 +17,11 @@ export const articlesTable = pgTable("articles", {
   isPublished: boolean("is_published").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
-});
+}, (table) => [
+  index("articles_is_published_idx").on(table.isPublished),
+  index("articles_category_idx").on(table.category),
+  index("articles_published_at_idx").on(table.publishedAt),
+]);
 
 export const insertArticleSchema = createInsertSchema(articlesTable).omit({ id: true, createdAt: true, updatedAt: true });
 export type InsertArticle = z.infer<typeof insertArticleSchema>;

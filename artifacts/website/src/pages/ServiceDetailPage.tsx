@@ -3,6 +3,27 @@ import { Link } from "wouter";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import PublicLayout from "@/components/PublicLayout";
 
+const ROLE_LABELS: Record<string, string> = {
+  partners: "Partner",
+  directors: "Director",
+  associates: "Associate",
+  candidate_attorneys: "Candidate Attorney",
+  consultants: "Consultant",
+  support: "Support",
+};
+const LEGACY_ROLE_MAP: Record<string, string> = {
+  Partner: "partners",
+  Director: "directors",
+  Associate: "associates",
+  CandidateAttorney: "candidate_attorneys",
+  Candidate_Attorneys: "candidate_attorneys",
+  Consultant: "consultants",
+  Support: "support",
+};
+function normalizeRole(role: string): string {
+  return LEGACY_ROLE_MAP[role] ?? role;
+}
+
 interface Props { slug: string; }
 
 export default function ServiceDetailPage({ slug }: Props) {
@@ -80,7 +101,7 @@ export default function ServiceDetailPage({ slug }: Props) {
                   <div className="w-12 h-12 bg-[#C6A15B]/10 flex items-center justify-center mb-4 text-[#C6A15B] font-serif text-lg">
                     {person.firstName[0]}{person.lastName[0]}
                   </div>
-                  <p className="text-[#C6A15B] text-xs uppercase tracking-widest mb-1">{person.role}</p>
+                  <p className="text-[#C6A15B] text-xs uppercase tracking-widest mb-1">{ROLE_LABELS[normalizeRole(person.role)] ?? person.role}</p>
                   <h3 className="text-[#F7F4EE] font-serif group-hover:text-[#C6A15B] transition-colors">{person.firstName} {person.lastName}</h3>
                 </Link>
               ))}

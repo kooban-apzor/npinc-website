@@ -23,6 +23,7 @@ const LEGACY_ROLE_MAP: Record<string, PersonRole> = {
   Director: "directors",
   Associate: "associates",
   CandidateAttorney: "candidate_attorneys",
+  Candidate_Attorneys: "candidate_attorneys",
   Consultant: "consultants",
   Support: "support",
   partners: "partners",

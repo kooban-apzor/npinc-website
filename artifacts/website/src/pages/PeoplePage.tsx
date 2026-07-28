@@ -15,6 +15,18 @@ const ROLE_LABELS: Record<string, string> = {
   consultants: "Consultants",
   support: "Support",
 };
+const LEGACY_ROLE_MAP: Record<string, string> = {
+  Partner: "partners",
+  Director: "directors",
+  Associate: "associates",
+  CandidateAttorney: "candidate_attorneys",
+  Candidate_Attorneys: "candidate_attorneys",
+  Consultant: "consultants",
+  Support: "support",
+};
+function normalizeRole(role: string): string {
+  return LEGACY_ROLE_MAP[role] ?? role;
+}
 
 export default function PeoplePage() {
   const [activeRole, setActiveRole] = useState<string>("All");
@@ -84,7 +96,7 @@ export default function PeoplePage() {
                   </div>
                 )}
                 <div className="flex items-center gap-2 mb-1 flex-wrap">
-                  <p className="text-[#C6A15B] text-xs uppercase tracking-widest">{ROLE_LABELS[person.role] ?? person.role}</p>
+                  <p className="text-[#C6A15B] text-xs uppercase tracking-widest">{ROLE_LABELS[normalizeRole(person.role)] ?? person.role}</p>
                   {(person as never as Record<string, unknown>).memberStatus === "just_joined" && (
                     <span className="text-[0.6rem] bg-[#C6A15B]/15 text-[#C6A15B] border border-[#C6A15B]/30 px-2 py-0.5 uppercase tracking-widest">Just Joined</span>
                   )}
