@@ -21,7 +21,7 @@ export default function AdminEvents() {
 
   const invalidate = () => qc.invalidateQueries({ queryKey: getAdminListEventsQueryKey() });
   const openCreate = () => setModal({ mode: "create", form: { ...empty } });
-  const openEdit = (e: NonNullable<typeof events>[0]) => setModal({ mode: "edit", id: e.id, form: { slug: e.slug, title: e.title, description: e.description ?? "", location: e.location ?? "", eventDate: e.eventDate?.slice(0, 10) ?? e.eventDate, eventEndDate: e.eventEndDate ? e.eventEndDate.slice(0, 10) : "", registrationUrl: e.registrationUrl ?? "", isPublished: e.isPublished } });
+  const openEdit = (e: NonNullable<typeof events>[0]) => setModal({ mode: "edit", id: e.id, form: { slug: e.slug, title: e.title, description: e.description ?? "", location: e.location ?? "", eventDate: e.eventDate?.slice(0, 10) ?? e.eventDate, eventEndDate: e.eventEndDate ? e.eventEndDate.slice(0, 10) : "", registrationUrl: e.registrationUrl ?? "", isPublished: e.isPublished ?? false } });
   const handleSave = () => {
     if (!modal) return;
     const data = { ...modal.form, eventEndDate: modal.form.eventEndDate || undefined, registrationUrl: modal.form.registrationUrl || undefined } as never;

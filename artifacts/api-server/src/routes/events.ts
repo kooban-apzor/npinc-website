@@ -20,7 +20,7 @@ const router: IRouter = Router();
 router.get("/events", async (req, res): Promise<void> => {
   const queryParams = ListEventsQueryParams.safeParse(req.query);
   if (!queryParams.success) {
-    res.status(400).json({ error: queryParams.error.message });
+    res.status(400).json({ error: "Invalid query parameters." });
     return;
   }
 
@@ -31,7 +31,7 @@ router.get("/events", async (req, res): Promise<void> => {
     .orderBy(asc(eventsTable.eventDate));
 
   let filtered = rows;
-  if (queryParams.data.upcoming === "true") {
+  if (queryParams.data.upcoming) {
     const today = new Date().toISOString().split("T")[0];
     filtered = rows.filter((r) => r.eventDate >= today!);
   }
@@ -42,7 +42,7 @@ router.get("/events", async (req, res): Promise<void> => {
 router.get("/events/:slug", async (req, res): Promise<void> => {
   const params = GetEventParams.safeParse(req.params);
   if (!params.success) {
-    res.status(400).json({ error: params.error.message });
+    res.status(400).json({ error: "Invalid parameters." });
     return;
   }
   const [row] = await db
@@ -67,7 +67,7 @@ router.get("/admin/events", requireAdmin, async (_req, res): Promise<void> => {
 router.post("/admin/events", requireAdmin, async (req, res): Promise<void> => {
   const parsed = CreateEventBody.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
+    res.status(400).json({ error: "Invalid request body." });
     return;
   }
   const [row] = await db.insert(eventsTable).values(parsed.data).returning();
@@ -76,9 +76,9 @@ router.post("/admin/events", requireAdmin, async (req, res): Promise<void> => {
 
 router.put("/admin/events/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = UpdateEventParams.safeParse(req.params);
-  if (!params.success) { res.status(400).json({ error: params.error.message }); return; }
+  if (!params.success) { res.status(400).json({ error: "Invalid parameters." }); return; }
   const parsed = UpdateEventBody.safeParse(req.body);
-  if (!parsed.success) { res.status(400).json({ error: parsed.error.message }); return; }
+  if (!parsed.success) { res.status(400).json({ error: "Invalid request body." }); return; }
   const [row] = await db.update(eventsTable).set(parsed.data as never).where(eq(eventsTable.id, params.data.id)).returning();
   if (!row) { res.status(404).json({ error: "Event not found" }); return; }
   res.json(row);
@@ -86,7 +86,7 @@ router.put("/admin/events/:id", requireAdmin, async (req, res): Promise<void> =>
 
 router.delete("/admin/events/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = DeleteEventParams.safeParse(req.params);
-  if (!params.success) { res.status(400).json({ error: params.error.message }); return; }
+  if (!params.success) { res.status(400).json({ error: "Invalid parameters." }); return; }
   const [row] = await db.delete(eventsTable).where(eq(eventsTable.id, params.data.id)).returning();
   if (!row) { res.status(404).json({ error: "Event not found" }); return; }
   res.json({ success: true });

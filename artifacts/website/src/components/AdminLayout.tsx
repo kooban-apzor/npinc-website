@@ -30,7 +30,7 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const [location] = useLocation();
-  const { data: me, isError } = useGetAdminMe({ query: { retry: false, staleTime: Infinity, refetchOnWindowFocus: false } });
+  const { data: me, isError } = useGetAdminMe({ query: { queryKey: ['admin-me'], retry: false, staleTime: Infinity, refetchOnWindowFocus: false } });
   const logout = useAdminLogout();
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -61,7 +61,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   }, []);
 
   const handleLogout = () => {
-    logout.mutate({}, {
+    logout.mutate(undefined, {
       onSuccess: () => { window.location.replace("/"); }
     });
   };

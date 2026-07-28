@@ -28,7 +28,7 @@ router.get("/admin/calculator-rates", requireAdmin, async (_req, res): Promise<v
 router.post("/admin/calculator-rates", requireAdmin, async (req, res): Promise<void> => {
   const parsed = CreateCalculatorRateBody.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
+    res.status(400).json({ error: "Invalid request body." });
     return;
   }
   const data = { ...parsed.data } as Record<string, unknown>;
@@ -40,12 +40,12 @@ router.post("/admin/calculator-rates", requireAdmin, async (req, res): Promise<v
 router.put("/admin/calculator-rates/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = UpdateCalculatorRateParams.safeParse(req.params);
   if (!params.success) {
-    res.status(400).json({ error: params.error.message });
+    res.status(400).json({ error: "Invalid parameters." });
     return;
   }
   const parsed = UpdateCalculatorRateBody.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
+    res.status(400).json({ error: "Invalid request body." });
     return;
   }
   const data = { ...parsed.data } as Record<string, unknown>;
@@ -66,7 +66,7 @@ router.put("/admin/calculator-rates/:id", requireAdmin, async (req, res): Promis
 router.delete("/admin/calculator-rates/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = DeleteCalculatorRateParams.safeParse(req.params);
   if (!params.success) {
-    res.status(400).json({ error: params.error.message });
+    res.status(400).json({ error: "Invalid parameters." });
     return;
   }
   const [row] = await db

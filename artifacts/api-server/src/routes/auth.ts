@@ -1,6 +1,7 @@
 import { Router, type IRouter, type Request, type Response } from "express";
 import { rateLimit } from "express-rate-limit";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { eq } from "drizzle-orm";
 import { db, adminUsersTable } from "@workspace/db";
 import {
@@ -10,6 +11,15 @@ import {
   GetAdminMeResponse,
   ChangeAdminPasswordBody,
 } from "@workspace/api-zod";
+
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{10,}$/;
+
+function validatePassword(password: string): string | null {
+  if (!PASSWORD_REGEX.test(password)) {
+    return "Password must be at least 10 characters and include uppercase, lowercase, number, and symbol.";
+  }
+  return null;
+}
 
 declare module "express-session" {
   interface SessionData {
@@ -22,21 +32,20 @@ const router: IRouter = Router();
 // ─── Seed / sync admin from env ──────────────────────────────────────────────
 export async function seedAdminUser(): Promise<void> {
   const username = process.env["ADMIN_USERNAME"] ?? "admin";
-  const password = process.env["ADMIN_PASSWORD"] ?? "admin123";
+  const password = process.env["ADMIN_PASSWORD"] ?? "";
+
+  const pwError = validatePassword(password);
+  if (pwError) {
+    throw new Error(`ADMIN_PASSWORD does not meet requirements: ${pwError}`);
+  }
+
   const hash = await bcrypt.hash(password, 12);
 
   const existing = await db.select().from(adminUsersTable).limit(1);
 
   if (existing.length === 0) {
     await db.insert(adminUsersTable).values({ username, passwordHash: hash });
-    return;
   }
-
-  // .env is the source of truth on deploy — sync so restarts pick up password changes
-  await db
-    .update(adminUsersTable)
-    .set({ username, passwordHash: hash })
-    .where(eq(adminUsersTable.id, existing[0]!.id));
 }
 
 // ─── In-memory failed-attempt tracker ────────────────────────────────────────
@@ -176,7 +185,12 @@ router.post("/admin/login", loginRateLimit, async (req: Request, res: Response):
 
 // ─── Logout ───────────────────────────────────────────────────────────────────
 router.post("/admin/logout", async (req: Request, res: Response): Promise<void> => {
-  req.session.destroy(() => {
+  req.session.destroy((err) => {
+    if (err) {
+      res.status(500).json({ error: "Failed to logout" });
+      return;
+    }
+    res.clearCookie("connect.sid");
     res.json(AdminLogoutResponse.parse({ success: true }));
   });
 });
@@ -210,7 +224,13 @@ router.post("/admin/change-password", async (req: Request, res: Response): Promi
 
   const parsed = ChangeAdminPasswordBody.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
+    res.status(400).json({ error: "Invalid request body." });
+    return;
+  }
+
+  const pwError = validatePassword(parsed.data.newPassword);
+  if (pwError) {
+    res.status(400).json({ error: pwError });
     return;
   }
 
@@ -247,13 +267,22 @@ router.post("/admin/reset-password", resetRateLimit, async (req: Request, res: R
     res.status(400).json({ error: "secretPhrase is required." });
     return;
   }
-  if (typeof newPassword !== "string" || newPassword.length < 6) {
-    res.status(400).json({ error: "newPassword must be at least 6 characters." });
+  if (typeof newPassword !== "string") {
+    res.status(400).json({ error: "newPassword is required." });
     return;
   }
 
-  const resetPhrase = process.env["ADMIN_RESET_PHRASE"] ?? "nike";
-  if (secretPhrase !== resetPhrase) {
+  const pwError = validatePassword(newPassword);
+  if (pwError) {
+    res.status(400).json({ error: pwError });
+    return;
+  }
+
+  const resetPhrase = process.env["ADMIN_RESET_PHRASE"] ?? "";
+  const phraseBuffer = Buffer.from(resetPhrase);
+  const inputBuffer = Buffer.from(secretPhrase);
+  
+  if (phraseBuffer.length !== inputBuffer.length || !crypto.timingSafeEqual(phraseBuffer, inputBuffer)) {
     res.status(401).json({ error: "Invalid secret phrase." });
     return;
   }
@@ -270,7 +299,6 @@ router.post("/admin/reset-password", resetRateLimit, async (req: Request, res: R
     .set({ passwordHash: newHash })
     .where(eq(adminUsersTable.id, user.id));
 
-  // Clear any login lockouts after a successful reset
   clearFailures(req);
 
   res.json({ success: true });

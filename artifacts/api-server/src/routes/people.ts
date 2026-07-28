@@ -44,7 +44,7 @@ function withStatus(row: typeof peopleTable.$inferSelect) {
 router.get("/people", async (req, res): Promise<void> => {
   const queryParams = ListPeopleQueryParams.safeParse(req.query);
   if (!queryParams.success) {
-    res.status(400).json({ error: queryParams.error.message });
+    res.status(400).json({ error: "Invalid query parameters." });
     return;
   }
 
@@ -60,11 +60,6 @@ router.get("/people", async (req, res): Promise<void> => {
     const role = normalizePersonRole(queryParams.data.role);
     filtered = filtered.filter(r => normalizePersonRole(r.role) === role);
   }
-  if (queryParams.data.practiceArea) {
-    filtered = filtered.filter(
-      r => r.practiceAreas && r.practiceAreas.includes(queryParams.data.practiceArea!),
-    );
-  }
 
   res.json(filtered.map(withStatus));
 });
@@ -72,7 +67,7 @@ router.get("/people", async (req, res): Promise<void> => {
 router.get("/people/:slug", async (req, res): Promise<void> => {
   const params = GetPersonParams.safeParse(req.params);
   if (!params.success) {
-    res.status(400).json({ error: params.error.message });
+    res.status(400).json({ error: "Invalid parameters." });
     return;
   }
   const [row] = await db.select().from(peopleTable).where(eq(peopleTable.slug, params.data.slug));
@@ -91,7 +86,7 @@ router.get("/admin/people", requireAdmin, async (_req, res): Promise<void> => {
 
 router.post("/admin/people", requireAdmin, async (req, res): Promise<void> => {
   const parsed = CreatePersonBody.safeParse(req.body);
-  if (!parsed.success) { res.status(400).json({ error: parsed.error.message }); return; }
+  if (!parsed.success) { res.status(400).json({ error: "Invalid request body." }); return; }
   const data = { ...parsed.data } as Record<string, unknown>;
   if (typeof data.role === "string") data.role = normalizePersonRole(data.role);
   if (data.joinedAt) data.joinedAt = toDateOrNull(data.joinedAt);
@@ -102,9 +97,9 @@ router.post("/admin/people", requireAdmin, async (req, res): Promise<void> => {
 
 router.put("/admin/people/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = UpdatePersonParams.safeParse(req.params);
-  if (!params.success) { res.status(400).json({ error: params.error.message }); return; }
+  if (!params.success) { res.status(400).json({ error: "Invalid parameters." }); return; }
   const parsed = UpdatePersonBody.safeParse(req.body);
-  if (!parsed.success) { res.status(400).json({ error: parsed.error.message }); return; }
+  if (!parsed.success) { res.status(400).json({ error: "Invalid request body." }); return; }
   const data = { ...parsed.data } as Record<string, unknown>;
   if (typeof data.role === "string") data.role = normalizePersonRole(data.role);
   if ("joinedAt" in data) data.joinedAt = data.joinedAt ? toDateOrNull(data.joinedAt) : null;
@@ -116,7 +111,7 @@ router.put("/admin/people/:id", requireAdmin, async (req, res): Promise<void> =>
 
 router.delete("/admin/people/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = DeletePersonParams.safeParse(req.params);
-  if (!params.success) { res.status(400).json({ error: params.error.message }); return; }
+  if (!params.success) { res.status(400).json({ error: "Invalid parameters." }); return; }
   const [row] = await db.delete(peopleTable).where(eq(peopleTable.id, params.data.id)).returning();
   if (!row) { res.status(404).json({ error: "Person not found" }); return; }
   res.json({ success: true });

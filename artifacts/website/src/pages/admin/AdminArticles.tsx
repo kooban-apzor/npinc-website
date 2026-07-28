@@ -24,7 +24,7 @@ export default function AdminArticles() {
   const openCreate = () => setModal({ mode: "create", form: { ...empty } });
   const openEdit = (a: NonNullable<typeof articles>[0]) => setModal({
     mode: "edit", id: a.id,
-    form: { slug: a.slug, title: a.title, category: a.category, summary: a.summary ?? "", content: a.content ?? "", author: a.author ?? "", publishedAt: a.publishedAt ? new Date(a.publishedAt).toISOString().split("T")[0]! : "", isPublished: a.isPublished }
+    form: { slug: a.slug, title: a.title, category: a.category, summary: a.summary ?? "", content: a.content ?? "", author: a.author ?? "", publishedAt: a.publishedAt ? new Date(a.publishedAt).toISOString().split("T")[0]! : "", isPublished: a.isPublished ?? false }
   });
   const handleSave = () => {
     if (!modal) return;

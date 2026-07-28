@@ -36,7 +36,7 @@ function isStaffMovementVisible(
 router.get("/articles", async (req, res): Promise<void> => {
   const queryParams = ListArticlesQueryParams.safeParse(req.query);
   if (!queryParams.success) {
-    res.status(400).json({ error: queryParams.error.message });
+    res.status(400).json({ error: "Invalid query parameters." });
     return;
   }
 
@@ -57,7 +57,7 @@ router.get("/articles", async (req, res): Promise<void> => {
 router.get("/articles/:slug", async (req, res): Promise<void> => {
   const params = GetArticleParams.safeParse(req.params);
   if (!params.success) {
-    res.status(400).json({ error: params.error.message });
+    res.status(400).json({ error: "Invalid parameters." });
     return;
   }
   const [row] = await db
@@ -82,7 +82,7 @@ router.get("/admin/articles", requireAdmin, async (_req, res): Promise<void> => 
 router.post("/admin/articles", requireAdmin, async (req, res): Promise<void> => {
   const parsed = CreateArticleBody.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
+    res.status(400).json({ error: "Invalid request body." });
     return;
   }
   const data = { ...parsed.data } as Record<string, unknown>;
@@ -93,9 +93,9 @@ router.post("/admin/articles", requireAdmin, async (req, res): Promise<void> => 
 
 router.put("/admin/articles/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = UpdateArticleParams.safeParse(req.params);
-  if (!params.success) { res.status(400).json({ error: params.error.message }); return; }
+  if (!params.success) { res.status(400).json({ error: "Invalid parameters." }); return; }
   const parsed = UpdateArticleBody.safeParse(req.body);
-  if (!parsed.success) { res.status(400).json({ error: parsed.error.message }); return; }
+  if (!parsed.success) { res.status(400).json({ error: "Invalid request body." }); return; }
   const data = { ...parsed.data } as Record<string, unknown>;
   if ("publishedAt" in data) {
     data.publishedAt = data.publishedAt ? toDateOrNull(data.publishedAt) : null;
@@ -107,7 +107,7 @@ router.put("/admin/articles/:id", requireAdmin, async (req, res): Promise<void> 
 
 router.delete("/admin/articles/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = DeleteArticleParams.safeParse(req.params);
-  if (!params.success) { res.status(400).json({ error: params.error.message }); return; }
+  if (!params.success) { res.status(400).json({ error: "Invalid parameters." }); return; }
   const [row] = await db.delete(articlesTable).where(eq(articlesTable.id, params.data.id)).returning();
   if (!row) { res.status(404).json({ error: "Article not found" }); return; }
   res.json({ success: true });

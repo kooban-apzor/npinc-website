@@ -172,7 +172,7 @@ export default function AdminPeople() {
   };
 
   const nextSortOrder = () => {
-    const orders = (people ?? []).map(p => p.sortOrder);
+    const orders = (people ?? []).map(p => p.sortOrder).filter((o): o is number => o != null);
     return orders.length ? Math.max(...orders) + 1 : 1;
   };
 
@@ -185,7 +185,7 @@ export default function AdminPeople() {
       admissions: p.admissions ?? "", bio: p.bio ?? "",
       email: p.email ?? "", phone: p.phone ?? "", photoUrl: p.photoUrl ?? "",
       practiceAreas: (p.practiceAreas ?? []).join(", "),
-      sortOrder: p.sortOrder, isPublished: p.isPublished,
+      sortOrder: p.sortOrder ?? 0, isPublished: p.isPublished ?? false,
       joinedAt: p.joinedAt ? p.joinedAt.slice(0, 10) : "",
       leftAt: p.leftAt ? p.leftAt.slice(0, 10) : "",
     },

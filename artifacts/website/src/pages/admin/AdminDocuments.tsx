@@ -20,7 +20,7 @@ export default function AdminDocuments() {
 
   const invalidate = () => qc.invalidateQueries({ queryKey: getAdminListDocumentsQueryKey() });
   const openCreate = () => setModal({ mode: "create", form: { ...empty } });
-  const openEdit = (d: NonNullable<typeof docs>[0]) => setModal({ mode: "edit", id: d.id, form: { title: d.title, category: d.category ?? "", description: d.description ?? "", fileUrl: d.fileUrl, isPublic: d.isPublic, sortOrder: d.sortOrder } });
+  const openEdit = (d: NonNullable<typeof docs>[0]) => setModal({ mode: "edit", id: d.id, form: { title: d.title, category: d.category ?? "", description: d.description ?? "", fileUrl: d.fileUrl, isPublic: d.isPublic ?? false, sortOrder: d.sortOrder ?? 0 } });
   const handleSave = () => {
     if (!modal) return;
     if (modal.mode === "create") {

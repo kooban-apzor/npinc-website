@@ -25,11 +25,11 @@ function printApplication(s: {
   phone?: string | null;
   position?: string | null;
   coverLetter?: string | null;
-  createdAt: string;
+  createdAt?: string;
   attachments?: unknown;
 }) {
   const attachments = (s.attachments ?? []) as Attachment[];
-  const date = new Date(s.createdAt).toLocaleDateString("en-ZA", { year: "numeric", month: "long", day: "numeric" });
+  const date = s.createdAt ? new Date(s.createdAt).toLocaleDateString("en-ZA", { year: "numeric", month: "long", day: "numeric" }) : "";
 
   const attachmentRows = attachments.length
     ? attachments.map(a => `<li style="margin:4px 0;">${a.filename}</li>`).join("")
@@ -176,7 +176,7 @@ export default function AdminCvSubmissions() {
                       )}
 
                       <p className="text-[#B8B8B8] text-xs mt-2">
-                        {new Date(s.createdAt).toLocaleDateString("en-ZA", { year: "numeric", month: "long", day: "numeric" })}
+                        {s.createdAt && new Date(s.createdAt).toLocaleDateString("en-ZA", { year: "numeric", month: "long", day: "numeric" })}
                       </p>
                     </div>
 

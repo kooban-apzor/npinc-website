@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none">
+  <rect width="180" height="180" rx="36" fill="#0E0E0E"/>
+  <text
+    x="90"
+    y="118"
+    font-family="Georgia, 'Times New Roman', Times, serif"
+    font-size="72"
+    font-weight="700"
+    fill="#C6A15B"
+    text-anchor="middle"
+    letter-spacing="-2"
+  >NP</text>
+</svg>

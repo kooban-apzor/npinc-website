@@ -28,7 +28,7 @@ router.get("/services", async (_req, res): Promise<void> => {
 router.get("/services/:slug", async (req, res): Promise<void> => {
   const params = GetServiceParams.safeParse(req.params);
   if (!params.success) {
-    res.status(400).json({ error: params.error.message });
+    res.status(400).json({ error: "Invalid parameters." });
     return;
   }
   const [row] = await db
@@ -53,18 +53,18 @@ router.get("/admin/services", requireAdmin, async (_req, res): Promise<void> => 
 router.post("/admin/services", requireAdmin, async (req, res): Promise<void> => {
   const parsed = CreateServiceBody.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
+    res.status(400).json({ error: "Invalid request body." });
     return;
   }
-  const [row] = await db.insert(servicesTable).values(parsed.data).returning();
+  const [row] = await db.insert(servicesTable).values(parsed.data as never).returning();
   res.status(201).json(row);
 });
 
 router.put("/admin/services/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = UpdateServiceParams.safeParse(req.params);
-  if (!params.success) { res.status(400).json({ error: params.error.message }); return; }
+  if (!params.success) { res.status(400).json({ error: "Invalid parameters." }); return; }
   const parsed = UpdateServiceBody.safeParse(req.body);
-  if (!parsed.success) { res.status(400).json({ error: parsed.error.message }); return; }
+  if (!parsed.success) { res.status(400).json({ error: "Invalid request body." }); return; }
   const [row] = await db.update(servicesTable).set(parsed.data as never).where(eq(servicesTable.id, params.data.id)).returning();
   if (!row) { res.status(404).json({ error: "Service not found" }); return; }
   res.json(row);
@@ -72,7 +72,7 @@ router.put("/admin/services/:id", requireAdmin, async (req, res): Promise<void> 
 
 router.delete("/admin/services/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = DeleteServiceParams.safeParse(req.params);
-  if (!params.success) { res.status(400).json({ error: params.error.message }); return; }
+  if (!params.success) { res.status(400).json({ error: "Invalid parameters." }); return; }
   const [row] = await db.delete(servicesTable).where(eq(servicesTable.id, params.data.id)).returning();
   if (!row) { res.status(404).json({ error: "Service not found" }); return; }
   res.json({ success: true });

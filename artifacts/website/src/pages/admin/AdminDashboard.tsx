@@ -5,13 +5,13 @@ import { useEffect } from "react";
 import { Briefcase, Users, Newspaper, FileText, FileCheck, MessageSquare } from "lucide-react";
 
 export default function AdminDashboard() {
-  const { data: me, isError } = useGetAdminMe({ query: { retry: false } });
+  const { data: me, isError } = useGetAdminMe({ query: { queryKey: ['admin-me'], retry: false } });
   const { data: services } = useListServices();
   const { data: people } = useListPeople({});
   const { data: articles } = useListArticles({});
   const { data: vacancies } = useListVacancies();
-  const { data: cvSubs } = useListCvSubmissions({ query: { retry: false } });
-  const { data: enquiries } = useListContactEnquiries({ query: { retry: false } });
+  const { data: cvSubs } = useListCvSubmissions({ query: { queryKey: ['cv-submissions'], retry: false } });
+  const { data: enquiries } = useListContactEnquiries({ query: { queryKey: ['contact-enquiries'], retry: false } });
   const [, setLocation] = useLocation();
 
   useEffect(() => {

@@ -13,6 +13,15 @@ services:
     expose:
       - "8080"
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   web:
     build:
@@ -26,6 +35,15 @@ services:
     networks:
       - npinc
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 networks:
   npinc:

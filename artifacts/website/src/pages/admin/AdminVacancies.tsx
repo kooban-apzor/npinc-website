@@ -21,7 +21,7 @@ export default function AdminVacancies() {
 
   const invalidate = () => qc.invalidateQueries({ queryKey: getAdminListVacanciesQueryKey() });
   const openCreate = () => setModal({ mode: "create", form: { ...empty } });
-  const openEdit = (v: NonNullable<typeof vacancies>[0]) => setModal({ mode: "edit", id: v.id, form: { slug: v.slug, title: v.title, department: v.department ?? "", location: v.location ?? "", type: v.type ?? "Full-time", summary: v.summary ?? "", description: v.description ?? "", closingDate: v.closingDate ? v.closingDate.slice(0, 10) : "", isPublished: v.isPublished } });
+  const openEdit = (v: NonNullable<typeof vacancies>[0]) => setModal({ mode: "edit", id: v.id, form: { slug: v.slug, title: v.title, department: v.department ?? "", location: v.location ?? "", type: v.type ?? "Full-time", summary: v.summary ?? "", description: v.description ?? "", closingDate: v.closingDate ? v.closingDate.slice(0, 10) : "", isPublished: v.isPublished ?? false } });
   const handleSave = () => {
     if (!modal) return;
     const data = { ...modal.form, closingDate: modal.form.closingDate || undefined } as never;

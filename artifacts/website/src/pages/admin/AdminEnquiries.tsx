@@ -33,7 +33,7 @@ export default function AdminEnquiries() {
                     {e.phone && <div className="flex items-center gap-2 text-[#B8B8B8] text-sm"><Phone size={13} className="text-[#C6A15B]" />{e.phone}</div>}
                     {e.subject && <p className="text-[#B8B8B8] text-sm font-medium">Subject: {e.subject}</p>}
                     <div className="flex items-start gap-2 text-[#B8B8B8] text-sm mt-2"><MessageSquare size={13} className="text-[#C6A15B] mt-0.5 shrink-0" /><p className="line-clamp-3">{e.message}</p></div>
-                    <p className="text-[#B8B8B8] text-xs mt-2">{new Date(e.createdAt).toLocaleDateString("en-ZA")}</p>
+                    <p className="text-[#B8B8B8] text-xs mt-2">{e.createdAt && new Date(e.createdAt).toLocaleDateString("en-ZA")}</p>
                   </div>
                   <button onClick={() => handleDelete(e.id)} data-testid={`button-delete-enquiry-${e.id}`} className="text-[#B8B8B8] hover:text-red-400 p-2 shrink-0"><Trash2 size={15} /></button>
                 </div>

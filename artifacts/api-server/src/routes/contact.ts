@@ -1,4 +1,5 @@
 import { Router, type IRouter } from "express";
+import { rateLimit } from "express-rate-limit";
 import { eq, desc } from "drizzle-orm";
 import { db, contactEnquiriesTable } from "@workspace/db";
 import {
@@ -11,10 +12,18 @@ import { requireAdmin } from "../middlewares/require-admin";
 
 const router: IRouter = Router();
 
-router.post("/contact", async (req, res): Promise<void> => {
+const contactRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { error: "Too many contact submissions. Please try again in 15 minutes." },
+});
+
+router.post("/contact", contactRateLimit, async (req, res): Promise<void> => {
   const parsed = SubmitContactBody.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
+    res.status(400).json({ error: "Invalid request body." });
     return;
   }
   const [row] = await db.insert(contactEnquiriesTable).values(parsed.data).returning();
@@ -32,7 +41,7 @@ router.get("/admin/contact-enquiries", requireAdmin, async (_req, res): Promise<
 router.delete("/admin/contact-enquiries/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = DeleteContactEnquiryParams.safeParse(req.params);
   if (!params.success) {
-    res.status(400).json({ error: params.error.message });
+    res.status(400).json({ error: "Invalid parameters." });
     return;
   }
   const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;

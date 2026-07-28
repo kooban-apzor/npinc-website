@@ -23,7 +23,7 @@ export default function AdminServices() {
   const openCreate = () => setModal({ mode: "create", form: { ...empty } });
   const openEdit = (s: NonNullable<typeof services>[0]) => setModal({
     mode: "edit", id: s.id,
-    form: { slug: s.slug, title: s.title, summary: s.summary, howWeAssist: s.howWeAssist ?? "", typicalMatters: (s.typicalMatters ?? []).join("\n"), sortOrder: s.sortOrder, isPublished: s.isPublished }
+    form: { slug: s.slug, title: s.title, summary: s.summary ?? "", howWeAssist: s.howWeAssist ?? "", typicalMatters: (s.typicalMatters ?? []).join("\n"), sortOrder: s.sortOrder ?? 0, isPublished: s.isPublished ?? false }
   });
 
   const handleSave = () => {
@@ -92,7 +92,7 @@ export default function AdminServices() {
                 <div key={key}>
                   <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">{label}</label>
                   {type === "textarea" ? (
-                    <textarea rows={3} value={(modal.form as never)[key]} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, [key]: type === "number" ? Number(e.target.value) : e.target.value } }))}
+                    <textarea rows={3} value={(modal.form as never)[key]} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, [key]: e.target.value } }))}
                       className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none resize-none" />
                   ) : (
                     <input type={type} value={(modal.form as never)[key]} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, [key]: type === "number" ? Number(e.target.value) : e.target.value } }))}

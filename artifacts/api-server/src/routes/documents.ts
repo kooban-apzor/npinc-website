@@ -35,7 +35,7 @@ router.get("/admin/documents", requireAdmin, async (_req, res): Promise<void> =>
 router.post("/admin/documents", requireAdmin, async (req, res): Promise<void> => {
   const parsed = CreateDocumentBody.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
+    res.status(400).json({ error: "Invalid request body." });
     return;
   }
   const [row] = await db.insert(documentsTable).values(parsed.data).returning();
@@ -45,12 +45,12 @@ router.post("/admin/documents", requireAdmin, async (req, res): Promise<void> =>
 router.put("/admin/documents/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = UpdateDocumentParams.safeParse(req.params);
   if (!params.success) {
-    res.status(400).json({ error: params.error.message });
+    res.status(400).json({ error: "Invalid parameters." });
     return;
   }
   const parsed = UpdateDocumentBody.safeParse(req.body);
   if (!parsed.success) {
-    res.status(400).json({ error: parsed.error.message });
+    res.status(400).json({ error: "Invalid request body." });
     return;
   }
   const [row] = await db
@@ -68,7 +68,7 @@ router.put("/admin/documents/:id", requireAdmin, async (req, res): Promise<void>
 router.delete("/admin/documents/:id", requireAdmin, async (req, res): Promise<void> => {
   const params = DeleteDocumentParams.safeParse(req.params);
   if (!params.success) {
-    res.status(400).json({ error: params.error.message });
+    res.status(400).json({ error: "Invalid parameters." });
     return;
   }
   const [row] = await db

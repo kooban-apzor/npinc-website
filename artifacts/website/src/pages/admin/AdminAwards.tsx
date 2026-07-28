@@ -20,7 +20,7 @@ export default function AdminAwards() {
 
   const invalidate = () => qc.invalidateQueries({ queryKey: getAdminListAwardsQueryKey() });
   const openCreate = () => setModal({ mode: "create", form: { ...empty } });
-  const openEdit = (a: NonNullable<typeof awards>[0]) => setModal({ mode: "edit", id: a.id, form: { title: a.title, awardingBody: a.awardingBody ?? "", year: a.year ?? "", description: a.description ?? "", sortOrder: a.sortOrder } });
+  const openEdit = (a: NonNullable<typeof awards>[0]) => setModal({ mode: "edit", id: a.id, form: { title: a.title, awardingBody: a.awardingBody ?? "", year: a.year ?? "", description: a.description ?? "", sortOrder: a.sortOrder ?? 0 } });
   const handleSave = () => {
     if (!modal) return;
     if (modal.mode === "create") {
