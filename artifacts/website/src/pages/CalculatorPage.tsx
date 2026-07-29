@@ -810,16 +810,16 @@ export default function CalculatorPage() {
           {tab === "transfer" && <TransferCalculator />}
           {tab === "bond" && <BondCalculator />}
           {tab === "repayment" && <RepaymentCalculator />}
-        </div>
 
-        <div className="mt-6 text-[#B8B8B8] text-xs leading-relaxed border border-[#2A2A2A] p-4 sm:p-6">
-          <p className="font-semibold text-[#F7F4EE] mb-2">Rate Sources</p>
-          <ul className="space-y-1">
-            <li>• Transfer Duty: SARS official tariff, effective 1 April 2025 (confirmed unchanged for 2026/27)</li>
-            <li>• Deeds Office Fees: Government Notice GN R.4447, Government Gazette No. 50239, effective 1 April 2024</li>
-            <li>• Attorney Fees: Based on LSSA recommended conveyancing tariff (2024), incl. 15% VAT</li>
-            <li>• Bond Repayment: Standard amortisation formula at the specified interest rate</li>
-          </ul>
+          <div className="mt-6 pt-6 border-t border-[#2A2A2A] text-[#B8B8B8] text-xs leading-relaxed">
+            <p className="font-semibold text-[#F7F4EE] mb-2">Rate Sources</p>
+            <ul className="space-y-1">
+              <li>• Transfer Duty: SARS official tariff, effective 1 April 2025 (confirmed unchanged for 2026/27)</li>
+              <li>• Deeds Office Fees: Government Notice GN R.4447, Government Gazette No. 50239, effective 1 April 2024</li>
+              <li>• Attorney Fees: Based on LSSA recommended conveyancing tariff (2024), incl. 15% VAT</li>
+              <li>• Bond Repayment: Standard amortisation formula at the specified interest rate</li>
+            </ul>
+          </div>
         </div>
 
         <div className="mt-8 border border-[#2A2A2A] p-6 sm:p-8 text-center">
