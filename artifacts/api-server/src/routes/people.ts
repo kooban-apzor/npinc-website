@@ -99,7 +99,9 @@ router.post("/admin/people", requireAdmin, async (req, res): Promise<void> => {
     const [row] = await db.insert(peopleTable).values(data as never).returning();
     res.status(201).json(withStatus(row));
   } catch (err: unknown) {
-    if (err instanceof Error && "code" in err && (err as { code: string }).code === "23505") {
+    const error = err as any;
+    const code = error?.code || error?.cause?.code || error?.originalError?.code;
+    if (code === "23505" || error?.message?.includes("duplicate key")) {
       res.status(400).json({ error: "A person with this slug already exists. Slugs must be unique." });
       return;
     }
@@ -129,7 +131,9 @@ router.put("/admin/people/:id", requireAdmin, async (req, res): Promise<void> =>
     if (!row) { res.status(404).json({ error: "Person not found" }); return; }
     res.json(withStatus(row));
   } catch (err: unknown) {
-    if (err instanceof Error && "code" in err && (err as { code: string }).code === "23505") {
+    const error = err as any;
+    const code = error?.code || error?.cause?.code || error?.originalError?.code;
+    if (code === "23505" || error?.message?.includes("duplicate key")) {
       res.status(400).json({ error: "A person with this slug already exists. Slugs must be unique." });
       return;
     }

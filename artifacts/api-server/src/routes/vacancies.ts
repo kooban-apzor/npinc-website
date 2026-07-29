@@ -60,7 +60,9 @@ router.post("/admin/vacancies", requireAdmin, async (req, res): Promise<void> =>
     const [row] = await db.insert(vacanciesTable).values(parsed.data).returning();
     res.status(201).json(row);
   } catch (err: unknown) {
-    if (err instanceof Error && "code" in err && (err as { code: string }).code === "23505") {
+    const error = err as any;
+    const code = error?.code || error?.cause?.code || error?.originalError?.code;
+    if (code === "23505" || error?.message?.includes("duplicate key")) {
       res.status(400).json({ error: "A vacancy with this slug already exists. Slugs must be unique." });
       return;
     }
@@ -78,7 +80,9 @@ router.put("/admin/vacancies/:id", requireAdmin, async (req, res): Promise<void>
     if (!row) { res.status(404).json({ error: "Vacancy not found" }); return; }
     res.json(row);
   } catch (err: unknown) {
-    if (err instanceof Error && "code" in err && (err as { code: string }).code === "23505") {
+    const error = err as any;
+    const code = error?.code || error?.cause?.code || error?.originalError?.code;
+    if (code === "23505" || error?.message?.includes("duplicate key")) {
       res.status(400).json({ error: "A vacancy with this slug already exists. Slugs must be unique." });
       return;
     }
