@@ -89,6 +89,7 @@ export default function ContactPage() {
               <div className="border border-[#C6A15B]/30 p-16 text-center">
                 <div className="text-[#C6A15B] text-5xl font-serif mb-6">Thank you</div>
                 <p className="text-[#B8B8B8] text-lg">Your enquiry has been received. We'll be in touch shortly.</p>
+                <button onClick={() => setSubmitted(false)} className="mt-6 bg-[#C6A15B] text-[#0E0E0E] px-8 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors">Submit Another Enquiry</button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6" data-testid="form-contact">

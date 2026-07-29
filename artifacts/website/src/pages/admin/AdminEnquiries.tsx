@@ -12,7 +12,7 @@ export default function AdminEnquiries() {
 
   const handleDelete = (id: number) => {
     if (!confirm("Delete this enquiry?")) return;
-    remove.mutate({ id }, { onSuccess: () => { qc.invalidateQueries({ queryKey: getListContactEnquiriesQueryKey() }); toast({ title: "Deleted" }); }, onError: () => toast({ title: "Error", variant: "destructive" }) });
+    remove.mutate({ id }, { onSuccess: () => { qc.invalidateQueries({ queryKey: getListContactEnquiriesQueryKey() }); toast({ title: "Deleted" }); }, onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); } });
   };
 
   return (

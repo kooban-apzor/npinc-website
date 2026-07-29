@@ -31,15 +31,15 @@ export default function AdminServices() {
     const matters = modal.form.typicalMatters.split("\n").map(s => s.trim()).filter(Boolean);
     const data = { ...modal.form, typicalMatters: matters };
     if (modal.mode === "create") {
-      createService.mutate({ data }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Service created" }); }, onError: () => toast({ title: "Error", variant: "destructive" }) });
+      createService.mutate({ data }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Service created" }); }, onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); } });
     } else {
-      updateService.mutate({ id: modal.id!, data }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Service updated" }); }, onError: () => toast({ title: "Error", variant: "destructive" }) });
+      updateService.mutate({ id: modal.id!, data }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Service updated" }); }, onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); } });
     }
   };
 
   const handleDelete = (id: number) => {
     if (!confirm("Delete this service?")) return;
-    deleteService.mutate({ id }, { onSuccess: () => { invalidate(); toast({ title: "Service deleted" }); }, onError: () => toast({ title: "Error", variant: "destructive" }) });
+    deleteService.mutate({ id }, { onSuccess: () => { invalidate(); toast({ title: "Service deleted" }); }, onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); } });
   };
 
   return (

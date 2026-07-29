@@ -31,14 +31,14 @@ export default function AdminCalculatorRates() {
   const handleSave = () => {
     if (!modal) return;
     if (modal.mode === "create") {
-      create.mutate({ data: buildPayload(modal.form) as never }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Rate created" }); }, onError: () => toast({ title: "Error", variant: "destructive" }) });
+      create.mutate({ data: buildPayload(modal.form) as never }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Rate created" }); }, onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); } });
     } else {
-      update.mutate({ id: modal.id!, data: buildPayload(modal.form) as never }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Rate updated" }); }, onError: () => toast({ title: "Error", variant: "destructive" }) });
+      update.mutate({ id: modal.id!, data: buildPayload(modal.form) as never }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Rate updated" }); }, onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); } });
     }
   };
   const handleDelete = (id: number) => {
     if (!confirm("Delete this rate?")) return;
-    remove.mutate({ id }, { onSuccess: () => { invalidate(); toast({ title: "Deleted" }); }, onError: () => toast({ title: "Error", variant: "destructive" }) });
+    remove.mutate({ id }, { onSuccess: () => { invalidate(); toast({ title: "Deleted" }); }, onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); } });
   };
 
   return (

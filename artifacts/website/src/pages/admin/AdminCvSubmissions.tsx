@@ -107,7 +107,7 @@ export default function AdminCvSubmissions() {
     if (!confirm("Delete this CV submission?")) return;
     remove.mutate({ id }, {
       onSuccess: () => { qc.invalidateQueries({ queryKey: getListCvSubmissionsQueryKey() }); toast({ title: "Deleted" }); },
-      onError: () => toast({ title: "Error", variant: "destructive" })
+      onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); }
     });
   };
 

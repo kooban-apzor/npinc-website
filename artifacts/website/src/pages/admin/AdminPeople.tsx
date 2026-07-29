@@ -62,24 +62,29 @@ function toGrayscaleDataUrl(file: File): Promise<string> {
     const img = new Image();
     const objectUrl = URL.createObjectURL(file);
     img.onload = () => {
-      URL.revokeObjectURL(objectUrl);
+      try {
+        URL.revokeObjectURL(objectUrl);
 
-      // Scale so the shorter dimension fills TARGET_SIZE (cover mode)
-      const scale = TARGET_SIZE / Math.min(img.naturalWidth, img.naturalHeight);
-      const scaledW = Math.round(img.naturalWidth * scale);
-      const scaledH = Math.round(img.naturalHeight * scale);
+        // Scale so the shorter dimension fills TARGET_SIZE (cover mode)
+        const scale = TARGET_SIZE / Math.min(img.naturalWidth, img.naturalHeight);
+        const scaledW = Math.round(img.naturalWidth * scale);
+        const scaledH = Math.round(img.naturalHeight * scale);
 
-      // Center-horizontal, top-biased crop (keeps face in frame)
-      const sx = Math.round((scaledW - TARGET_SIZE) / 2);
-      const sy = Math.round((scaledH - TARGET_SIZE) * 0.15); // 15% from top
+        // Center-horizontal, top-biased crop (keeps face in frame)
+        const sx = Math.round((scaledW - TARGET_SIZE) / 2);
+        const sy = Math.round((scaledH - TARGET_SIZE) * 0.15); // 15% from top
 
-      const canvas = document.createElement("canvas");
-      canvas.width = TARGET_SIZE;
-      canvas.height = TARGET_SIZE;
-      const ctx = canvas.getContext("2d")!;
-      ctx.filter = "grayscale(100%)";
-      ctx.drawImage(img, -sx, -sy, scaledW, scaledH);
-      resolve(canvas.toDataURL("image/jpeg", 0.88));
+        const canvas = document.createElement("canvas");
+        canvas.width = TARGET_SIZE;
+        canvas.height = TARGET_SIZE;
+        const ctx = canvas.getContext("2d")!;
+        ctx.filter = "grayscale(100%)";
+        ctx.drawImage(img, -sx, -sy, scaledW, scaledH);
+        resolve(canvas.toDataURL("image/jpeg", 0.88));
+      } catch (error) {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error("Failed to process image: " + (error instanceof Error ? error.message : "Unknown error")));
+      }
     };
     img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error("Image load failed")); };
     img.src = objectUrl;
@@ -97,6 +102,10 @@ function PhotoUpload({ value, onChange }: { value: string; onChange: (url: strin
     if (!file) return;
     if (!file.type.startsWith("image/")) {
       toast({ title: "Please select an image file.", variant: "destructive" });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "Image too large. Maximum size is 5MB.", variant: "destructive" });
       return;
     }
     setConverting(true);
@@ -247,12 +256,12 @@ export default function AdminPeople() {
     if (modal.mode === "create") {
       create.mutate({ data: data as never }, {
         onSuccess: () => { afterSave(); toast({ title: "Person created" }); },
-        onError: () => toast({ title: "Error", variant: "destructive" })
+        onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); }
       });
     } else {
       update.mutate({ id: modal.id!, data: data as never }, {
         onSuccess: () => { afterSave(); toast({ title: "Person updated" }); },
-        onError: () => toast({ title: "Error", variant: "destructive" })
+        onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); }
       });
     }
   };
@@ -288,7 +297,7 @@ export default function AdminPeople() {
             );
           }
         },
-        onError: () => toast({ title: "Error", variant: "destructive" }),
+        onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); },
       },
     );
   };

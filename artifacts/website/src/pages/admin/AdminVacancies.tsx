@@ -26,14 +26,14 @@ export default function AdminVacancies() {
     if (!modal) return;
     const data = { ...modal.form, closingDate: modal.form.closingDate || undefined } as never;
     if (modal.mode === "create") {
-      create.mutate({ data }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Vacancy created" }); }, onError: () => toast({ title: "Error", variant: "destructive" }) });
+      create.mutate({ data }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Vacancy created" }); }, onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); } });
     } else {
-      update.mutate({ id: modal.id!, data }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Vacancy updated" }); }, onError: () => toast({ title: "Error", variant: "destructive" }) });
+      update.mutate({ id: modal.id!, data }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Vacancy updated" }); }, onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); } });
     }
   };
   const handleDelete = (id: number) => {
     if (!confirm("Delete this vacancy?")) return;
-    remove.mutate({ id }, { onSuccess: () => { invalidate(); toast({ title: "Deleted" }); }, onError: () => toast({ title: "Error", variant: "destructive" }) });
+    remove.mutate({ id }, { onSuccess: () => { invalidate(); toast({ title: "Deleted" }); }, onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); } });
   };
 
   return (
