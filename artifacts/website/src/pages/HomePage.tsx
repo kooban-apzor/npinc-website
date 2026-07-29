@@ -223,7 +223,7 @@ export default function HomePage() {
       </section>
 
       {/* Calculator CTA */}
-      <section className="bg-[#C6A15B] py-24 px-6">
+      <section className="bg-[#C6A15B] py-12 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-serif text-[#0E0E0E] mb-6">
             Conveyancing Calculator
@@ -262,7 +262,7 @@ export default function HomePage() {
       )}
 
       {/* Careers CTA */}
-      <section className="bg-[#151515] border-y border-[#2A2A2A] py-24 px-6">
+      <section className="bg-[#151515] border-y border-[#2A2A2A] py-12 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-[#C6A15B] text-xs uppercase tracking-[0.25em] mb-4">Join Our Team</p>
           <h2 className="text-4xl md:text-5xl font-serif text-[#F7F4EE] mb-6">Build Your Legal Career</h2>

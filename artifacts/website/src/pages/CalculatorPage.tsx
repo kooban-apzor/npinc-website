@@ -788,7 +788,7 @@ export default function CalculatorPage() {
   return (
     <PublicLayout>
       <PageSEO page="calculator" />
-      <section className="py-16 sm:py-24 px-4 sm:px-6 max-w-6xl mx-auto">
+      <section className="py-8 sm:py-12 px-4 sm:px-6 max-w-6xl mx-auto">
         <div className="mb-8 sm:mb-12">
           <p className="text-[#C6A15B] text-xs uppercase tracking-[0.25em] mb-4">Tools</p>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif text-[#F7F4EE]" data-testid="text-calculator-title">Calculators</h1>

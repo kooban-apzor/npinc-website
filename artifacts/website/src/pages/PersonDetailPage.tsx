@@ -32,7 +32,7 @@ export default function PersonDetailPage({ slug }: Props) {
   if (isLoading) {
     return (
       <PublicLayout>
-        <div className="py-24 px-6 max-w-4xl mx-auto animate-pulse">
+        <div className="py-12 px-6 max-w-4xl mx-auto animate-pulse">
           <div className="h-8 bg-[#2A2A2A] rounded w-1/4 mb-8" />
           <div className="h-16 bg-[#2A2A2A] rounded mb-6" />
           <div className="h-48 bg-[#2A2A2A] rounded" />
@@ -44,7 +44,7 @@ export default function PersonDetailPage({ slug }: Props) {
   if (!person) {
     return (
       <PublicLayout>
-        <div className="py-24 px-6 text-center">
+        <div className="py-12 px-6 text-center">
           <h1 className="text-4xl font-serif text-[#F7F4EE] mb-4">Person Not Found</h1>
           <Link href="/people" className="text-[#C6A15B]">← Our People</Link>
         </div>

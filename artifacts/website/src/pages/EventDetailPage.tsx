@@ -8,10 +8,10 @@ interface Props { slug: string; }
 export default function EventDetailPage({ slug }: Props) {
   const { data: event, isLoading } = useGetEvent(slug, { query: { queryKey: getGetEventQueryKey(slug) } });
 
-  if (isLoading) return <PublicLayout><div className="py-24 px-6 max-w-3xl mx-auto animate-pulse"><div className="h-48 bg-[#2A2A2A] rounded" /></div></PublicLayout>;
+  if (isLoading) return <PublicLayout><div className="py-12 px-6 max-w-3xl mx-auto animate-pulse"><div className="h-48 bg-[#2A2A2A] rounded" /></div></PublicLayout>;
   if (!event) return (
     <PublicLayout>
-      <div className="py-24 px-6 text-center">
+      <div className="py-12 px-6 text-center">
         <h1 className="text-4xl font-serif text-[#F7F4EE] mb-4">Event Not Found</h1>
         <Link href="/events" className="text-[#C6A15B]">← Events</Link>
       </div>

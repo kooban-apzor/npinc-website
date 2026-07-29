@@ -8,10 +8,10 @@ interface Props { slug: string; }
 export default function VacancyDetailPage({ slug }: Props) {
   const { data: vacancy, isLoading } = useGetVacancy(slug, { query: { queryKey: getGetVacancyQueryKey(slug) } });
 
-  if (isLoading) return <PublicLayout><div className="py-24 px-6 max-w-3xl mx-auto animate-pulse"><div className="h-64 bg-[#2A2A2A] rounded" /></div></PublicLayout>;
+  if (isLoading) return <PublicLayout><div className="py-12 px-6 max-w-3xl mx-auto animate-pulse"><div className="h-64 bg-[#2A2A2A] rounded" /></div></PublicLayout>;
   if (!vacancy) return (
     <PublicLayout>
-      <div className="py-24 px-6 text-center">
+      <div className="py-12 px-6 text-center">
         <h1 className="text-4xl font-serif text-[#F7F4EE] mb-4">Vacancy Not Found</h1>
         <Link href="/careers" className="text-[#C6A15B]">← Careers</Link>
       </div>

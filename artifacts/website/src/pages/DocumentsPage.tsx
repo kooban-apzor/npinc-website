@@ -7,7 +7,7 @@ export default function DocumentsPage() {
 
   return (
     <PublicLayout>
-      <section className="py-24 px-6 max-w-4xl mx-auto">
+      <section className="py-12 px-6 max-w-4xl mx-auto">
         <div className="mb-16">
           <p className="text-[#C6A15B] text-xs uppercase tracking-[0.25em] mb-4">Resources</p>
           <h1 className="text-5xl md:text-6xl font-serif text-[#F7F4EE]" data-testid="text-documents-title">Public Documents</h1>

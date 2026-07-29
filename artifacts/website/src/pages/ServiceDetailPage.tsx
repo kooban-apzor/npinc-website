@@ -38,7 +38,7 @@ export default function ServiceDetailPage({ slug }: Props) {
   if (isLoading) {
     return (
       <PublicLayout>
-        <div className="py-24 px-6 max-w-4xl mx-auto animate-pulse">
+        <div className="py-12 px-6 max-w-4xl mx-auto animate-pulse">
           <div className="h-8 bg-[#2A2A2A] rounded w-1/4 mb-8" />
           <div className="h-16 bg-[#2A2A2A] rounded mb-8" />
           <div className="h-32 bg-[#2A2A2A] rounded" />
@@ -50,7 +50,7 @@ export default function ServiceDetailPage({ slug }: Props) {
   if (!service) {
     return (
       <PublicLayout>
-        <div className="py-24 px-6 text-center">
+        <div className="py-12 px-6 text-center">
           <h1 className="text-4xl font-serif text-[#F7F4EE] mb-4">Practice Area Not Found</h1>
           <Link href="/services" className="text-[#C6A15B]">← Back to Practice Areas</Link>
         </div>
