@@ -233,6 +233,20 @@ export default function AdminPeople() {
 
   const handleSave = () => {
     if (!modal) return;
+    const firstName = modal.form.firstName.trim();
+    const lastName = modal.form.lastName.trim();
+    if (!firstName && !lastName) {
+      toast({ title: "First name and last name are required.", variant: "destructive" });
+      return;
+    }
+    if (!firstName) {
+      toast({ title: "First name is required.", variant: "destructive" });
+      return;
+    }
+    if (!lastName) {
+      toast({ title: "Last name is required.", variant: "destructive" });
+      return;
+    }
     const areas = modal.form.practiceAreas.split(",").map(s => s.trim()).filter(Boolean);
     const data = {
       ...modal.form,
@@ -256,12 +270,12 @@ export default function AdminPeople() {
     if (modal.mode === "create") {
       create.mutate({ data: data as never }, {
         onSuccess: () => { afterSave(); toast({ title: "Person created" }); },
-        onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); }
+        onError: (err: unknown) => { const msg = (err as { data?: { error?: string } })?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); }
       });
     } else {
       update.mutate({ id: modal.id!, data: data as never }, {
         onSuccess: () => { afterSave(); toast({ title: "Person updated" }); },
-        onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); }
+        onError: (err: unknown) => { const msg = (err as { data?: { error?: string } })?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); }
       });
     }
   };
@@ -297,7 +311,7 @@ export default function AdminPeople() {
             );
           }
         },
-        onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); },
+        onError: (err: unknown) => { const msg = (err as { data?: { error?: string } })?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); },
       },
     );
   };
@@ -417,13 +431,13 @@ export default function AdminPeople() {
               {/* Row: First Name + Last Name */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">First Name</label>
-                  <input type="text" value={modal.form.firstName} onChange={e => setForm({ firstName: e.target.value })}
+                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">First Name <span className="text-[#C6A15B]">*</span></label>
+                  <input type="text" required value={modal.form.firstName} onChange={e => setForm({ firstName: e.target.value })}
                     className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
                 </div>
                 <div>
-                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Last Name</label>
-                  <input type="text" value={modal.form.lastName} onChange={e => setForm({ lastName: e.target.value })}
+                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Last Name <span className="text-[#C6A15B]">*</span></label>
+                  <input type="text" required value={modal.form.lastName} onChange={e => setForm({ lastName: e.target.value })}
                     className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
                 </div>
               </div>

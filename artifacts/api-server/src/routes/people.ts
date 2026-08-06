@@ -41,6 +41,14 @@ function withStatus(row: typeof peopleTable.$inferSelect) {
   return { ...row, memberStatus: computeMemberStatus(row) };
 }
 
+async function isSortOrderTaken(sortOrder: number, excludeId?: number): Promise<boolean> {
+  const rows = await db
+    .select({ id: peopleTable.id })
+    .from(peopleTable)
+    .where(eq(peopleTable.sortOrder, sortOrder));
+  return rows.some((r) => r.id !== excludeId);
+}
+
 router.get("/people", async (req, res): Promise<void> => {
   const queryParams = ListPeopleQueryParams.safeParse(req.query);
   if (!queryParams.success) {
@@ -52,7 +60,7 @@ router.get("/people", async (req, res): Promise<void> => {
     .select()
     .from(peopleTable)
     .where(eq(peopleTable.isPublished, true))
-    .orderBy(asc(peopleTable.sortOrder));
+    .orderBy(asc(peopleTable.sortOrder), asc(peopleTable.id));
 
   let filtered = rows.filter(r => isStillOnStaff(r.leftAt));
 
@@ -80,15 +88,29 @@ router.get("/people/:slug", async (req, res): Promise<void> => {
 });
 
 router.get("/admin/people", requireAdmin, async (_req, res): Promise<void> => {
-  const rows = await db.select().from(peopleTable).orderBy(asc(peopleTable.sortOrder));
+  const rows = await db.select().from(peopleTable).orderBy(asc(peopleTable.sortOrder), asc(peopleTable.id));
   res.json(rows.map(withStatus));
 });
 
 router.post("/admin/people", requireAdmin, async (req, res): Promise<void> => {
   const parsed = CreatePersonBody.safeParse(req.body);
   if (!parsed.success) { res.status(400).json({ error: "Invalid request body." }); return; }
-  if (!parsed.data.firstName?.trim() || !parsed.data.lastName?.trim()) {
+  const firstName = parsed.data.firstName?.trim() ?? "";
+  const lastName = parsed.data.lastName?.trim() ?? "";
+  if (!firstName && !lastName) {
     res.status(400).json({ error: "First name and last name are required." });
+    return;
+  }
+  if (!firstName) {
+    res.status(400).json({ error: "First name is required." });
+    return;
+  }
+  if (!lastName) {
+    res.status(400).json({ error: "Last name is required." });
+    return;
+  }
+  if (typeof parsed.data.sortOrder === "number" && (await isSortOrderTaken(parsed.data.sortOrder))) {
+    res.status(400).json({ error: `Display order ${parsed.data.sortOrder} is already assigned to another team member. Display order must be unique.` });
     return;
   }
   const data = { ...parsed.data } as Record<string, unknown>;
@@ -120,6 +142,10 @@ router.put("/admin/people/:id", requireAdmin, async (req, res): Promise<void> =>
   }
   if (parsed.data.lastName !== undefined && !parsed.data.lastName.trim()) {
     res.status(400).json({ error: "Last name cannot be empty." });
+    return;
+  }
+  if (typeof parsed.data.sortOrder === "number" && (await isSortOrderTaken(parsed.data.sortOrder, params.data.id))) {
+    res.status(400).json({ error: `Display order ${parsed.data.sortOrder} is already assigned to another team member. Display order must be unique.` });
     return;
   }
   const data = { ...parsed.data } as Record<string, unknown>;

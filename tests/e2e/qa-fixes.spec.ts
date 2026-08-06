@@ -1,11 +1,14 @@
 import { test, expect } from '@playwright/test';
 
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME ?? 'admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
 test.describe('Role Label Display - C-272', () => {
   test('Candidate Attorney role displays correctly on People page', async ({ page }) => {
     await page.goto('/people');
     
     // Check that "Candidate Attorney" appears (not "Candidate_Attorneys")
-    const candidateAttorneyText = page.locator('text=Candidate Attorney');
+    const candidateAttorneyText = page.getByText('Candidate Attorney').first();
     await expect(candidateAttorneyText).toBeVisible();
     
     // Ensure the broken label is NOT present
@@ -23,7 +26,7 @@ test.describe('Role Label Display - C-272', () => {
       await page.waitForLoadState('networkidle');
       
       // Verify the role displays correctly on detail page
-      const roleText = page.locator('text=Candidate Attorney');
+      const roleText = page.getByText('Candidate Attorney', { exact: true });
       await expect(roleText).toBeVisible();
     }
   });
@@ -48,8 +51,8 @@ test.describe('Name Validation - C-22, C-53, C-337, C-290, C-321, C-353', () => 
   test('Admin login works', async ({ page }) => {
     await page.goto('/admin/login');
     
-    await page.fill('[data-testid="input-admin-username"]', 'admin');
-    await page.fill('[data-testid="input-admin-password"]', 'GuQb8LbVAy3!');
+    await page.fill('[data-testid="input-admin-username"]', ADMIN_USERNAME);
+    await page.fill('[data-testid="input-admin-password"]', ADMIN_PASSWORD ?? '');
     await page.click('[data-testid="button-admin-login"]');
     
     // Should redirect to admin dashboard
@@ -60,7 +63,7 @@ test.describe('Name Validation - C-22, C-53, C-337, C-290, C-321, C-353', () => 
   test('Cannot create person with empty first name', async ({ page, request }) => {
     // Login via API
     const loginResponse = await request.post('/api/admin/login', {
-      data: { username: 'admin', password: 'GuQb8LbVAy3!' },
+      data: { username: ADMIN_USERNAME, password: ADMIN_PASSWORD },
     });
     expect(loginResponse.ok()).toBeTruthy();
     
@@ -83,13 +86,13 @@ test.describe('Name Validation - C-22, C-53, C-337, C-290, C-321, C-353', () => 
     
     expect(createResponse.status()).toBe(400);
     const body = await createResponse.json();
-    expect(body.error).toContain('First name and last name are required');
+    expect(body.error).toContain('First name is required');
   });
 
   test('Cannot create person with empty last name', async ({ page, request }) => {
     // Login via API
     const loginResponse = await request.post('/api/admin/login', {
-      data: { username: 'admin', password: 'GuQb8LbVAy3!' },
+      data: { username: ADMIN_USERNAME, password: ADMIN_PASSWORD },
     });
     expect(loginResponse.ok()).toBeTruthy();
     
@@ -112,7 +115,7 @@ test.describe('Name Validation - C-22, C-53, C-337, C-290, C-321, C-353', () => 
     
     expect(createResponse.status()).toBe(400);
     const body = await createResponse.json();
-    expect(body.error).toContain('First name and last name are required');
+    expect(body.error).toContain('Last name is required');
   });
 });
 
@@ -120,7 +123,7 @@ test.describe('Duplicate Slug Error Messages', () => {
   test('Duplicate slug returns specific error message', async ({ request }) => {
     // Login via API
     const loginResponse = await request.post('/api/admin/login', {
-      data: { username: 'admin', password: 'GuQb8LbVAy3!' },
+      data: { username: ADMIN_USERNAME, password: ADMIN_PASSWORD },
     });
     expect(loginResponse.ok()).toBeTruthy();
     
@@ -261,7 +264,7 @@ test.describe('Password Policy', () => {
   test('Password must meet requirements', async ({ request }) => {
     // Login via API
     const loginResponse = await request.post('/api/admin/login', {
-      data: { username: 'admin', password: 'GuQb8LbVAy3!' },
+      data: { username: ADMIN_USERNAME, password: ADMIN_PASSWORD },
     });
     expect(loginResponse.ok()).toBeTruthy();
     
@@ -275,7 +278,7 @@ test.describe('Password Policy', () => {
         'Content-Type': 'application/json',
       },
       data: {
-        currentPassword: 'GuQb8LbVAy3!',
+        currentPassword: ADMIN_PASSWORD,
         newPassword: 'weak',
       },
     });
