@@ -37,18 +37,18 @@ export default function Navbar() {
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between h-[120px]">
-        <Link href="/" data-testid="link-logo">
+        <Link href="/" data-testid="link-logo" className="inline-flex items-center self-center shrink-0">
           <AnimatedLogo className="h-[60px]" />
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden lg:flex items-center gap-12" data-testid="nav-desktop">
+        <nav className="hidden lg:flex items-center self-center gap-12" data-testid="nav-desktop">
           {navLinks.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               data-testid={`link-nav-${l.label.toLowerCase().replace(/\s+/g, "-")}`}
-              className={`text-base tracking-wide transition-colors duration-200 ${
+              className={`inline-flex items-center text-base leading-none tracking-wide transition-colors duration-200 ${
                 location === l.href
                   ? "text-[#C6A15B]"
                   : "text-[#B8B8B8] hover:text-[#C6A15B]"
@@ -61,7 +61,7 @@ export default function Navbar() {
 
         {/* Mobile hamburger */}
         <button
-          className="lg:hidden text-[#B8B8B8] hover:text-[#C6A15B] transition-colors"
+          className="lg:hidden inline-flex items-center self-center text-[#B8B8B8] hover:text-[#C6A15B] transition-colors"
           onClick={() => setOpen(!open)}
           data-testid="button-mobile-menu"
           aria-label="Toggle menu"
