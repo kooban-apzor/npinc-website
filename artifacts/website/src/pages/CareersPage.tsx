@@ -43,20 +43,32 @@ export default function CareersPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.email) return;
+    const name = form.name.trim();
+    const email = form.email.trim();
+    const coverLetter = form.coverLetter.trim();
+    if (!name || !email) {
+      toast({ title: "Name and email are required.", variant: "destructive" });
+      return;
+    }
+    if (form.coverLetter && !coverLetter) {
+      toast({ title: "Message cannot be blank.", variant: "destructive" });
+      return;
+    }
     setPending(true);
     try {
       const fd = new FormData();
-      fd.append("name", form.name);
-      fd.append("email", form.email);
-      if (form.phone) fd.append("phone", form.phone);
-      if (form.position) fd.append("position", form.position);
-      if (form.coverLetter) fd.append("coverLetter", form.coverLetter);
+      fd.append("name", name);
+      fd.append("email", email);
+      if (form.phone.trim()) fd.append("phone", form.phone.trim());
+      if (form.position.trim()) fd.append("position", form.position.trim());
+      if (coverLetter) fd.append("coverLetter", coverLetter);
       files.forEach((f) => fd.append("files", f));
 
       const base = import.meta.env.BASE_URL.replace(/\/$/, "");
       const res = await fetch(`${base}/api/careers/submit`, { method: "POST", body: fd });
       if (!res.ok) throw new Error("Server error");
+      setForm({ name: "", email: "", phone: "", position: "", coverLetter: "" });
+      setFiles([]);
       setSubmitted(true);
       toast({ title: "Application submitted", description: "We'll be in touch soon." });
     } catch {
@@ -64,6 +76,12 @@ export default function CareersPage() {
     } finally {
       setPending(false);
     }
+  };
+
+  const resetForm = () => {
+    setForm({ name: "", email: "", phone: "", position: "", coverLetter: "" });
+    setFiles([]);
+    setSubmitted(false);
   };
 
   return (
@@ -118,7 +136,7 @@ export default function CareersPage() {
         </div>
 
         {/* Application form */}
-        <div className="border border-[#2A2A2A] p-10 md:p-16">
+        <div id="submit-application" className="border border-[#2A2A2A] p-10 md:p-16 scroll-mt-24">
           <div className="flex items-center gap-3 mb-3">
             <Upload size={20} className="text-[#C6A15B]" />
             <h2 className="text-2xl font-serif text-[#F7F4EE]">Submit an Application</h2>
@@ -130,7 +148,11 @@ export default function CareersPage() {
           {submitted ? (
             <div className="text-center py-10">
               <div className="text-[#C6A15B] text-4xl font-serif mb-4">Thank you</div>
-              <p className="text-[#B8B8B8]">Your application has been received. We'll be in touch soon.</p>
+              <p className="text-[#B8B8B8] mb-8">Your application has been received. We'll be in touch soon.</p>
+              <button onClick={resetForm} data-testid="button-cv-submit-another"
+                className="bg-[#C6A15B] text-[#0E0E0E] px-10 py-4 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors">
+                Submit Another Application
+              </button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6" data-testid="form-cv-submission">

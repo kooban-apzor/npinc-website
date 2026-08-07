@@ -26,7 +26,21 @@ router.post("/contact", contactRateLimit, async (req, res): Promise<void> => {
     res.status(400).json({ error: "Invalid request body." });
     return;
   }
-  const [row] = await db.insert(contactEnquiriesTable).values(parsed.data).returning();
+  const name = parsed.data.name.trim();
+  const email = parsed.data.email.trim();
+  const message = parsed.data.message.trim();
+  if (!name || !email || !message) {
+    res.status(400).json({ error: "Name, email, and message are required and cannot be blank." });
+    return;
+  }
+  const [row] = await db.insert(contactEnquiriesTable).values({
+    ...parsed.data,
+    name,
+    email,
+    message,
+    phone: parsed.data.phone?.trim() || null,
+    subject: parsed.data.subject?.trim() || null,
+  }).returning();
   res.status(201).json(row);
 });
 

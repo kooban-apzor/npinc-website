@@ -13,8 +13,14 @@ export default function ContactPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.message) return;
-    submitContact.mutate({ data: form }, {
+    const name = form.name.trim();
+    const email = form.email.trim();
+    const message = form.message.trim();
+    if (!name || !email || !message) {
+      toast({ title: "Please complete all required fields.", variant: "destructive" });
+      return;
+    }
+    submitContact.mutate({ data: { ...form, name, email, message } }, {
       onSuccess: () => {
         setSubmitted(true);
         setForm({ name: "", email: "", phone: "", subject: "", message: "" });

@@ -35,7 +35,7 @@ export default function VacancyDetailPage({ slug }: Props) {
         {vacancy.description && (
           <div className="text-[#B8B8B8] leading-relaxed whitespace-pre-wrap text-base mb-12">{vacancy.description}</div>
         )}
-        <Link href="/careers" className="inline-flex items-center gap-3 bg-[#C6A15B] text-[#0E0E0E] px-8 py-4 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors" data-testid="link-apply">
+        <Link href="/careers#submit-application" className="inline-flex items-center gap-3 bg-[#C6A15B] text-[#0E0E0E] px-8 py-4 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors" data-testid="link-apply">
           Apply Now via CV Form
         </Link>
       </div>

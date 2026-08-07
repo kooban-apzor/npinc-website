@@ -46,6 +46,22 @@ router.post("/careers/submit", cvRateLimit, upload.array("files", 3), async (req
     return;
   }
 
+  const name = parsed.data.name.trim();
+  const email = parsed.data.email.trim();
+  if (!name) {
+    res.status(400).json({ error: "Name is required and cannot be blank." });
+    return;
+  }
+  if (!email) {
+    res.status(400).json({ error: "Email is required and cannot be blank." });
+    return;
+  }
+  const coverLetter = parsed.data.coverLetter?.trim();
+  if (parsed.data.coverLetter && !coverLetter) {
+    res.status(400).json({ error: "Message cannot be blank." });
+    return;
+  }
+
   const files = req.files as Express.Multer.File[] | undefined;
   const attachments = (files ?? []).map((f) => ({
     filename: f.originalname,
@@ -54,7 +70,11 @@ router.post("/careers/submit", cvRateLimit, upload.array("files", 3), async (req
   }));
 
   const [row] = await db.insert(cvSubmissionsTable).values({
-    ...parsed.data,
+    name,
+    email,
+    phone: parsed.data.phone?.trim() || null,
+    position: parsed.data.position?.trim() || null,
+    coverLetter: coverLetter || null,
     attachments,
   }).returning();
 
