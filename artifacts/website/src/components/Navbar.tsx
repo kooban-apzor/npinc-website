@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Menu, X } from "lucide-react";
-const logoPath = "/npinc/logo.png";
+import { AnimatedLogo } from "./AnimatedLogo";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -38,7 +38,7 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between h-20">
         <Link href="/" data-testid="link-logo">
-          <img src={logoPath} alt="Nike Pillay Inc" className="h-10 w-auto object-contain" />
+          <AnimatedLogo className="h-10" />
         </Link>
 
         {/* Desktop nav */}
