@@ -36,19 +36,19 @@ export default function Navbar() {
         scrolled ? "bg-[#0E0E0E]/95 backdrop-blur-sm border-b border-[#2A2A2A]" : "bg-transparent"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between h-20">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between h-[120px]">
         <Link href="/" data-testid="link-logo">
-          <AnimatedLogo className="h-10" />
+          <AnimatedLogo className="h-[60px]" />
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden lg:flex items-center gap-8" data-testid="nav-desktop">
+        <nav className="hidden lg:flex items-center gap-12" data-testid="nav-desktop">
           {navLinks.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               data-testid={`link-nav-${l.label.toLowerCase().replace(/\s+/g, "-")}`}
-              className={`text-sm tracking-wide transition-colors duration-200 ${
+              className={`text-base tracking-wide transition-colors duration-200 ${
                 location === l.href
                   ? "text-[#C6A15B]"
                   : "text-[#B8B8B8] hover:text-[#C6A15B]"
@@ -66,7 +66,7 @@ export default function Navbar() {
           data-testid="button-mobile-menu"
           aria-label="Toggle menu"
         >
-          {open ? <X size={24} /> : <Menu size={24} />}
+          {open ? <X size={32} /> : <Menu size={32} />}
         </button>
       </div>
 
