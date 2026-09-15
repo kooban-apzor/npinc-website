@@ -2,7 +2,7 @@ import { Router, type IRouter, type Request, type Response } from "express";
 import { rateLimit } from "express-rate-limit";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db, adminUsersTable } from "@workspace/db";
 import {
   AdminLoginBody,
@@ -154,7 +154,7 @@ router.post("/admin/login", loginRateLimit, async (req: Request, res: Response):
   const [user] = await db
     .select()
     .from(adminUsersTable)
-    .where(eq(adminUsersTable.username, parsed.data.username));
+    .where(sql`lower(${adminUsersTable.username}) = lower(${parsed.data.username})`);
 
   if (!user) {
     const result = recordFailure(req);

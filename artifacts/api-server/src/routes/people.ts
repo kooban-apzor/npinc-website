@@ -136,6 +136,7 @@ router.put("/admin/people/:id", requireAdmin, async (req, res): Promise<void> =>
   if (!params.success) { res.status(400).json({ error: "Invalid parameters." }); return; }
   const parsed = UpdatePersonBody.safeParse(req.body);
   if (!parsed.success) { res.status(400).json({ error: "Invalid request body." }); return; }
+  if (Object.keys(parsed.data).length === 0) { res.status(400).json({ error: "No fields to update." }); return; }
   if (parsed.data.firstName !== undefined && !parsed.data.firstName.trim()) {
     res.status(400).json({ error: "First name cannot be empty." });
     return;

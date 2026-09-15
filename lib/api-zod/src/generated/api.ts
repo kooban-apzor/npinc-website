@@ -252,8 +252,8 @@ export const UpdateServiceParams = zod.object({
 })
 
 export const UpdateServiceBody = zod.object({
-  "slug": zod.string(),
-  "title": zod.string(),
+  "slug": zod.string().optional(),
+  "title": zod.string().optional(),
   "summary": zod.string().optional(),
   "heroImageUrl": zod.string().optional(),
   "howWeAssist": zod.string().optional(),
@@ -415,10 +415,10 @@ export const UpdatePersonParams = zod.object({
 })
 
 export const UpdatePersonBody = zod.object({
-  "slug": zod.string(),
-  "firstName": zod.string(),
-  "lastName": zod.string(),
-  "role": zod.string(),
+  "slug": zod.string().optional(),
+  "firstName": zod.string().optional(),
+  "lastName": zod.string().optional(),
+  "role": zod.string().optional(),
   "title": zod.string().optional(),
   "photoUrl": zod.string().optional(),
   "qualifications": zod.string().optional(),
@@ -563,9 +563,9 @@ export const UpdateArticleParams = zod.object({
 })
 
 export const UpdateArticleBody = zod.object({
-  "slug": zod.string(),
-  "title": zod.string(),
-  "category": zod.string(),
+  "slug": zod.string().optional(),
+  "title": zod.string().optional(),
+  "category": zod.string().optional(),
   "summary": zod.string().optional(),
   "content": zod.string().optional(),
   "imageUrl": zod.string().optional(),
@@ -694,11 +694,11 @@ export const UpdateEventParams = zod.object({
 })
 
 export const UpdateEventBody = zod.object({
-  "slug": zod.string(),
-  "title": zod.string(),
+  "slug": zod.string().optional(),
+  "title": zod.string().optional(),
   "description": zod.string().optional(),
   "location": zod.string().optional(),
-  "eventDate": zod.string(),
+  "eventDate": zod.string().optional(),
   "eventEndDate": zod.string().optional(),
   "imageUrl": zod.string().optional(),
   "registrationUrl": zod.string().optional(),
@@ -789,7 +789,7 @@ export const UpdateAwardParams = zod.object({
 })
 
 export const UpdateAwardBody = zod.object({
-  "title": zod.string(),
+  "title": zod.string().optional(),
   "awardingBody": zod.string().optional(),
   "year": zod.string().optional(),
   "description": zod.string().optional(),
@@ -910,8 +910,8 @@ export const UpdateVacancyParams = zod.object({
 })
 
 export const UpdateVacancyBody = zod.object({
-  "slug": zod.string(),
-  "title": zod.string(),
+  "slug": zod.string().optional(),
+  "title": zod.string().optional(),
   "department": zod.string().optional(),
   "location": zod.string().optional(),
   "type": zod.string().optional(),
@@ -1050,9 +1050,9 @@ export const UpdateDocumentParams = zod.object({
 })
 
 export const UpdateDocumentBody = zod.object({
-  "title": zod.string(),
+  "title": zod.string().optional(),
   "category": zod.string().optional(),
-  "fileUrl": zod.string(),
+  "fileUrl": zod.string().optional(),
   "description": zod.string().optional(),
   "isPublic": zod.boolean().optional(),
   "sortOrder": zod.number().optional()
@@ -1136,9 +1136,9 @@ export const UpdateCalculatorRateParams = zod.object({
 })
 
 export const UpdateCalculatorRateBody = zod.object({
-  "rateType": zod.string(),
-  "label": zod.string(),
-  "value": zod.string(),
+  "rateType": zod.string().optional(),
+  "label": zod.string().optional(),
+  "value": zod.string().optional(),
   "effectiveFrom": zod.string().optional(),
   "notes": zod.string().optional()
 })

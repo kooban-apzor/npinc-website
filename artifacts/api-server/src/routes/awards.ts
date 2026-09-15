@@ -52,6 +52,7 @@ router.put("/admin/awards/:id", requireAdmin, async (req, res): Promise<void> =>
     res.status(400).json({ error: "Invalid request body." });
     return;
   }
+  if (Object.keys(parsed.data).length === 0) { res.status(400).json({ error: "No fields to update." }); return; }
   const [row] = await db
     .update(awardsTable)
     .set(parsed.data)

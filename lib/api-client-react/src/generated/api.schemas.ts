@@ -354,6 +354,99 @@ export interface UpsertCalculatorRateRequest {
   notes?: string;
 }
 
+export interface UpdateServiceRequest {
+  slug?: string;
+  title?: string;
+  summary?: string;
+  heroImageUrl?: string;
+  howWeAssist?: string;
+  typicalMatters?: string[];
+  relatedTeamSlugs?: string[];
+  sortOrder?: number;
+  isPublished?: boolean;
+}
+
+export interface UpdatePersonRequest {
+  slug?: string;
+  firstName?: string;
+  lastName?: string;
+  role?: string;
+  title?: string;
+  photoUrl?: string;
+  qualifications?: string;
+  admissions?: string;
+  bio?: string;
+  email?: string;
+  phone?: string;
+  practiceAreas?: string[];
+  sortOrder?: number;
+  isPublished?: boolean;
+  joinedAt?: string | null;
+  leftAt?: string | null;
+}
+
+export interface UpdateArticleRequest {
+  slug?: string;
+  title?: string;
+  category?: string;
+  summary?: string;
+  content?: string;
+  imageUrl?: string;
+  author?: string;
+  publishedAt?: string;
+  isPublished?: boolean;
+}
+
+export interface UpdateEventRequest {
+  slug?: string;
+  title?: string;
+  description?: string;
+  location?: string;
+  eventDate?: string;
+  eventEndDate?: string;
+  imageUrl?: string;
+  registrationUrl?: string;
+  isPublished?: boolean;
+}
+
+export interface UpdateAwardRequest {
+  title?: string;
+  awardingBody?: string;
+  year?: string;
+  description?: string;
+  imageUrl?: string;
+  sortOrder?: number;
+}
+
+export interface UpdateVacancyRequest {
+  slug?: string;
+  title?: string;
+  department?: string;
+  location?: string;
+  type?: string;
+  summary?: string;
+  description?: string;
+  isPublished?: boolean;
+  closingDate?: string;
+}
+
+export interface UpdateDocumentRequest {
+  title?: string;
+  category?: string;
+  fileUrl?: string;
+  description?: string;
+  isPublic?: boolean;
+  sortOrder?: number;
+}
+
+export interface UpdateCalculatorRateRequest {
+  rateType?: string;
+  label?: string;
+  value?: string;
+  effectiveFrom?: string;
+  notes?: string;
+}
+
 export interface ContactRequest {
   name: string;
   email: string;

@@ -232,7 +232,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpsertServiceRequest"
+              $ref: "#/components/schemas/UpdateServiceRequest"
       responses:
         "200":
           description: Updated
@@ -381,7 +381,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpsertPersonRequest"
+              $ref: "#/components/schemas/UpdatePersonRequest"
       responses:
         "200":
           description: Updated
@@ -534,7 +534,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpsertArticleRequest"
+              $ref: "#/components/schemas/UpdateArticleRequest"
       responses:
         "200":
           description: Updated
@@ -679,7 +679,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpsertEventRequest"
+              $ref: "#/components/schemas/UpdateEventRequest"
       responses:
         "200":
           description: Updated
@@ -794,7 +794,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpsertAwardRequest"
+              $ref: "#/components/schemas/UpdateAwardRequest"
       responses:
         "200":
           description: Updated
@@ -934,7 +934,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpsertVacancyRequest"
+              $ref: "#/components/schemas/UpdateVacancyRequest"
       responses:
         "200":
           description: Updated
@@ -1122,7 +1122,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpsertDocumentRequest"
+              $ref: "#/components/schemas/UpdateDocumentRequest"
       responses:
         "200":
           description: Updated
@@ -1237,7 +1237,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpsertCalculatorRateRequest"
+              $ref: "#/components/schemas/UpdateCalculatorRateRequest"
       responses:
         "200":
           description: Updated
@@ -2071,6 +2071,184 @@ components:
         notes:
           type: string
       required: [rateType, label, value]
+
+    UpdateServiceRequest:
+      type: object
+      properties:
+        slug:
+          type: string
+        title:
+          type: string
+        summary:
+          type: string
+        heroImageUrl:
+          type: string
+        howWeAssist:
+          type: string
+        typicalMatters:
+          type: array
+          items:
+            type: string
+        relatedTeamSlugs:
+          type: array
+          items:
+            type: string
+        sortOrder:
+          type: integer
+        isPublished:
+          type: boolean
+
+    UpdatePersonRequest:
+      type: object
+      properties:
+        slug:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        role:
+          type: string
+        title:
+          type: string
+        photoUrl:
+          type: string
+        qualifications:
+          type: string
+        admissions:
+          type: string
+        bio:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        practiceAreas:
+          type: array
+          items:
+            type: string
+        sortOrder:
+          type: integer
+        isPublished:
+          type: boolean
+        joinedAt:
+          type: string
+          nullable: true
+        leftAt:
+          type: string
+          nullable: true
+
+    UpdateArticleRequest:
+      type: object
+      properties:
+        slug:
+          type: string
+        title:
+          type: string
+        category:
+          type: string
+        summary:
+          type: string
+        content:
+          type: string
+        imageUrl:
+          type: string
+        author:
+          type: string
+        publishedAt:
+          type: string
+        isPublished:
+          type: boolean
+
+    UpdateEventRequest:
+      type: object
+      properties:
+        slug:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        location:
+          type: string
+        eventDate:
+          type: string
+        eventEndDate:
+          type: string
+        imageUrl:
+          type: string
+        registrationUrl:
+          type: string
+        isPublished:
+          type: boolean
+
+    UpdateAwardRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        awardingBody:
+          type: string
+        year:
+          type: string
+        description:
+          type: string
+        imageUrl:
+          type: string
+        sortOrder:
+          type: integer
+
+    UpdateVacancyRequest:
+      type: object
+      properties:
+        slug:
+          type: string
+        title:
+          type: string
+        department:
+          type: string
+        location:
+          type: string
+        type:
+          type: string
+        summary:
+          type: string
+        description:
+          type: string
+        isPublished:
+          type: boolean
+        closingDate:
+          type: string
+
+    UpdateDocumentRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        category:
+          type: string
+        fileUrl:
+          type: string
+        description:
+          type: string
+        isPublic:
+          type: boolean
+        sortOrder:
+          type: integer
+
+    UpdateCalculatorRateRequest:
+      type: object
+      properties:
+        rateType:
+          type: string
+        label:
+          type: string
+        value:
+          type: string
+        effectiveFrom:
+          type: string
+        notes:
+          type: string
 
     ContactRequest:
       type: object

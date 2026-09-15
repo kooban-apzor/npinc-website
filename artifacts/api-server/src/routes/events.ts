@@ -89,6 +89,7 @@ router.put("/admin/events/:id", requireAdmin, async (req, res): Promise<void> =>
   if (!params.success) { res.status(400).json({ error: "Invalid parameters." }); return; }
   const parsed = UpdateEventBody.safeParse(req.body);
   if (!parsed.success) { res.status(400).json({ error: "Invalid request body." }); return; }
+  if (Object.keys(parsed.data).length === 0) { res.status(400).json({ error: "No fields to update." }); return; }
   try {
     const [row] = await db.update(eventsTable).set(parsed.data as never).where(eq(eventsTable.id, params.data.id)).returning();
     if (!row) { res.status(404).json({ error: "Event not found" }); return; }
