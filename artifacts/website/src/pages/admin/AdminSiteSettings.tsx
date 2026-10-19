@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useGetSiteSettings, useUpdateSiteSettings, getGetSiteSettingsQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import AdminLayout from "@/components/AdminLayout";
 import { useToast } from "@/hooks/use-toast";
-import { Globe, Building2, Search, Palette } from "lucide-react";
+import { Globe, Building2, Search, Palette, Upload } from "lucide-react";
 import { DEFAULT_THEME, THEME_PRESETS, THEME_FIELDS, applyTheme, isValidHex, shiftLightness, type ThemeColors } from "@/lib/theme";
 
 type Tab = "homepage" | "contact" | "seo" | "colours";
@@ -198,6 +198,37 @@ export default function AdminSiteSettings() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<Tab>("homepage");
   const [form, setForm] = useState<FormState>(EMPTY);
+  const [uploadingHero, setUploadingHero] = useState(false);
+  const heroFileRef = useRef<HTMLInputElement>(null);
+
+  const handleHeroFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (heroFileRef.current) heroFileRef.current.value = "";
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Please choose an image file.", variant: "destructive" });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "Image too large. Maximum size is 5MB.", variant: "destructive" });
+      return;
+    }
+    setUploadingHero(true);
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(new Error("read failed"));
+        reader.readAsDataURL(file);
+      });
+      setForm(prev => ({ ...prev, heroImageUrl: dataUrl }));
+      toast({ title: "Image loaded — press Save Settings to go live." });
+    } catch {
+      toast({ title: "Could not read image. Please try another file.", variant: "destructive" });
+    } finally {
+      setUploadingHero(false);
+    }
+  };
 
   useEffect(() => {
     if (!settings) return;
@@ -389,19 +420,35 @@ export default function AdminSiteSettings() {
                     {...f("heroSubheading")}
                   />
                   <Field
-                    label="Background Image URL"
-                    hint="Path to the hero photo (e.g. /npinc/hero-property.jpg). Images are stored in the website's public/npinc/ folder."
+                    label="Background Image"
+                    hint="The photo behind the hero, blended dark like a watermark. Click Browse to upload, or type a path like /npinc/hero-property.jpg."
                     placeholder="/npinc/hero-property.jpg"
                     {...f("heroImageUrl")}
                   />
+                  <div className="flex items-center gap-3">
+                    <label className="inline-flex items-center gap-2 border border-line text-fog px-5 py-2.5 text-xs uppercase tracking-widest cursor-pointer hover:border-brand hover:text-brand transition-colors">
+                      <Upload size={13} /> {uploadingHero ? "Uploading…" : "Browse / Upload"}
+                      <input
+                        ref={heroFileRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleHeroFile}
+                      />
+                    </label>
+                    {form.heroImageUrl && (
+                      <span className="text-fog/60 text-xs truncate">{form.heroImageUrl}</span>
+                    )}
+                  </div>
                   {form.heroImageUrl && (
-                    <div className="border border-line overflow-hidden h-32">
+                    <div className="border border-line overflow-hidden">
                       <img
                         src={form.heroImageUrl}
-                        alt="Hero preview"
-                        className="w-full h-full object-cover opacity-60"
+                        alt="Hero preview — darkened as it will appear on the site"
+                        className="w-full h-48 object-cover brightness-[0.35]"
                         onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
                       />
+                      <p className="text-fog/60 text-xs px-3 py-2">Preview with the site's dark watermark blend applied.</p>
                     </div>
                   )}
                 </div>
@@ -577,7 +624,7 @@ export default function AdminSiteSettings() {
             </div>
           )}
 
-          <div className="mt-10 pt-6 border-t border-line">
+          <div className="sticky bottom-0 mt-10 -mx-2 px-2 py-4 bg-ink/95 backdrop-blur border-t border-line flex items-center gap-4">
             <button
               type="submit"
               disabled={update.isPending}
@@ -586,6 +633,9 @@ export default function AdminSiteSettings() {
             >
               {update.isPending ? "Saving..." : "Save Settings"}
             </button>
+            {activeTab === "colours" && coloursDirty && (
+              <span className="text-fog text-xs">You have unsaved colour changes — they are previewing live.</span>
+            )}
           </div>
         </form>
       </div>
