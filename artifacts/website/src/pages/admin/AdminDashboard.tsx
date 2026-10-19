@@ -47,7 +47,7 @@ export default function AdminDashboard() {
                     <Icon size={18} className="text-brand" />
                   </span>
                   <span className="min-w-0">
-                    <span className="block text-2xl font-serif text-paper leading-none">{value}</span>
+                    <span className="block text-2xl font-semibold text-paper leading-none">{value}</span>
                     <span className="block text-fog text-xs uppercase tracking-widest mt-1 truncate">{label}</span>
                   </span>
                   <ArrowRight size={14} className="ml-auto text-fog/40 group-hover:text-brand shrink-0 transition-colors" />

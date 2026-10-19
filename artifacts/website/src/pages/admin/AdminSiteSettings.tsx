@@ -175,7 +175,7 @@ interface FieldProps {
 function Field({ label, hint, value, onChange, multiline, rows = 3, placeholder, maxHint }: FieldProps) {
   return (
     <div>
-      <label className="block text-paper text-sm font-medium mb-1">{label}</label>
+      <label className="block text-paper text-sm mb-1">{label}</label>
       {hint && <p className="text-fog text-xs mb-2">{hint}</p>}
       {multiline ? (
         <textarea
@@ -226,7 +226,7 @@ function ColourRow({ label, hint, value, onChange }: ColourRowProps) {
         />
       </label>
       <div className="flex-1 min-w-0">
-        <p className="text-paper text-sm font-medium">{label}</p>
+        <p className="text-paper text-sm">{label}</p>
         <p className="text-fog text-xs">{hint}</p>
       </div>
       <input
@@ -255,7 +255,7 @@ function SeoPageSection({ label, titleKey, descKey, form, setForm }: {
   const desc = form[descKey];
   return (
     <div className="border border-line p-6 space-y-4">
-      <h3 className="text-brand text-xs uppercase tracking-widest font-medium">{label}</h3>
+      <h3 className="text-brand text-xs uppercase tracking-widest">{label}</h3>
       <Field
         label="Page Title"
         hint="Shown in the browser tab and Google results. Keep under 60 characters."
@@ -277,7 +277,7 @@ function SeoPageSection({ label, titleKey, descKey, form, setForm }: {
       {title && (
         <div className="bg-ink border border-line p-4 rounded">
           <p className="text-xs text-fog/60 uppercase tracking-widest mb-2">Google Preview</p>
-          <p className="text-fog text-sm font-medium truncate">{title}</p>
+          <p className="text-fog text-sm truncate">{title}</p>
           {desc && <p className="text-fog text-xs mt-1 leading-relaxed line-clamp-2">{desc}</p>}
         </div>
       )}
@@ -458,7 +458,7 @@ export default function AdminSiteSettings() {
               key={t.id}
               type="button"
               onClick={() => setActiveTab(t.id)}
-              className={`flex items-center gap-2 px-6 py-3 text-sm font-medium uppercase tracking-widest transition-colors border-b-2 -mb-px ${
+              className={`flex items-center gap-2 px-6 py-3 text-sm uppercase tracking-widest transition-colors border-b-2 -mb-px ${
                 activeTab === t.id
                   ? "border-brand text-brand"
                   : "border-transparent text-fog hover:text-paper"
@@ -608,7 +608,7 @@ export default function AdminSiteSettings() {
                           <span key={k} className="w-6 h-6 border border-black/30" style={{ backgroundColor: p.colors[k] }} />
                         ))}
                       </div>
-                      <p className="text-paper text-sm font-medium">{p.name}</p>
+                      <p className="text-paper text-sm">{p.name}</p>
                       <p className="text-fog text-xs mt-0.5">{p.blurb}</p>
                     </button>
                   ))}

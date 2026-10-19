@@ -133,7 +133,7 @@ export default function AdminCvSubmissions() {
                 <div key={s.id} data-testid={`row-cv-${s.id}`} className="bg-panel border border-line p-6">
                   <div className="flex items-start justify-between gap-4">
                     <div className="space-y-1 flex-1 min-w-0">
-                      <div className="flex items-center gap-2 text-paper font-serif">
+                      <div className="flex items-center gap-2 text-paper">
                         <User size={14} className="text-brand shrink-0" />{s.name}
                       </div>
                       <div className="flex items-center gap-2 text-fog text-sm">

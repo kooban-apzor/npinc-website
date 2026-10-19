@@ -71,7 +71,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       {/* Sidebar */}
       <aside className="w-64 bg-panel border-r border-line flex flex-col shrink-0" data-testid="admin-sidebar">
         <div className="px-6 py-6 border-b border-line">
-          <p className="text-brand text-xs uppercase tracking-widest font-semibold mb-1">NP Inc Admin</p>
+          <p className="text-brand text-xs uppercase tracking-widest mb-1">NP Inc Admin</p>
           {me && <p className="text-fog text-sm">{me.username}</p>}
         </div>
 

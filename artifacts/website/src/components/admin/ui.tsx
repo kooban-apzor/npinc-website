@@ -50,7 +50,7 @@ export function AdminRow({ testId, title, meta, published, onEdit, editTestId, o
     <div data-testid={testId} className="bg-panel border border-line px-5 py-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="text-paper font-serif truncate">{title}</h3>
+          <h3 className="text-paper truncate">{title}</h3>
           {(meta !== undefined || published !== undefined) && (
             <p className="text-fog text-xs mt-1 truncate">
               {meta}

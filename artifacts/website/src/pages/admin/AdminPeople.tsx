@@ -353,7 +353,7 @@ export default function AdminPeople() {
                   )}
                   <div className="min-w-0">
                     <div className="flex items-center gap-3 mb-1">
-                      <h3 className="text-paper font-serif truncate">{p.firstName} {p.lastName}</h3>
+                      <h3 className="text-paper truncate">{p.firstName} {p.lastName}</h3>
                       {statusBadge(p)}
                     </div>
                     <p className="text-fog text-xs truncate">{ROLE_OPTIONS.find(r => r.value === normalizeRole(p.role))?.label ?? p.role} · #{p.sortOrder} · {p.isPublished ? <span className="text-green-400">Published</span> : <span className="text-red-400">Draft</span>}</p>

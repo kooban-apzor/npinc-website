@@ -30,10 +30,10 @@ export default function AdminEnquiries() {
               <div key={e.id} data-testid={`row-enquiry-${e.id}`} className="bg-panel border border-line p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="space-y-1.5 min-w-0">
-                    <div className="flex items-center gap-2 text-paper font-serif truncate"><User size={14} className="text-brand shrink-0" />{e.name}</div>
+                    <div className="flex items-center gap-2 text-paper truncate"><User size={14} className="text-brand shrink-0" />{e.name}</div>
                     <div className="flex items-center gap-2 text-fog text-sm truncate"><Mail size={13} className="text-brand shrink-0" /><a href={`mailto:${e.email}`} className="hover:text-brand truncate">{e.email}</a></div>
                     {e.phone && <div className="flex items-center gap-2 text-fog text-sm"><Phone size={13} className="text-brand shrink-0" />{e.phone}</div>}
-                    {e.subject && <p className="text-paper text-sm font-medium truncate">{e.subject}</p>}
+                    {e.subject && <p className="text-paper text-sm truncate">{e.subject}</p>}
                     <div className="flex items-start gap-2 text-fog text-sm"><MessageSquare size={13} className="text-brand mt-0.5 shrink-0" /><p className="line-clamp-3">{e.message}</p></div>
                     <p className="text-fog/60 text-xs">{e.createdAt && new Date(e.createdAt).toLocaleDateString("en-ZA")}</p>
                   </div>
