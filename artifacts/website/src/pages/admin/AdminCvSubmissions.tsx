@@ -115,48 +115,48 @@ export default function AdminCvSubmissions() {
     <AdminLayout>
       <div className="p-8 md:p-12">
         <div className="mb-10">
-          <h1 className="text-3xl font-serif text-[#F7F4EE]">CV Submissions</h1>
-          <p className="text-[#B8B8B8] mt-1">{submissions?.length ?? 0} submission(s) received.</p>
+          <h1 className="text-3xl font-serif text-paper">CV Submissions</h1>
+          <p className="text-fog mt-1">{submissions?.length ?? 0} submission(s) received.</p>
         </div>
 
         {isLoading ? (
-          <div className="animate-pulse space-y-3">{[1,2,3].map(i => <div key={i} className="h-24 bg-[#151515] border border-[#2A2A2A]" />)}</div>
+          <div className="animate-pulse space-y-3">{[1,2,3].map(i => <div key={i} className="h-24 bg-panel border border-line" />)}</div>
         ) : (submissions ?? []).length === 0 ? (
-          <div className="border border-[#2A2A2A] p-16 text-center text-[#B8B8B8]">No submissions yet.</div>
+          <div className="border border-line p-16 text-center text-fog">No submissions yet.</div>
         ) : (
           <div className="space-y-4">
             {(submissions ?? []).map(s => {
               const attachments = (s.attachments ?? []) as Attachment[];
               return (
-                <div key={s.id} data-testid={`row-cv-${s.id}`} className="bg-[#151515] border border-[#2A2A2A] p-6">
+                <div key={s.id} data-testid={`row-cv-${s.id}`} className="bg-panel border border-line p-6">
                   <div className="flex items-start justify-between gap-4">
                     <div className="space-y-1 flex-1 min-w-0">
-                      <div className="flex items-center gap-2 text-[#F7F4EE] font-serif">
-                        <User size={14} className="text-[#C6A15B] shrink-0" />{s.name}
+                      <div className="flex items-center gap-2 text-paper font-serif">
+                        <User size={14} className="text-brand shrink-0" />{s.name}
                       </div>
-                      <div className="flex items-center gap-2 text-[#B8B8B8] text-sm">
-                        <Mail size={13} className="text-[#C6A15B] shrink-0" />
-                        <a href={`mailto:${s.email}`} className="hover:text-[#C6A15B] transition-colors">{s.email}</a>
+                      <div className="flex items-center gap-2 text-fog text-sm">
+                        <Mail size={13} className="text-brand shrink-0" />
+                        <a href={`mailto:${s.email}`} className="hover:text-brand transition-colors">{s.email}</a>
                       </div>
                       {s.phone && (
-                        <div className="flex items-center gap-2 text-[#B8B8B8] text-sm">
-                          <Phone size={13} className="text-[#C6A15B] shrink-0" />{s.phone}
+                        <div className="flex items-center gap-2 text-fog text-sm">
+                          <Phone size={13} className="text-brand shrink-0" />{s.phone}
                         </div>
                       )}
                       {s.position && (
-                        <p className="text-[#B8B8B8] text-sm">
-                          Position: <span className="text-[#F7F4EE]">{s.position}</span>
+                        <p className="text-fog text-sm">
+                          Position: <span className="text-paper">{s.position}</span>
                         </p>
                       )}
                       {s.coverLetter && (
-                        <p className="text-[#B8B8B8] text-sm mt-2 line-clamp-3 whitespace-pre-line">{s.coverLetter}</p>
+                        <p className="text-fog text-sm mt-2 line-clamp-3 whitespace-pre-line">{s.coverLetter}</p>
                       )}
 
                       {/* Attachments */}
                       {attachments.length > 0 && (
-                        <div className="mt-3 pt-3 border-t border-[#2A2A2A]">
-                          <p className="text-[#B8B8B8] text-xs uppercase tracking-widest mb-2 flex items-center gap-1">
-                            <Paperclip size={11} className="text-[#C6A15B]" />
+                        <div className="mt-3 pt-3 border-t border-line">
+                          <p className="text-fog text-xs uppercase tracking-widest mb-2 flex items-center gap-1">
+                            <Paperclip size={11} className="text-brand" />
                             {attachments.length} attachment{attachments.length !== 1 ? "s" : ""}
                           </p>
                           <div className="flex flex-wrap gap-2">
@@ -164,7 +164,7 @@ export default function AdminCvSubmissions() {
                               <button
                                 key={i}
                                 onClick={() => downloadAttachment(att)}
-                                className="flex items-center gap-2 bg-[#0E0E0E] border border-[#2A2A2A] hover:border-[#C6A15B]/50 px-3 py-2 text-xs text-[#B8B8B8] hover:text-[#C6A15B] transition-colors"
+                                className="flex items-center gap-2 bg-ink border border-line hover:border-brand/50 px-3 py-2 text-xs text-fog hover:text-brand transition-colors"
                                 title={`Download ${att.filename}`}
                               >
                                 <Download size={11} />
@@ -175,7 +175,7 @@ export default function AdminCvSubmissions() {
                         </div>
                       )}
 
-                      <p className="text-[#B8B8B8] text-xs mt-2">
+                      <p className="text-fog text-xs mt-2">
                         {s.createdAt && new Date(s.createdAt).toLocaleDateString("en-ZA", { year: "numeric", month: "long", day: "numeric" })}
                       </p>
                     </div>
@@ -185,7 +185,7 @@ export default function AdminCvSubmissions() {
                       <button
                         onClick={() => printApplication(s)}
                         title="Print / save full application"
-                        className="text-[#B8B8B8] hover:text-[#C6A15B] p-2 transition-colors"
+                        className="text-fog hover:text-brand p-2 transition-colors"
                       >
                         <Printer size={15} />
                       </button>
@@ -193,7 +193,7 @@ export default function AdminCvSubmissions() {
                         onClick={() => handleDelete(s.id)}
                         data-testid={`button-delete-cv-${s.id}`}
                         title="Delete submission"
-                        className="text-[#B8B8B8] hover:text-red-400 p-2 transition-colors"
+                        className="text-fog hover:text-red-400 p-2 transition-colors"
                       >
                         <Trash2 size={15} />
                       </button>

@@ -33,7 +33,7 @@ export default function Navbar() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-[#0E0E0E]/95 backdrop-blur-sm border-b border-[#2A2A2A]" : "bg-transparent"
+        scrolled ? "bg-ink/95 backdrop-blur-sm border-b border-line" : "bg-transparent"
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between h-[120px]">
@@ -50,8 +50,8 @@ export default function Navbar() {
               data-testid={`link-nav-${l.label.toLowerCase().replace(/\s+/g, "-")}`}
               className={`inline-flex items-center text-base leading-none tracking-wide transition-colors duration-200 ${
                 location === l.href
-                  ? "text-[#C6A15B]"
-                  : "text-[#B8B8B8] hover:text-[#C6A15B]"
+                  ? "text-brand"
+                  : "text-fog hover:text-brand"
               }`}
             >
               {l.label}
@@ -61,7 +61,7 @@ export default function Navbar() {
 
         {/* Mobile hamburger */}
         <button
-          className="lg:hidden inline-flex items-center self-center text-[#B8B8B8] hover:text-[#C6A15B] transition-colors"
+          className="lg:hidden inline-flex items-center self-center text-fog hover:text-brand transition-colors"
           onClick={() => setOpen(!open)}
           data-testid="button-mobile-menu"
           aria-label="Toggle menu"
@@ -72,13 +72,13 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {open && (
-        <div className="lg:hidden bg-[#0E0E0E] border-t border-[#2A2A2A] px-6 py-6 flex flex-col gap-5" data-testid="nav-mobile">
+        <div className="lg:hidden bg-ink border-t border-line px-6 py-6 flex flex-col gap-5" data-testid="nav-mobile">
           {navLinks.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               data-testid={`link-mobile-${l.label.toLowerCase().replace(/\s+/g, "-")}`}
-              className="text-[#B8B8B8] hover:text-[#C6A15B] text-base transition-colors"
+              className="text-fog hover:text-brand text-base transition-colors"
             >
               {l.label}
             </Link>

@@ -45,17 +45,17 @@ export default function AdminCalculatorRates() {
     <AdminLayout>
       <div className="p-8 md:p-12">
         <div className="flex items-center justify-between mb-10">
-          <div><h1 className="text-3xl font-serif text-[#F7F4EE]">Calculator Rates</h1><p className="text-[#B8B8B8] mt-1">Manage conveyancing calculator rates and thresholds.</p></div>
-          <button onClick={openCreate} data-testid="button-create-rate" className="flex items-center gap-2 bg-[#C6A15B] text-[#0E0E0E] px-5 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors"><Plus size={16} /> Add Rate</button>
+          <div><h1 className="text-3xl font-serif text-paper">Calculator Rates</h1><p className="text-fog mt-1">Manage conveyancing calculator rates and thresholds.</p></div>
+          <button onClick={openCreate} data-testid="button-create-rate" className="flex items-center gap-2 bg-brand text-ink px-5 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors"><Plus size={16} /> Add Rate</button>
         </div>
-        {isLoading ? <div className="animate-pulse space-y-3">{[1,2,3].map(i => <div key={i} className="h-16 bg-[#151515] border border-[#2A2A2A]" />)}</div> : (
+        {isLoading ? <div className="animate-pulse space-y-3">{[1,2,3].map(i => <div key={i} className="h-16 bg-panel border border-line" />)}</div> : (
           <div className="space-y-3">
             {(rates ?? []).map(r => (
-              <div key={r.id} data-testid={`row-rate-${r.id}`} className="flex items-center justify-between bg-[#151515] border border-[#2A2A2A] px-6 py-4">
-                <div><h3 className="text-[#F7F4EE] font-serif">{r.label}</h3><p className="text-[#B8B8B8] text-xs mt-1">{r.rateType} · Value: {r.value}{r.notes ? ` · ${r.notes}` : ""}</p></div>
+              <div key={r.id} data-testid={`row-rate-${r.id}`} className="flex items-center justify-between bg-panel border border-line px-6 py-4">
+                <div><h3 className="text-paper font-serif">{r.label}</h3><p className="text-fog text-xs mt-1">{r.rateType} · Value: {r.value}{r.notes ? ` · ${r.notes}` : ""}</p></div>
                 <div className="flex gap-3">
-                  <button onClick={() => openEdit(r)} data-testid={`button-edit-rate-${r.id}`} className="text-[#B8B8B8] hover:text-[#C6A15B] p-2"><Pencil size={15} /></button>
-                  <button onClick={() => handleDelete(r.id)} data-testid={`button-delete-rate-${r.id}`} className="text-[#B8B8B8] hover:text-red-400 p-2"><Trash2 size={15} /></button>
+                  <button onClick={() => openEdit(r)} data-testid={`button-edit-rate-${r.id}`} className="text-fog hover:text-brand p-2"><Pencil size={15} /></button>
+                  <button onClick={() => handleDelete(r.id)} data-testid={`button-delete-rate-${r.id}`} className="text-fog hover:text-red-400 p-2"><Trash2 size={15} /></button>
                 </div>
               </div>
             ))}
@@ -65,12 +65,12 @@ export default function AdminCalculatorRates() {
       {modal && (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
           <div className={adminModalPanelClass}>
-            <div className="flex items-center justify-between mb-6"><h2 className="text-xl font-serif text-[#F7F4EE]">{modal.mode === "create" ? "Add Rate" : "Edit Rate"}</h2><button onClick={() => setModal(null)}><X size={20} className="text-[#B8B8B8]" /></button></div>
+            <div className="flex items-center justify-between mb-6"><h2 className="text-xl font-serif text-paper">{modal.mode === "create" ? "Add Rate" : "Edit Rate"}</h2><button onClick={() => setModal(null)}><X size={20} className="text-fog" /></button></div>
             <div className="space-y-4">
               {[{ l: "Rate Type", k: "rateType" }, { l: "Label", k: "label" }, { l: "Value", k: "value" }, { l: "Notes", k: "notes" }].map(({ l, k }) => (
                 <div key={k}>
-                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">{l}</label>
-                  <input type="text" value={(modal.form as never)[k]} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, [k]: e.target.value } }))} className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
+                  <label className="block text-fog text-xs uppercase tracking-widest mb-2">{l}</label>
+                  <input type="text" value={(modal.form as never)[k]} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, [k]: e.target.value } }))} className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none" />
                 </div>
               ))}
               <AdminDateField
@@ -81,8 +81,8 @@ export default function AdminCalculatorRates() {
               />
             </div>
             <div className="flex gap-4 mt-8">
-              <button onClick={handleSave} data-testid="button-save-rate" className="bg-[#C6A15B] text-[#0E0E0E] px-8 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors">Save</button>
-              <button onClick={() => setModal(null)} className="border border-[#2A2A2A] text-[#B8B8B8] px-8 py-3 text-sm hover:border-[#C6A15B] transition-colors">Cancel</button>
+              <button onClick={handleSave} data-testid="button-save-rate" className="bg-brand text-ink px-8 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors">Save</button>
+              <button onClick={() => setModal(null)} className="border border-line text-fog px-8 py-3 text-sm hover:border-brand transition-colors">Cancel</button>
             </div>
           </div>
         </div>

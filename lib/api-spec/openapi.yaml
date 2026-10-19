@@ -1530,6 +1530,20 @@ components:
           type: string
         seoContactDescription:
           type: string
+        themePrimary:
+          type: string
+        themePrimaryDark:
+          type: string
+        themeBackground:
+          type: string
+        themeSurface:
+          type: string
+        themeText:
+          type: string
+        themeMuted:
+          type: string
+        themeBorder:
+          type: string
         updatedAt:
           type: string
       required: [id]
@@ -1600,6 +1614,20 @@ components:
         seoContactTitle:
           type: string
         seoContactDescription:
+          type: string
+        themePrimary:
+          type: string
+        themePrimaryDark:
+          type: string
+        themeBackground:
+          type: string
+        themeSurface:
+          type: string
+        themeText:
+          type: string
+        themeMuted:
+          type: string
+        themeBorder:
           type: string
 
     Service:

@@ -47,25 +47,25 @@ export default function AdminServices() {
       <div className="p-8 md:p-12">
         <div className="flex items-center justify-between mb-10">
           <div>
-            <h1 className="text-3xl font-serif text-[#F7F4EE]" data-testid="text-admin-services-title">Practice Areas</h1>
-            <p className="text-[#B8B8B8] mt-1">Manage the firm's practice areas and service descriptions.</p>
+            <h1 className="text-3xl font-serif text-paper" data-testid="text-admin-services-title">Practice Areas</h1>
+            <p className="text-fog mt-1">Manage the firm's practice areas and service descriptions.</p>
           </div>
-          <button onClick={openCreate} data-testid="button-create-service" className="flex items-center gap-2 bg-[#C6A15B] text-[#0E0E0E] px-5 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors">
+          <button onClick={openCreate} data-testid="button-create-service" className="flex items-center gap-2 bg-brand text-ink px-5 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors">
             <Plus size={16} /> Add Service
           </button>
         </div>
 
-        {isLoading ? <div className="animate-pulse space-y-4">{[1,2,3].map(i => <div key={i} className="h-16 bg-[#151515] border border-[#2A2A2A]" />)}</div> : (
+        {isLoading ? <div className="animate-pulse space-y-4">{[1,2,3].map(i => <div key={i} className="h-16 bg-panel border border-line" />)}</div> : (
           <div className="space-y-3">
             {(services ?? []).map(s => (
-              <div key={s.id} data-testid={`row-service-${s.id}`} className="flex items-center justify-between bg-[#151515] border border-[#2A2A2A] px-6 py-4">
+              <div key={s.id} data-testid={`row-service-${s.id}`} className="flex items-center justify-between bg-panel border border-line px-6 py-4">
                 <div>
-                  <h3 className="text-[#F7F4EE] font-serif">{s.title}</h3>
-                  <p className="text-[#B8B8B8] text-xs mt-1">{s.slug} · Sort: {s.sortOrder} · {s.isPublished ? <span className="text-green-400">Published</span> : <span className="text-red-400">Draft</span>}</p>
+                  <h3 className="text-paper font-serif">{s.title}</h3>
+                  <p className="text-fog text-xs mt-1">{s.slug} · Sort: {s.sortOrder} · {s.isPublished ? <span className="text-green-400">Published</span> : <span className="text-red-400">Draft</span>}</p>
                 </div>
                 <div className="flex gap-3">
-                  <button onClick={() => openEdit(s)} data-testid={`button-edit-service-${s.id}`} className="text-[#B8B8B8] hover:text-[#C6A15B] transition-colors p-2"><Pencil size={15} /></button>
-                  <button onClick={() => handleDelete(s.id)} data-testid={`button-delete-service-${s.id}`} className="text-[#B8B8B8] hover:text-red-400 transition-colors p-2"><Trash2 size={15} /></button>
+                  <button onClick={() => openEdit(s)} data-testid={`button-edit-service-${s.id}`} className="text-fog hover:text-brand transition-colors p-2"><Pencil size={15} /></button>
+                  <button onClick={() => handleDelete(s.id)} data-testid={`button-delete-service-${s.id}`} className="text-fog hover:text-red-400 transition-colors p-2"><Trash2 size={15} /></button>
                 </div>
               </div>
             ))}
@@ -77,8 +77,8 @@ export default function AdminServices() {
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
           <div className={adminModalPanelClass}>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-serif text-[#F7F4EE]">{modal.mode === "create" ? "Add Service" : "Edit Service"}</h2>
-              <button onClick={() => setModal(null)} className="text-[#B8B8B8] hover:text-[#F7F4EE]"><X size={20} /></button>
+              <h2 className="text-xl font-serif text-paper">{modal.mode === "create" ? "Add Service" : "Edit Service"}</h2>
+              <button onClick={() => setModal(null)} className="text-fog hover:text-paper"><X size={20} /></button>
             </div>
             <div className="space-y-5">
               {[
@@ -90,24 +90,24 @@ export default function AdminServices() {
                 { label: "Sort Order", key: "sortOrder", type: "number" },
               ].map(({ label, key, type }) => (
                 <div key={key}>
-                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">{label}</label>
+                  <label className="block text-fog text-xs uppercase tracking-widest mb-2">{label}</label>
                   {type === "textarea" ? (
                     <textarea rows={3} value={(modal.form as never)[key]} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, [key]: e.target.value } }))}
-                      className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none resize-none" />
+                      className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none resize-none" />
                   ) : (
                     <input type={type} value={(modal.form as never)[key]} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, [key]: type === "number" ? Number(e.target.value) : e.target.value } }))}
-                      className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
+                      className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none" />
                   )}
                 </div>
               ))}
               <div className="flex items-center gap-3">
-                <input type="checkbox" id="is-published" checked={modal.form.isPublished} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, isPublished: e.target.checked } }))} className="w-4 h-4 accent-[#C6A15B]" />
-                <label htmlFor="is-published" className="text-[#B8B8B8] text-sm">Published</label>
+                <input type="checkbox" id="is-published" checked={modal.form.isPublished} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, isPublished: e.target.checked } }))} className="w-4 h-4 accent-brand" />
+                <label htmlFor="is-published" className="text-fog text-sm">Published</label>
               </div>
             </div>
             <div className="flex gap-4 mt-8">
-              <button onClick={handleSave} data-testid="button-save-service" className="bg-[#C6A15B] text-[#0E0E0E] px-8 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors">Save</button>
-              <button onClick={() => setModal(null)} className="border border-[#2A2A2A] text-[#B8B8B8] px-8 py-3 text-sm hover:border-[#C6A15B] transition-colors">Cancel</button>
+              <button onClick={handleSave} data-testid="button-save-service" className="bg-brand text-ink px-8 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors">Save</button>
+              <button onClick={() => setModal(null)} className="border border-line text-fog px-8 py-3 text-sm hover:border-brand transition-colors">Cancel</button>
             </div>
           </div>
         </div>

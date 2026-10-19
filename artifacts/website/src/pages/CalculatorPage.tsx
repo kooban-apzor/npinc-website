@@ -362,16 +362,16 @@ function printReport(opts: {
 function CollapsibleInfo({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border-t border-[#2A2A2A] pt-3 mt-4">
+    <div className="border-t border-line pt-3 mt-4">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 text-[#B8B8B8] text-xs hover:text-[#C6A15B] transition-colors w-full text-left"
+        className="flex items-center gap-2 text-fog text-xs hover:text-brand transition-colors w-full text-left"
       >
         <span className={`transition-transform text-[10px] ${open ? 'rotate-90' : ''}`}>▶</span>
         About this calculator
       </button>
       {open && (
-        <div className="mt-3 text-[#B8B8B8] text-xs leading-relaxed space-y-2 pl-5">
+        <div className="mt-3 text-fog text-xs leading-relaxed space-y-2 pl-5">
           {children}
         </div>
       )}
@@ -448,9 +448,9 @@ function TransferCalculator() {
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-end gap-3">
           <div className="flex-1 min-w-0">
-            <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Purchase Price</label>
+            <label className="block text-fog text-xs uppercase tracking-widest mb-2">Purchase Price</label>
             <div className="flex">
-              <span className="bg-[#2A2A2A] border border-r-0 border-[#3A3A3A] text-[#B8B8B8] px-3 flex items-center text-sm">R</span>
+              <span className="bg-line border border-r-0 border-line text-fog px-3 flex items-center text-sm">R</span>
               <input
                 type="number"
                 value={priceStr}
@@ -458,17 +458,17 @@ function TransferCalculator() {
                 onKeyDown={e => e.key === "Enter" && calculate()}
                 placeholder="0"
                 data-testid="input-purchase-price"
-                className="flex-1 min-w-0 bg-[#0E0E0E] border border-[#3A3A3A] text-[#F7F4EE] px-3 py-2.5 text-sm focus:border-[#C6A15B] focus:outline-none transition-colors"
+                className="flex-1 min-w-0 bg-ink border border-line text-paper px-3 py-2.5 text-sm focus:border-brand focus:outline-none transition-colors"
               />
             </div>
           </div>
-          <button onClick={calculate} data-testid="button-calculate-transfer" className="bg-[#C6A15B] text-[#0E0E0E] px-6 py-2.5 text-xs font-bold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors shrink-0">
+          <button onClick={calculate} data-testid="button-calculate-transfer" className="bg-brand text-ink px-6 py-2.5 text-xs font-bold uppercase tracking-widest hover:bg-brand-deep transition-colors shrink-0">
             Calculate
           </button>
         </div>
         <CollapsibleInfo>
           <p>The costs of transferring ownership of property into your name comprise costs due to the government in the form of transfer duty, legal costs as well as a number of payments the attorneys have to make to obtain clearances.</p>
-          <p className="text-[#C6A15B]/70">All values are quotation estimates subject to change. Nike Pillay Inc accepts no liability for errors.</p>
+          <p className="text-brand/70">All values are quotation estimates subject to change. Nike Pillay Inc accepts no liability for errors.</p>
         </CollapsibleInfo>
       </div>
 
@@ -476,27 +476,27 @@ function TransferCalculator() {
         {result ? (
           <div className="space-y-0">
             {rows.map(r => (
-              <div key={r.label} className="flex justify-between items-center py-2 border-b border-[#2A2A2A]">
+              <div key={r.label} className="flex justify-between items-center py-2 border-b border-line">
                 <div className="flex items-center gap-2 min-w-0 flex-1">
-                  <span className="text-[#B8B8B8] text-xs sm:text-sm truncate">{r.label}</span>
+                  <span className="text-fog text-xs sm:text-sm truncate">{r.label}</span>
                   <span className="group relative cursor-default shrink-0">
-                    <span className="text-[#C6A15B]/50 text-[10px] border border-[#C6A15B]/30 rounded-full w-3.5 h-3.5 inline-flex items-center justify-center">i</span>
-                    <span className="hidden group-hover:block absolute left-5 top-0 z-10 bg-[#0E0E0E] border border-[#2A2A2A] text-[#B8B8B8] text-xs p-2 w-48 leading-snug">{r.tip}</span>
+                    <span className="text-brand/50 text-[10px] border border-brand/30 rounded-full w-3.5 h-3.5 inline-flex items-center justify-center">i</span>
+                    <span className="hidden group-hover:block absolute left-5 top-0 z-10 bg-ink border border-line text-fog text-xs p-2 w-48 leading-snug">{r.tip}</span>
                   </span>
                 </div>
-                <span className="text-[#F7F4EE] font-medium text-xs sm:text-sm tabular-nums ml-2">{fmt(r.value)}</span>
+                <span className="text-paper font-medium text-xs sm:text-sm tabular-nums ml-2">{fmt(r.value)}</span>
               </div>
             ))}
-            <div className="flex justify-between items-center py-3 bg-[#C6A15B]/10 px-3 mt-2">
-              <span className="text-[#F7F4EE] font-semibold text-xs sm:text-sm">Total Transfer Costs (incl VAT)</span>
-              <span className="text-[#C6A15B] font-bold text-base sm:text-lg tabular-nums" data-testid="text-total-transfer">{fmt(result.total)}</span>
+            <div className="flex justify-between items-center py-3 bg-brand/10 px-3 mt-2">
+              <span className="text-paper font-semibold text-xs sm:text-sm">Total Transfer Costs (incl VAT)</span>
+              <span className="text-brand font-bold text-base sm:text-lg tabular-nums" data-testid="text-total-transfer">{fmt(result.total)}</span>
             </div>
-            <button onClick={handlePrint} className="mt-3 flex items-center gap-2 bg-[#C6A15B] text-[#0E0E0E] text-xs font-semibold uppercase tracking-widest px-5 py-2.5 hover:bg-[#9F7E3F] transition-colors">
+            <button onClick={handlePrint} className="mt-3 flex items-center gap-2 bg-brand text-ink text-xs font-semibold uppercase tracking-widest px-5 py-2.5 hover:bg-brand-deep transition-colors">
               <Printer size={14} /> Print / Save PDF
             </button>
           </div>
         ) : (
-          <div className="py-12 text-center text-[#B8B8B8] text-sm">
+          <div className="py-12 text-center text-fog text-sm">
             Enter a purchase price and click Calculate to see results
           </div>
         )}
@@ -566,9 +566,9 @@ function BondCalculator() {
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-end gap-3">
           <div className="flex-1 min-w-0">
-            <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Bond Amount</label>
+            <label className="block text-fog text-xs uppercase tracking-widest mb-2">Bond Amount</label>
             <div className="flex">
-              <span className="bg-[#2A2A2A] border border-r-0 border-[#3A3A3A] text-[#B8B8B8] px-3 flex items-center text-sm">R</span>
+              <span className="bg-line border border-r-0 border-line text-fog px-3 flex items-center text-sm">R</span>
               <input
                 type="number"
                 value={bondStr}
@@ -576,17 +576,17 @@ function BondCalculator() {
                 onKeyDown={e => e.key === "Enter" && calculate()}
                 placeholder="0"
                 data-testid="input-bond-amount"
-                className="flex-1 min-w-0 bg-[#0E0E0E] border border-[#3A3A3A] text-[#F7F4EE] px-3 py-2.5 text-sm focus:border-[#C6A15B] focus:outline-none transition-colors"
+                className="flex-1 min-w-0 bg-ink border border-line text-paper px-3 py-2.5 text-sm focus:border-brand focus:outline-none transition-colors"
               />
             </div>
           </div>
-          <button onClick={calculate} data-testid="button-calculate-bond" className="bg-[#C6A15B] text-[#0E0E0E] px-6 py-2.5 text-xs font-bold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors shrink-0">
+          <button onClick={calculate} data-testid="button-calculate-bond" className="bg-brand text-ink px-6 py-2.5 text-xs font-bold uppercase tracking-widest hover:bg-brand-deep transition-colors shrink-0">
             Calculate
           </button>
         </div>
         <CollapsibleInfo>
           <p>There are legal and administration costs in registering a bank loan to cover the balance of your purchase price. These costs are required upfront before registration can take place.</p>
-          <p className="text-[#C6A15B]/70">All values are quotation estimates subject to change. Nike Pillay Inc accepts no liability for errors.</p>
+          <p className="text-brand/70">All values are quotation estimates subject to change. Nike Pillay Inc accepts no liability for errors.</p>
         </CollapsibleInfo>
       </div>
 
@@ -594,27 +594,27 @@ function BondCalculator() {
         {result ? (
           <div className="space-y-0">
             {rows.map(r => (
-              <div key={r.label} className="flex justify-between items-center py-2 border-b border-[#2A2A2A]">
+              <div key={r.label} className="flex justify-between items-center py-2 border-b border-line">
                 <div className="flex items-center gap-2 min-w-0 flex-1">
-                  <span className="text-[#B8B8B8] text-xs sm:text-sm truncate">{r.label}</span>
+                  <span className="text-fog text-xs sm:text-sm truncate">{r.label}</span>
                   <span className="group relative cursor-default shrink-0">
-                    <span className="text-[#C6A15B]/50 text-[10px] border border-[#C6A15B]/30 rounded-full w-3.5 h-3.5 inline-flex items-center justify-center">i</span>
-                    <span className="hidden group-hover:block absolute left-5 top-0 z-10 bg-[#0E0E0E] border border-[#2A2A2A] text-[#B8B8B8] text-xs p-2 w-48 leading-snug">{r.tip}</span>
+                    <span className="text-brand/50 text-[10px] border border-brand/30 rounded-full w-3.5 h-3.5 inline-flex items-center justify-center">i</span>
+                    <span className="hidden group-hover:block absolute left-5 top-0 z-10 bg-ink border border-line text-fog text-xs p-2 w-48 leading-snug">{r.tip}</span>
                   </span>
                 </div>
-                <span className="text-[#F7F4EE] font-medium text-xs sm:text-sm tabular-nums ml-2">{fmt(r.value)}</span>
+                <span className="text-paper font-medium text-xs sm:text-sm tabular-nums ml-2">{fmt(r.value)}</span>
               </div>
             ))}
-            <div className="flex justify-between items-center py-3 bg-[#C6A15B]/10 px-3 mt-2">
-              <span className="text-[#F7F4EE] font-semibold text-xs sm:text-sm">Total Bond Costs (incl VAT)</span>
-              <span className="text-[#C6A15B] font-bold text-base sm:text-lg tabular-nums" data-testid="text-total-bond">{fmt(result.total)}</span>
+            <div className="flex justify-between items-center py-3 bg-brand/10 px-3 mt-2">
+              <span className="text-paper font-semibold text-xs sm:text-sm">Total Bond Costs (incl VAT)</span>
+              <span className="text-brand font-bold text-base sm:text-lg tabular-nums" data-testid="text-total-bond">{fmt(result.total)}</span>
             </div>
-            <button onClick={handlePrint} className="mt-3 flex items-center gap-2 bg-[#C6A15B] text-[#0E0E0E] text-xs font-semibold uppercase tracking-widest px-5 py-2.5 hover:bg-[#9F7E3F] transition-colors">
+            <button onClick={handlePrint} className="mt-3 flex items-center gap-2 bg-brand text-ink text-xs font-semibold uppercase tracking-widest px-5 py-2.5 hover:bg-brand-deep transition-colors">
               <Printer size={14} /> Print / Save PDF
             </button>
           </div>
         ) : (
-          <div className="py-12 text-center text-[#B8B8B8] text-sm">
+          <div className="py-12 text-center text-fog text-sm">
             Enter a bond amount and click Calculate to see results
           </div>
         )}
@@ -676,20 +676,20 @@ function RepaymentCalculator() {
       <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="min-w-0">
-            <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Bond Amount</label>
+            <label className="block text-fog text-xs uppercase tracking-widest mb-2">Bond Amount</label>
             <div className="flex">
-              <span className="bg-[#2A2A2A] border border-r-0 border-[#3A3A3A] text-[#B8B8B8] px-3 flex items-center text-sm">R</span>
+              <span className="bg-line border border-r-0 border-line text-fog px-3 flex items-center text-sm">R</span>
               <input
                 type="number"
                 value={bondStr}
                 onChange={e => setBondStr(e.target.value)}
                 placeholder="0"
-                className="flex-1 min-w-0 bg-[#0E0E0E] border border-[#3A3A3A] text-[#F7F4EE] px-3 py-2.5 text-sm focus:border-[#C6A15B] focus:outline-none transition-colors"
+                className="flex-1 min-w-0 bg-ink border border-line text-paper px-3 py-2.5 text-sm focus:border-brand focus:outline-none transition-colors"
               />
             </div>
           </div>
           <div>
-            <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Years</label>
+            <label className="block text-fog text-xs uppercase tracking-widest mb-2">Years</label>
             <div className="flex gap-1">
               {YEAR_OPTIONS.map(y => (
                 <button
@@ -697,8 +697,8 @@ function RepaymentCalculator() {
                   onClick={() => setYears(y)}
                   className={`flex-1 py-2.5 text-xs font-semibold border transition-colors ${
                     years === y
-                      ? "bg-[#C6A15B] text-[#0E0E0E] border-[#C6A15B]"
-                      : "bg-[#0E0E0E] text-[#B8B8B8] border-[#3A3A3A] hover:border-[#C6A15B] hover:text-[#C6A15B]"
+                      ? "bg-brand text-ink border-brand"
+                      : "bg-ink text-fog border-line hover:border-brand hover:text-brand"
                   }`}
                 >
                   {y}
@@ -707,30 +707,30 @@ function RepaymentCalculator() {
             </div>
           </div>
           <div className="min-w-0">
-            <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Interest Rate</label>
+            <label className="block text-fog text-xs uppercase tracking-widest mb-2">Interest Rate</label>
             <div className="flex">
-              <span className="bg-[#2A2A2A] border border-r-0 border-[#3A3A3A] text-[#B8B8B8] px-3 flex items-center text-sm">%</span>
+              <span className="bg-line border border-r-0 border-line text-fog px-3 flex items-center text-sm">%</span>
               <input
                 type="number"
                 step="0.25"
                 value={rateStr}
                 onChange={e => setRateStr(e.target.value)}
-                className="flex-1 min-w-0 bg-[#0E0E0E] border border-[#3A3A3A] text-[#F7F4EE] px-3 py-2.5 text-sm focus:border-[#C6A15B] focus:outline-none transition-colors"
+                className="flex-1 min-w-0 bg-ink border border-line text-paper px-3 py-2.5 text-sm focus:border-brand focus:outline-none transition-colors"
               />
             </div>
-            <p className="text-[#B8B8B8] text-[10px] mt-1">Prime: 11.25%</p>
+            <p className="text-fog text-[10px] mt-1">Prime: 11.25%</p>
           </div>
         </div>
         <button
           onClick={calculate}
           data-testid="button-calculate-repayment"
-          className="bg-[#C6A15B] text-[#0E0E0E] px-6 py-2.5 text-xs font-bold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors w-full sm:w-auto"
+          className="bg-brand text-ink px-6 py-2.5 text-xs font-bold uppercase tracking-widest hover:bg-brand-deep transition-colors w-full sm:w-auto"
         >
           Calculate
         </button>
         <CollapsibleInfo>
           <p>The bond repayment calculator will assist you in finding out what monthly expense you can expect on your bond.</p>
-          <p className="text-[#C6A15B]/70">All values are quotation estimates subject to change. Nike Pillay Inc accepts no liability for errors.</p>
+          <p className="text-brand/70">All values are quotation estimates subject to change. Nike Pillay Inc accepts no liability for errors.</p>
         </CollapsibleInfo>
       </div>
 
@@ -741,32 +741,32 @@ function RepaymentCalculator() {
               { label: "Interest Repayment", tip: "Total interest paid over the loan term", value: result.interestRepayment },
               { label: "Total Loan Repayment", tip: "Principal + total interest", value: result.totalRepayment },
             ].map(r => (
-              <div key={r.label} className="flex justify-between items-center py-2 border-b border-[#2A2A2A]">
+              <div key={r.label} className="flex justify-between items-center py-2 border-b border-line">
                 <div className="flex items-center gap-2 min-w-0 flex-1">
-                  <span className="text-[#B8B8B8] text-xs sm:text-sm truncate">{r.label}</span>
+                  <span className="text-fog text-xs sm:text-sm truncate">{r.label}</span>
                   <span className="group relative cursor-default shrink-0">
-                    <span className="text-[#C6A15B]/50 text-[10px] border border-[#C6A15B]/30 rounded-full w-3.5 h-3.5 inline-flex items-center justify-center">i</span>
-                    <span className="hidden group-hover:block absolute left-5 top-0 z-10 bg-[#0E0E0E] border border-[#2A2A2A] text-[#B8B8B8] text-xs p-2 w-48 leading-snug">{r.tip}</span>
+                    <span className="text-brand/50 text-[10px] border border-brand/30 rounded-full w-3.5 h-3.5 inline-flex items-center justify-center">i</span>
+                    <span className="hidden group-hover:block absolute left-5 top-0 z-10 bg-ink border border-line text-fog text-xs p-2 w-48 leading-snug">{r.tip}</span>
                   </span>
                 </div>
-                <span className="text-[#F7F4EE] font-medium text-xs sm:text-sm tabular-nums ml-2">{fmt(r.value)}</span>
+                <span className="text-paper font-medium text-xs sm:text-sm tabular-nums ml-2">{fmt(r.value)}</span>
               </div>
             ))}
-            <div className="flex justify-between items-center py-3 bg-[#C6A15B]/10 px-3 mt-2">
-              <span className="text-[#F7F4EE] font-semibold text-xs sm:text-sm">Total Monthly Cost</span>
-              <span className="text-[#C6A15B] font-bold text-base sm:text-lg tabular-nums" data-testid="text-monthly-repayment">
+            <div className="flex justify-between items-center py-3 bg-brand/10 px-3 mt-2">
+              <span className="text-paper font-semibold text-xs sm:text-sm">Total Monthly Cost</span>
+              <span className="text-brand font-bold text-base sm:text-lg tabular-nums" data-testid="text-monthly-repayment">
                 {fmt(result.monthly)}
               </span>
             </div>
             <button
               onClick={handlePrint}
-              className="mt-3 flex items-center gap-2 bg-[#C6A15B] text-[#0E0E0E] text-xs font-semibold uppercase tracking-widest px-5 py-2.5 hover:bg-[#9F7E3F] transition-colors"
+              className="mt-3 flex items-center gap-2 bg-brand text-ink text-xs font-semibold uppercase tracking-widest px-5 py-2.5 hover:bg-brand-deep transition-colors"
             >
               <Printer size={14} /> Print / Save PDF
             </button>
           </div>
         ) : (
-          <div className="py-12 text-center text-[#B8B8B8] text-sm">
+          <div className="py-12 text-center text-fog text-sm">
             Enter values above and click Calculate to see results
           </div>
         )}
@@ -790,29 +790,29 @@ export default function CalculatorPage() {
       <PageSEO page="calculator" />
       <section className="py-8 sm:py-12 px-4 sm:px-6 max-w-6xl mx-auto">
         <div className="mb-8 sm:mb-12">
-          <p className="text-[#C6A15B] text-xs uppercase tracking-[0.25em] mb-4">Tools</p>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif text-[#F7F4EE]" data-testid="text-calculator-title">Calculators</h1>
-          <p className="text-[#B8B8B8] mt-4 max-w-2xl text-base sm:text-lg leading-relaxed">
+          <p className="text-brand text-xs uppercase tracking-[0.25em] mb-4">Tools</p>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-serif text-paper" data-testid="text-calculator-title">Calculators</h1>
+          <p className="text-fog mt-4 max-w-2xl text-base sm:text-lg leading-relaxed">
             Estimate your property transfer costs, bond registration fees, and monthly repayments. Rates sourced from SARS and the Deeds Office.
           </p>
         </div>
 
-        <div className="flex border-b border-[#2A2A2A] mb-6 sm:mb-10 overflow-x-auto">
+        <div className="flex border-b border-line mb-6 sm:mb-10 overflow-x-auto">
           {tabs.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)} data-testid={`tab-${t.id}`}
-              className={`px-4 sm:px-6 py-3 sm:py-4 text-[10px] sm:text-xs uppercase tracking-widest whitespace-nowrap border-b-2 transition-colors -mb-px ${tab === t.id ? "border-[#C6A15B] text-[#C6A15B]" : "border-transparent text-[#B8B8B8] hover:text-[#F7F4EE]"}`}>
+              className={`px-4 sm:px-6 py-3 sm:py-4 text-[10px] sm:text-xs uppercase tracking-widest whitespace-nowrap border-b-2 transition-colors -mb-px ${tab === t.id ? "border-brand text-brand" : "border-transparent text-fog hover:text-paper"}`}>
               {t.label}
             </button>
           ))}
         </div>
 
-        <div className="bg-[#151515] border border-[#2A2A2A] p-4 sm:p-6 md:p-8">
+        <div className="bg-panel border border-line p-4 sm:p-6 md:p-8">
           {tab === "transfer" && <TransferCalculator />}
           {tab === "bond" && <BondCalculator />}
           {tab === "repayment" && <RepaymentCalculator />}
 
-          <div className="mt-6 pt-6 border-t border-[#2A2A2A] text-[#B8B8B8] text-xs leading-relaxed">
-            <p className="font-semibold text-[#F7F4EE] mb-2">Rate Sources</p>
+          <div className="mt-6 pt-6 border-t border-line text-fog text-xs leading-relaxed">
+            <p className="font-semibold text-paper mb-2">Rate Sources</p>
             <ul className="space-y-1">
               <li>• Transfer Duty: SARS official tariff, effective 1 April 2025 (confirmed unchanged for 2026/27)</li>
               <li>• Deeds Office Fees: Government Notice GN R.4447, Government Gazette No. 50239, effective 1 April 2024</li>
@@ -822,11 +822,11 @@ export default function CalculatorPage() {
           </div>
         </div>
 
-        <div className="mt-8 border border-[#2A2A2A] p-6 sm:p-8 text-center">
-          <h3 className="text-lg sm:text-xl font-serif text-[#F7F4EE] mb-3">Need a Precise Quote?</h3>
-          <p className="text-[#B8B8B8] text-sm mb-6">Our conveyancing team will provide a detailed cost estimate for your specific transaction.</p>
+        <div className="mt-8 border border-line p-6 sm:p-8 text-center">
+          <h3 className="text-lg sm:text-xl font-serif text-paper mb-3">Need a Precise Quote?</h3>
+          <p className="text-fog text-sm mb-6">Our conveyancing team will provide a detailed cost estimate for your specific transaction.</p>
           <a href="mailto:nike@npinc.co.za"
-            className="inline-flex items-center gap-3 bg-[#C6A15B] text-[#0E0E0E] px-6 sm:px-8 py-3 sm:py-4 text-xs sm:text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors"
+            className="inline-flex items-center gap-3 bg-brand text-ink px-6 sm:px-8 py-3 sm:py-4 text-xs sm:text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors"
             data-testid="link-contact-quote">
             Get a Quote
           </a>

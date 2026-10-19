@@ -39,9 +39,9 @@ export default function ServiceDetailPage({ slug }: Props) {
     return (
       <PublicLayout>
         <div className="py-12 px-6 max-w-4xl mx-auto animate-pulse">
-          <div className="h-8 bg-[#2A2A2A] rounded w-1/4 mb-8" />
-          <div className="h-16 bg-[#2A2A2A] rounded mb-8" />
-          <div className="h-32 bg-[#2A2A2A] rounded" />
+          <div className="h-8 bg-line rounded w-1/4 mb-8" />
+          <div className="h-16 bg-line rounded mb-8" />
+          <div className="h-32 bg-line rounded" />
         </div>
       </PublicLayout>
     );
@@ -51,8 +51,8 @@ export default function ServiceDetailPage({ slug }: Props) {
     return (
       <PublicLayout>
         <div className="py-12 px-6 text-center">
-          <h1 className="text-4xl font-serif text-[#F7F4EE] mb-4">Practice Area Not Found</h1>
-          <Link href="/services" className="text-[#C6A15B]">← Back to Practice Areas</Link>
+          <h1 className="text-4xl font-serif text-paper mb-4">Practice Area Not Found</h1>
+          <Link href="/services" className="text-brand">← Back to Practice Areas</Link>
         </div>
       </PublicLayout>
     );
@@ -61,31 +61,31 @@ export default function ServiceDetailPage({ slug }: Props) {
   return (
     <PublicLayout>
       <div className="max-w-4xl mx-auto px-6 py-24">
-        <Link href="/services" className="inline-flex items-center gap-2 text-[#C6A15B] text-sm uppercase tracking-widest mb-12 hover:gap-3 transition-all" data-testid="link-back-services">
+        <Link href="/services" className="inline-flex items-center gap-2 text-brand text-sm uppercase tracking-widest mb-12 hover:gap-3 transition-all" data-testid="link-back-services">
           <ArrowLeft size={14} /> Practice Areas
         </Link>
 
-        <p className="text-[#C6A15B] text-xs uppercase tracking-[0.25em] mb-4">Practice Area</p>
-        <h1 className="text-5xl md:text-6xl font-serif text-[#F7F4EE] mb-8" data-testid="text-service-title">
+        <p className="text-brand text-xs uppercase tracking-[0.25em] mb-4">Practice Area</p>
+        <h1 className="text-5xl md:text-6xl font-serif text-paper mb-8" data-testid="text-service-title">
           {service.title}
         </h1>
-        <p className="text-[#B8B8B8] text-xl leading-relaxed mb-16">{service.summary}</p>
+        <p className="text-fog text-xl leading-relaxed mb-16">{service.summary}</p>
 
         {service.howWeAssist && (
           <div className="mb-16">
-            <h2 className="text-2xl font-serif text-[#F7F4EE] mb-6">How We Assist</h2>
-            <p className="text-[#B8B8B8] leading-relaxed text-lg">{service.howWeAssist}</p>
+            <h2 className="text-2xl font-serif text-paper mb-6">How We Assist</h2>
+            <p className="text-fog leading-relaxed text-lg">{service.howWeAssist}</p>
           </div>
         )}
 
         {service.typicalMatters && service.typicalMatters.length > 0 && (
           <div className="mb-16">
-            <h2 className="text-2xl font-serif text-[#F7F4EE] mb-8">Typical Matters</h2>
+            <h2 className="text-2xl font-serif text-paper mb-8">Typical Matters</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {service.typicalMatters.map((matter) => (
-                <div key={matter} className="flex items-center gap-4 border border-[#2A2A2A] p-4">
-                  <div className="w-2 h-2 bg-[#C6A15B] shrink-0" />
-                  <span className="text-[#B8B8B8]">{matter}</span>
+                <div key={matter} className="flex items-center gap-4 border border-line p-4">
+                  <div className="w-2 h-2 bg-brand shrink-0" />
+                  <span className="text-fog">{matter}</span>
                 </div>
               ))}
             </div>
@@ -94,23 +94,23 @@ export default function ServiceDetailPage({ slug }: Props) {
 
         {relatedPeople.length > 0 && (
           <div className="mb-16">
-            <h2 className="text-2xl font-serif text-[#F7F4EE] mb-8">Related Team</h2>
+            <h2 className="text-2xl font-serif text-paper mb-8">Related Team</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {relatedPeople.slice(0, 3).map((person) => (
-                <Link key={person.id} href={`/people/${person.slug}`} data-testid={`card-person-${person.id}`} className="group border border-[#2A2A2A] hover:border-[#C6A15B]/40 transition-colors p-6">
-                  <div className="w-12 h-12 bg-[#C6A15B]/10 flex items-center justify-center mb-4 text-[#C6A15B] font-serif text-lg">
+                <Link key={person.id} href={`/people/${person.slug}`} data-testid={`card-person-${person.id}`} className="group border border-line hover:border-brand/40 transition-colors p-6">
+                  <div className="w-12 h-12 bg-brand/10 flex items-center justify-center mb-4 text-brand font-serif text-lg">
                     {person.firstName[0]}{person.lastName[0]}
                   </div>
-                  <p className="text-[#C6A15B] text-xs uppercase tracking-widest mb-1">{ROLE_LABELS[normalizeRole(person.role)] ?? person.role}</p>
-                  <h3 className="text-[#F7F4EE] font-serif group-hover:text-[#C6A15B] transition-colors">{person.firstName} {person.lastName}</h3>
+                  <p className="text-brand text-xs uppercase tracking-widest mb-1">{ROLE_LABELS[normalizeRole(person.role)] ?? person.role}</p>
+                  <h3 className="text-paper font-serif group-hover:text-brand transition-colors">{person.firstName} {person.lastName}</h3>
                 </Link>
               ))}
             </div>
           </div>
         )}
 
-        <div className="border-t border-[#2A2A2A] pt-12 flex flex-col sm:flex-row gap-4">
-          <Link href="/contact" className="inline-flex items-center gap-3 bg-[#C6A15B] text-[#0E0E0E] px-8 py-4 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors" data-testid="link-contact-cta">
+        <div className="border-t border-line pt-12 flex flex-col sm:flex-row gap-4">
+          <Link href="/contact" className="inline-flex items-center gap-3 bg-brand text-ink px-8 py-4 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors" data-testid="link-contact-cta">
             Discuss Your Matter <ArrowRight size={16} />
           </Link>
         </div>

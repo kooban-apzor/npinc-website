@@ -47,6 +47,15 @@ export const siteSettingsTable = pgTable("site_settings", {
   seoContactTitle: text("seo_contact_title"),
   seoContactDescription: text("seo_contact_description"),
 
+  // Theme colours (hex, e.g. #C6A15B) — applied site-wide via CSS vars
+  themePrimary: text("theme_primary").notNull().default("#C6A15B"),
+  themePrimaryDark: text("theme_primary_dark").notNull().default("#9F7E3F"),
+  themeBackground: text("theme_background").notNull().default("#0E0E0E"),
+  themeSurface: text("theme_surface").notNull().default("#151515"),
+  themeText: text("theme_text").notNull().default("#F7F4EE"),
+  themeMuted: text("theme_muted").notNull().default("#B8B8B8"),
+  themeBorder: text("theme_border").notNull().default("#2A2A2A"),
+
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow().$onUpdate(() => new Date()),
 });
 

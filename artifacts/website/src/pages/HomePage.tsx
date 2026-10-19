@@ -51,29 +51,29 @@ export default function HomePage() {
           alt=""
           className="absolute inset-0 w-full h-full object-cover object-center"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0E0E0E]/80 via-[#0E0E0E]/60 to-[#0E0E0E]/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-ink/80 via-ink/60 to-ink/90" />
         <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
-          <div className="inline-block border border-[#C6A15B]/30 text-[#C6A15B] text-xs tracking-[0.25em] uppercase px-6 py-2 mb-10 font-medium">
+          <div className="inline-block border border-brand/30 text-brand text-xs tracking-[0.25em] uppercase px-6 py-2 mb-10 font-medium">
             {badgeText}
           </div>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-[#F7F4EE] leading-[1.05] mb-8 tracking-tight" data-testid="text-hero-heading">
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-paper leading-[1.05] mb-8 tracking-tight" data-testid="text-hero-heading">
             {heading}
           </h1>
-          <p className="text-lg md:text-xl text-[#B8B8B8] mb-12 max-w-2xl mx-auto leading-relaxed" data-testid="text-hero-subheading">
+          <p className="text-lg md:text-xl text-fog mb-12 max-w-2xl mx-auto leading-relaxed" data-testid="text-hero-subheading">
             {subheading}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href={ctaPrimaryLink}
               data-testid="link-hero-services"
-              className="inline-flex items-center gap-3 bg-[#C6A15B] text-[#0E0E0E] px-8 py-4 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors"
+              className="inline-flex items-center gap-3 bg-brand text-ink px-8 py-4 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors"
             >
               {ctaPrimaryText} <ArrowRight size={16} />
             </Link>
             <Link
               href={ctaSecondaryLink}
               data-testid="link-hero-contact"
-              className="inline-flex items-center gap-3 border border-[#2A2A2A] text-[#F7F4EE] px-8 py-4 text-sm font-semibold uppercase tracking-widest hover:border-[#C6A15B] hover:text-[#C6A15B] transition-colors"
+              className="inline-flex items-center gap-3 border border-line text-paper px-8 py-4 text-sm font-semibold uppercase tracking-widest hover:border-brand hover:text-brand transition-colors"
             >
               {ctaSecondaryText}
             </Link>
@@ -81,25 +81,25 @@ export default function HomePage() {
         </div>
         {/* Scroll indicator */}
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-40">
-          <div className="w-px h-12 bg-[#C6A15B]" />
+          <div className="w-px h-12 bg-brand" />
         </div>
       </section>
 
       {/* B-BBEE Badge Strip */}
-      <section className="bg-[#151515] border-y border-[#2A2A2A] py-5">
-        <div className="max-w-7xl mx-auto px-6 flex flex-wrap items-center justify-center gap-8 text-xs uppercase tracking-widest text-[#B8B8B8]">
-          <div className="flex items-center gap-2 text-[#C6A15B] font-semibold">
+      <section className="bg-panel border-y border-line py-5">
+        <div className="max-w-7xl mx-auto px-6 flex flex-wrap items-center justify-center gap-8 text-xs uppercase tracking-widest text-fog">
+          <div className="flex items-center gap-2 text-brand font-semibold">
             <Shield size={14} />
             <span>B-BBEE Level 1 Provider</span>
           </div>
-          <span className="hidden md:block text-[#2A2A2A]">|</span>
+          <span className="hidden md:block text-line">|</span>
           <span>Durban, South Africa</span>
-          <span className="hidden md:block text-[#2A2A2A]">|</span>
-          <a href="tel:0823820843" className="hover:text-[#C6A15B] transition-colors flex items-center gap-2">
+          <span className="hidden md:block text-line">|</span>
+          <a href="tel:0823820843" className="hover:text-brand transition-colors flex items-center gap-2">
             <Phone size={12} /> 082 382 0843
           </a>
-          <span className="hidden md:block text-[#2A2A2A]">|</span>
-          <a href="mailto:nike@npinc.co.za" className="hover:text-[#C6A15B] transition-colors flex items-center gap-2">
+          <span className="hidden md:block text-line">|</span>
+          <a href="mailto:nike@npinc.co.za" className="hover:text-brand transition-colors flex items-center gap-2">
             <Mail size={12} /> nike@npinc.co.za
           </a>
         </div>
@@ -108,43 +108,43 @@ export default function HomePage() {
       {/* Practice Areas */}
       <section className="py-28 px-6 max-w-7xl mx-auto">
         <div className="mb-16">
-          <p className="text-[#C6A15B] text-xs uppercase tracking-[0.25em] mb-4">Expertise</p>
-          <h2 className="text-4xl md:text-5xl font-serif text-[#F7F4EE]" data-testid="text-services-heading">Practice Areas</h2>
+          <p className="text-brand text-xs uppercase tracking-[0.25em] mb-4">Expertise</p>
+          <h2 className="text-4xl md:text-5xl font-serif text-paper" data-testid="text-services-heading">Practice Areas</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-[#2A2A2A]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-line">
           {(services ?? []).map((service, i) => (
             <Link
               key={service.id}
               href={`/services/${service.slug}`}
               data-testid={`card-service-${service.id}`}
-              className="group bg-[#0E0E0E] p-10 hover:bg-[#151515] transition-colors"
+              className="group bg-ink p-10 hover:bg-panel transition-colors"
             >
-              <div className="text-[#C6A15B] text-3xl font-serif mb-6 opacity-30">
+              <div className="text-brand text-3xl font-serif mb-6 opacity-30">
                 {String(i + 1).padStart(2, "0")}
               </div>
-              <h3 className="text-xl font-serif text-[#F7F4EE] mb-4 group-hover:text-[#C6A15B] transition-colors">
+              <h3 className="text-xl font-serif text-paper mb-4 group-hover:text-brand transition-colors">
                 {service.title}
               </h3>
-              <p className="text-[#B8B8B8] text-sm leading-relaxed mb-6">{service.summary}</p>
-              <span className="text-[#C6A15B] text-xs uppercase tracking-widest inline-flex items-center gap-2 group-hover:gap-3 transition-all">
+              <p className="text-fog text-sm leading-relaxed mb-6">{service.summary}</p>
+              <span className="text-brand text-xs uppercase tracking-widest inline-flex items-center gap-2 group-hover:gap-3 transition-all">
                 Learn more <ArrowRight size={12} />
               </span>
             </Link>
           ))}
         </div>
         <div className="mt-10 text-center">
-          <Link href="/services" className="text-[#C6A15B] text-sm uppercase tracking-widest border border-[#C6A15B]/30 px-8 py-3 hover:border-[#C6A15B] transition-colors inline-block">
+          <Link href="/services" className="text-brand text-sm uppercase tracking-widest border border-brand/30 px-8 py-3 hover:border-brand transition-colors inline-block">
             View All Practice Areas
           </Link>
         </div>
       </section>
 
       {/* Team Preview */}
-      <section className="py-28 bg-[#151515] border-y border-[#2A2A2A]">
+      <section className="py-28 bg-panel border-y border-line">
         <div className="max-w-7xl mx-auto px-6">
           <div className="mb-16">
-            <p className="text-[#C6A15B] text-xs uppercase tracking-[0.25em] mb-4">The Firm</p>
-            <h2 className="text-4xl md:text-5xl font-serif text-[#F7F4EE]">Our People</h2>
+            <p className="text-brand text-xs uppercase tracking-[0.25em] mb-4">The Firm</p>
+            <h2 className="text-4xl md:text-5xl font-serif text-paper">Our People</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {(people ?? []).slice(0, 3).map((person) => (
@@ -154,7 +154,7 @@ export default function HomePage() {
                 data-testid={`card-person-${person.id}`}
                 className="group"
               >
-                <div className="bg-[#0E0E0E] border border-[#2A2A2A] group-hover:border-[#C6A15B]/40 transition-colors p-8">
+                <div className="bg-ink border border-line group-hover:border-brand/40 transition-colors p-8">
                   {person.photoUrl ? (
                     <img
                       src={person.photoUrl}
@@ -162,18 +162,18 @@ export default function HomePage() {
                       className="w-20 h-20 object-cover object-top mb-6 grayscale group-hover:grayscale-0 transition-all duration-500"
                     />
                   ) : (
-                    <div className="w-16 h-16 bg-[#C6A15B]/10 border border-[#C6A15B]/20 flex items-center justify-center mb-6 text-[#C6A15B] font-serif text-2xl">
+                    <div className="w-16 h-16 bg-brand/10 border border-brand/20 flex items-center justify-center mb-6 text-brand font-serif text-2xl">
                       {person.firstName[0]}{person.lastName[0]}
                     </div>
                   )}
-                  <p className="text-[#C6A15B] text-xs uppercase tracking-widest mb-1">{ROLE_LABELS[normalizeRole(person.role)] ?? person.role}</p>
-                  <h3 className="text-xl font-serif text-[#F7F4EE] mb-2">
+                  <p className="text-brand text-xs uppercase tracking-widest mb-1">{ROLE_LABELS[normalizeRole(person.role)] ?? person.role}</p>
+                  <h3 className="text-xl font-serif text-paper mb-2">
                     {person.title ? `${person.title} ` : ""}{person.firstName} {person.lastName}
                   </h3>
                   {person.qualifications && (
-                    <p className="text-[#B8B8B8] text-sm mb-4">{person.qualifications}</p>
+                    <p className="text-fog text-sm mb-4">{person.qualifications}</p>
                   )}
-                  <span className="text-[#C6A15B] text-xs uppercase tracking-widest inline-flex items-center gap-2">
+                  <span className="text-brand text-xs uppercase tracking-widest inline-flex items-center gap-2">
                     View Profile <ArrowRight size={12} />
                   </span>
                 </div>
@@ -181,7 +181,7 @@ export default function HomePage() {
             ))}
           </div>
           <div className="mt-10 text-center">
-            <Link href="/people" className="text-[#C6A15B] text-sm uppercase tracking-widest border border-[#C6A15B]/30 px-8 py-3 hover:border-[#C6A15B] transition-colors inline-block">
+            <Link href="/people" className="text-brand text-sm uppercase tracking-widest border border-brand/30 px-8 py-3 hover:border-brand transition-colors inline-block">
               Meet the Full Team
             </Link>
           </div>
@@ -191,8 +191,8 @@ export default function HomePage() {
       {/* Insights */}
       <section className="py-28 px-6 max-w-7xl mx-auto">
         <div className="mb-16">
-          <p className="text-[#C6A15B] text-xs uppercase tracking-[0.25em] mb-4">Insights</p>
-          <h2 className="text-4xl md:text-5xl font-serif text-[#F7F4EE]">Latest from the Firm</h2>
+          <p className="text-brand text-xs uppercase tracking-[0.25em] mb-4">Insights</p>
+          <h2 className="text-4xl md:text-5xl font-serif text-paper">Latest from the Firm</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {(articles ?? []).slice(0, 3).map((article) => (
@@ -200,41 +200,41 @@ export default function HomePage() {
               key={article.id}
               href={`/insights/${article.slug}`}
               data-testid={`card-article-${article.id}`}
-              className="group border border-[#2A2A2A] hover:border-[#C6A15B]/30 transition-colors p-8"
+              className="group border border-line hover:border-brand/30 transition-colors p-8"
             >
-              <span className="text-[#C6A15B] text-xs uppercase tracking-widest">{article.category}</span>
-              <h3 className="text-lg font-serif text-[#F7F4EE] mt-3 mb-4 leading-snug group-hover:text-[#C6A15B] transition-colors">
+              <span className="text-brand text-xs uppercase tracking-widest">{article.category}</span>
+              <h3 className="text-lg font-serif text-paper mt-3 mb-4 leading-snug group-hover:text-brand transition-colors">
                 {article.title}
               </h3>
               {article.summary && (
-                <p className="text-[#B8B8B8] text-sm leading-relaxed mb-6 line-clamp-3">{article.summary}</p>
+                <p className="text-fog text-sm leading-relaxed mb-6 line-clamp-3">{article.summary}</p>
               )}
-              <span className="text-[#C6A15B] text-xs uppercase tracking-widest inline-flex items-center gap-2">
+              <span className="text-brand text-xs uppercase tracking-widest inline-flex items-center gap-2">
                 Read more <ArrowRight size={12} />
               </span>
             </Link>
           ))}
         </div>
         <div className="mt-10 text-center">
-          <Link href="/insights" className="text-[#C6A15B] text-sm uppercase tracking-widest border border-[#C6A15B]/30 px-8 py-3 hover:border-[#C6A15B] transition-colors inline-block">
+          <Link href="/insights" className="text-brand text-sm uppercase tracking-widest border border-brand/30 px-8 py-3 hover:border-brand transition-colors inline-block">
             View All Insights
           </Link>
         </div>
       </section>
 
       {/* Calculator CTA */}
-      <section className="bg-[#C6A15B] py-12 px-6">
+      <section className="bg-brand py-12 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-serif text-[#0E0E0E] mb-6">
+          <h2 className="text-4xl md:text-5xl font-serif text-ink mb-6">
             Conveyancing Calculator
           </h2>
-          <p className="text-[#0E0E0E]/70 text-lg mb-10 max-w-xl mx-auto">
+          <p className="text-ink/70 text-lg mb-10 max-w-xl mx-auto">
             Get an instant estimate of your property transfer and bond registration costs.
           </p>
           <Link
             href="/calculator"
             data-testid="link-calculator-cta"
-            className="inline-flex items-center gap-3 bg-[#0E0E0E] text-[#C6A15B] px-10 py-4 text-sm font-semibold uppercase tracking-widest hover:bg-[#151515] transition-colors"
+            className="inline-flex items-center gap-3 bg-ink text-brand px-10 py-4 text-sm font-semibold uppercase tracking-widest hover:bg-panel transition-colors"
           >
             Calculate Your Costs <ArrowRight size={16} />
           </Link>
@@ -245,16 +245,16 @@ export default function HomePage() {
       {(awards ?? []).length > 0 && (
         <section className="py-28 px-6 max-w-7xl mx-auto">
           <div className="mb-16">
-            <p className="text-[#C6A15B] text-xs uppercase tracking-[0.25em] mb-4">Recognition</p>
-            <h2 className="text-4xl md:text-5xl font-serif text-[#F7F4EE]">Awards & Honours</h2>
+            <p className="text-brand text-xs uppercase tracking-[0.25em] mb-4">Recognition</p>
+            <h2 className="text-4xl md:text-5xl font-serif text-paper">Awards & Honours</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {(awards ?? []).slice(0, 3).map((award) => (
-              <div key={award.id} data-testid={`card-award-${award.id}`} className="border border-[#2A2A2A] p-8">
-                <p className="text-[#C6A15B] text-xs uppercase tracking-widest mb-2">{award.year}</p>
-                <h3 className="text-lg font-serif text-[#F7F4EE] mb-2">{award.title}</h3>
-                {award.awardingBody && <p className="text-[#B8B8B8] text-sm mb-3">{award.awardingBody}</p>}
-                {award.description && <p className="text-[#B8B8B8] text-sm leading-relaxed">{award.description}</p>}
+              <div key={award.id} data-testid={`card-award-${award.id}`} className="border border-line p-8">
+                <p className="text-brand text-xs uppercase tracking-widest mb-2">{award.year}</p>
+                <h3 className="text-lg font-serif text-paper mb-2">{award.title}</h3>
+                {award.awardingBody && <p className="text-fog text-sm mb-3">{award.awardingBody}</p>}
+                {award.description && <p className="text-fog text-sm leading-relaxed">{award.description}</p>}
               </div>
             ))}
           </div>
@@ -262,17 +262,17 @@ export default function HomePage() {
       )}
 
       {/* Careers CTA */}
-      <section className="bg-[#151515] border-y border-[#2A2A2A] py-12 px-6">
+      <section className="bg-panel border-y border-line py-12 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-[#C6A15B] text-xs uppercase tracking-[0.25em] mb-4">Join Our Team</p>
-          <h2 className="text-4xl md:text-5xl font-serif text-[#F7F4EE] mb-6">Build Your Legal Career</h2>
-          <p className="text-[#B8B8B8] text-lg mb-10 max-w-xl mx-auto">
+          <p className="text-brand text-xs uppercase tracking-[0.25em] mb-4">Join Our Team</p>
+          <h2 className="text-4xl md:text-5xl font-serif text-paper mb-6">Build Your Legal Career</h2>
+          <p className="text-fog text-lg mb-10 max-w-xl mx-auto">
             We invest in exceptional talent. Explore our current opportunities and become part of a firm that makes a difference.
           </p>
           <Link
             href="/careers"
             data-testid="link-careers-cta"
-            className="inline-flex items-center gap-3 border border-[#C6A15B] text-[#C6A15B] px-10 py-4 text-sm font-semibold uppercase tracking-widest hover:bg-[#C6A15B] hover:text-[#0E0E0E] transition-colors"
+            className="inline-flex items-center gap-3 border border-brand text-brand px-10 py-4 text-sm font-semibold uppercase tracking-widest hover:bg-brand hover:text-ink transition-colors"
           >
             View Current Openings <ArrowRight size={16} />
           </Link>
@@ -281,20 +281,20 @@ export default function HomePage() {
 
       {/* Contact strip */}
       <section className="py-16 px-6 max-w-7xl mx-auto text-center">
-        <h2 className="text-3xl font-serif text-[#F7F4EE] mb-4">Ready to discuss your matter?</h2>
-        <p className="text-[#B8B8B8] mb-8">Contact us for a confidential consultation.</p>
-        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center text-sm text-[#B8B8B8]">
-          <a href="tel:0823820843" className="flex items-center gap-2 hover:text-[#C6A15B] transition-colors">
-            <Phone size={14} className="text-[#C6A15B]" /> 082 382 0843
+        <h2 className="text-3xl font-serif text-paper mb-4">Ready to discuss your matter?</h2>
+        <p className="text-fog mb-8">Contact us for a confidential consultation.</p>
+        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center text-sm text-fog">
+          <a href="tel:0823820843" className="flex items-center gap-2 hover:text-brand transition-colors">
+            <Phone size={14} className="text-brand" /> 082 382 0843
           </a>
-          <a href="tel:0871839891" className="flex items-center gap-2 hover:text-[#C6A15B] transition-colors">
-            <Phone size={14} className="text-[#C6A15B]" /> 087 183 9891
+          <a href="tel:0871839891" className="flex items-center gap-2 hover:text-brand transition-colors">
+            <Phone size={14} className="text-brand" /> 087 183 9891
           </a>
-          <a href="mailto:nike@npinc.co.za" className="flex items-center gap-2 hover:text-[#C6A15B] transition-colors">
-            <Mail size={14} className="text-[#C6A15B]" /> nike@npinc.co.za
+          <a href="mailto:nike@npinc.co.za" className="flex items-center gap-2 hover:text-brand transition-colors">
+            <Mail size={14} className="text-brand" /> nike@npinc.co.za
           </a>
         </div>
-        <Link href="/contact" className="mt-8 inline-flex items-center gap-2 text-[#C6A15B] text-sm uppercase tracking-widest hover:underline">
+        <Link href="/contact" className="mt-8 inline-flex items-center gap-2 text-brand text-sm uppercase tracking-widest hover:underline">
           Send an Enquiry <ArrowRight size={14} />
         </Link>
       </section>

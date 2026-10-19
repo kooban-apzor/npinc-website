@@ -7,14 +7,14 @@ type AdminDateFieldProps = {
 };
 
 const inputClass =
-  "w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none";
+  "w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none";
 
 export default function AdminDateField({ label, value, onChange, onClear, required }: AdminDateFieldProps) {
   return (
     <div>
-      <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">
+      <label className="block text-fog text-xs uppercase tracking-widest mb-2">
         {label}
-        {required && <span className="text-[#C6A15B]"> *</span>}
+        {required && <span className="text-brand"> *</span>}
       </label>
       <input
         type="date"
@@ -24,7 +24,7 @@ export default function AdminDateField({ label, value, onChange, onClear, requir
         className={inputClass}
       />
       {value && onClear && (
-        <button type="button" onClick={onClear} className="text-[#555] text-xs mt-1 hover:text-[#B8B8B8]">
+        <button type="button" onClick={onClear} className="text-fog/60 text-xs mt-1 hover:text-fog">
           Clear
         </button>
       )}

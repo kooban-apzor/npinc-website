@@ -67,12 +67,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen flex bg-[#0E0E0E]">
+    <div className="min-h-screen flex bg-ink">
       {/* Sidebar */}
-      <aside className="w-64 bg-[#151515] border-r border-[#2A2A2A] flex flex-col shrink-0" data-testid="admin-sidebar">
-        <div className="px-6 py-6 border-b border-[#2A2A2A]">
-          <p className="text-[#C6A15B] text-xs uppercase tracking-widest font-semibold mb-1">NP Inc Admin</p>
-          {me && <p className="text-[#B8B8B8] text-sm">{me.username}</p>}
+      <aside className="w-64 bg-panel border-r border-line flex flex-col shrink-0" data-testid="admin-sidebar">
+        <div className="px-6 py-6 border-b border-line">
+          <p className="text-brand text-xs uppercase tracking-widest font-semibold mb-1">NP Inc Admin</p>
+          {me && <p className="text-fog text-sm">{me.username}</p>}
         </div>
 
         <nav className="flex-1 py-4 overflow-y-auto">
@@ -85,8 +85,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 data-testid={`link-admin-${label.toLowerCase().replace(/\s+/g, "-")}`}
                 className={`flex items-center gap-3 px-6 py-3 text-sm transition-colors ${
                   active
-                    ? "bg-[#C6A15B]/10 text-[#C6A15B] border-r-2 border-[#C6A15B]"
-                    : "text-[#B8B8B8] hover:text-[#F7F4EE] hover:bg-[#2A2A2A]/50"
+                    ? "bg-brand/10 text-brand border-r-2 border-brand"
+                    : "text-fog hover:text-paper hover:bg-line/50"
                 }`}
               >
                 <Icon size={16} />
@@ -97,17 +97,17 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           })}
         </nav>
 
-        <div className="p-4 border-t border-[#2A2A2A]">
+        <div className="p-4 border-t border-line">
           <Link
             href="/"
-            className="flex items-center gap-3 px-2 py-2 text-sm text-[#B8B8B8] hover:text-[#F7F4EE] transition-colors mb-2"
+            className="flex items-center gap-3 px-2 py-2 text-sm text-fog hover:text-paper transition-colors mb-2"
           >
             ← View Public Site
           </Link>
           <button
             onClick={handleLogout}
             data-testid="button-logout"
-            className="flex items-center gap-3 w-full px-2 py-2 text-sm text-[#B8B8B8] hover:text-red-400 transition-colors"
+            className="flex items-center gap-3 w-full px-2 py-2 text-sm text-fog hover:text-red-400 transition-colors"
           >
             <LogOut size={16} />
             Logout

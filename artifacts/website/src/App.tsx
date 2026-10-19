@@ -3,6 +3,7 @@ import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import ThemeProvider from "@/components/ThemeProvider";
 
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/HomePage";
@@ -49,15 +50,15 @@ function AdminLoginModal({ open, onClose }: { open: boolean; onClose: () => void
   if (!open) return null;
   return (
     <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4" onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} className="bg-[#151515] border border-[#2A2A2A] p-8 w-full max-w-sm">
+      <div onClick={e => e.stopPropagation()} className="bg-panel border border-line p-8 w-full max-w-sm">
         <div className="text-center mb-6">
-          <p className="text-[#C6A15B] text-xs uppercase tracking-widest mb-2">Restricted Access</p>
-          <h2 className="text-2xl font-serif text-[#F7F4EE]">Admin Login</h2>
+          <p className="text-brand text-xs uppercase tracking-widest mb-2">Restricted Access</p>
+          <h2 className="text-2xl font-serif text-paper">Admin Login</h2>
         </div>
-        <a href="/admin/login" className="block w-full bg-[#C6A15B] text-[#0E0E0E] py-4 text-sm font-semibold uppercase tracking-widest text-center hover:bg-[#9F7E3F] transition-colors mb-3">
+        <a href="/admin/login" className="block w-full bg-brand text-ink py-4 text-sm font-semibold uppercase tracking-widest text-center hover:bg-brand-deep transition-colors mb-3">
           Go to Admin Login
         </a>
-        <button onClick={onClose} className="block w-full border border-[#2A2A2A] text-[#B8B8B8] py-3 text-sm hover:border-[#C6A15B] transition-colors">
+        <button onClick={onClose} className="block w-full border border-line text-fog py-3 text-sm hover:border-brand transition-colors">
           Cancel
         </button>
       </div>
@@ -142,6 +143,7 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <ThemeProvider />
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
           <ScrollToTop />

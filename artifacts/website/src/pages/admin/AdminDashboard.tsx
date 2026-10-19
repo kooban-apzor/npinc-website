@@ -31,11 +31,11 @@ export default function AdminDashboard() {
     <AdminLayout>
       <div className="p-8 md:p-12">
         <div className="mb-10">
-          <p className="text-[#C6A15B] text-xs uppercase tracking-[0.25em] mb-2">CMS Dashboard</p>
-          <h1 className="text-3xl font-serif text-[#F7F4EE]" data-testid="text-admin-title">
+          <p className="text-brand text-xs uppercase tracking-[0.25em] mb-2">CMS Dashboard</p>
+          <h1 className="text-3xl font-serif text-paper" data-testid="text-admin-title">
             Welcome{me ? `, ${me.username}` : ""}
           </h1>
-          <p className="text-[#B8B8B8] mt-2">Manage all content for the Nike Pillay Inc website.</p>
+          <p className="text-fog mt-2">Manage all content for the Nike Pillay Inc website.</p>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-12">
@@ -44,17 +44,17 @@ export default function AdminDashboard() {
               key={label}
               href={href}
               data-testid={`card-stat-${label.toLowerCase().replace(/\s+/g, "-")}`}
-              className="bg-[#151515] border border-[#2A2A2A] hover:border-[#C6A15B]/30 transition-colors p-6"
+              className="bg-panel border border-line hover:border-brand/30 transition-colors p-6"
             >
-              <Icon size={20} className="text-[#C6A15B] mb-4" />
-              <p className="text-3xl font-serif text-[#F7F4EE] mb-1">{value}</p>
-              <p className="text-[#B8B8B8] text-xs uppercase tracking-widest">{label}</p>
+              <Icon size={20} className="text-brand mb-4" />
+              <p className="text-3xl font-serif text-paper mb-1">{value}</p>
+              <p className="text-fog text-xs uppercase tracking-widest">{label}</p>
             </a>
           ))}
         </div>
 
-        <div className="border border-[#2A2A2A] p-8">
-          <h2 className="text-lg font-serif text-[#F7F4EE] mb-4">Quick Actions</h2>
+        <div className="border border-line p-8">
+          <h2 className="text-lg font-serif text-paper mb-4">Quick Actions</h2>
           <div className="flex flex-wrap gap-4">
             {[
               { label: "Add Article", href: "/admin/articles" },
@@ -66,7 +66,7 @@ export default function AdminDashboard() {
               <a
                 key={href}
                 href={href}
-                className="border border-[#2A2A2A] hover:border-[#C6A15B] text-[#B8B8B8] hover:text-[#C6A15B] px-6 py-3 text-sm transition-colors"
+                className="border border-line hover:border-brand text-fog hover:text-brand px-6 py-3 text-sm transition-colors"
               >
                 {label}
               </a>

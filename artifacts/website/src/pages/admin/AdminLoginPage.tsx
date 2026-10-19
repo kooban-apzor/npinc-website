@@ -12,11 +12,11 @@ export default function AdminLoginPage() {
   const [mode, setMode] = useState<Mode>("login");
 
   return (
-    <div className="min-h-screen bg-[#0E0E0E] flex items-center justify-center px-6">
+    <div className="min-h-screen bg-ink flex items-center justify-center px-6">
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
           <img src={logoPath} alt="Nike Pillay Inc" className="h-10 w-auto mx-auto mb-6 object-contain" />
-          <p className="text-[#B8B8B8] text-xs uppercase tracking-widest">Admin Access</p>
+          <p className="text-fog text-xs uppercase tracking-widest">Admin Access</p>
         </div>
 
         {mode === "login" ? (
@@ -25,8 +25,8 @@ export default function AdminLoginPage() {
           <ResetForm onSwitchToLogin={() => setMode("login")} />
         )}
 
-        <p className="text-center mt-8 text-[#B8B8B8] text-xs">
-          <a href="/" className="hover:text-[#C6A15B] transition-colors">← Return to site</a>
+        <p className="text-center mt-8 text-fog text-xs">
+          <a href="/" className="hover:text-brand transition-colors">← Return to site</a>
         </p>
       </div>
     </div>
@@ -94,15 +94,15 @@ function LoginForm({ onSwitchToReset }: { onSwitchToReset: () => void }) {
         <div className="border border-red-500/30 bg-red-500/10 px-6 py-6">
           <Lock size={28} className="text-red-400 mx-auto mb-3" />
           <p className="text-red-400 text-sm font-semibold mb-2">Access Locked</p>
-          <p className="text-[#B8B8B8] text-xs leading-relaxed">
+          <p className="text-fog text-xs leading-relaxed">
             Too many failed login attempts. Access is temporarily locked for {lockMinutes} minute{lockMinutes !== 1 ? "s" : ""}.
           </p>
-          <p className="text-[#555] text-xs mt-3">Please try again later, or use the password reset option below.</p>
+          <p className="text-fog/60 text-xs mt-3">Please try again later, or use the password reset option below.</p>
         </div>
         <button
           type="button"
           onClick={onSwitchToReset}
-          className="w-full border border-[#2A2A2A] text-[#B8B8B8] py-4 text-sm hover:border-[#C6A15B] hover:text-[#C6A15B] transition-colors"
+          className="w-full border border-line text-fog py-4 text-sm hover:border-brand hover:text-brand transition-colors"
         >
           Reset password with secret phrase →
         </button>
@@ -113,7 +113,7 @@ function LoginForm({ onSwitchToReset }: { onSwitchToReset: () => void }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5" data-testid="form-admin-login">
       <div>
-        <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-3">Username</label>
+        <label className="block text-fog text-xs uppercase tracking-widest mb-3">Username</label>
         <input
           type="text"
           value={username}
@@ -121,11 +121,11 @@ function LoginForm({ onSwitchToReset }: { onSwitchToReset: () => void }) {
           required
           data-testid="input-admin-username"
           autoComplete="username"
-          className="w-full bg-[#151515] border border-[#2A2A2A] text-[#F7F4EE] px-4 py-4 focus:border-[#C6A15B] focus:outline-none transition-colors"
+          className="w-full bg-panel border border-line text-paper px-4 py-4 focus:border-brand focus:outline-none transition-colors"
         />
       </div>
       <div>
-        <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-3">Password</label>
+        <label className="block text-fog text-xs uppercase tracking-widest mb-3">Password</label>
         <input
           type="password"
           value={password}
@@ -133,7 +133,7 @@ function LoginForm({ onSwitchToReset }: { onSwitchToReset: () => void }) {
           required
           data-testid="input-admin-password"
           autoComplete="current-password"
-          className="w-full bg-[#151515] border border-[#2A2A2A] text-[#F7F4EE] px-4 py-4 focus:border-[#C6A15B] focus:outline-none transition-colors"
+          className="w-full bg-panel border border-line text-paper px-4 py-4 focus:border-brand focus:outline-none transition-colors"
         />
       </div>
 
@@ -143,7 +143,7 @@ function LoginForm({ onSwitchToReset }: { onSwitchToReset: () => void }) {
             <ShieldAlert size={14} className="shrink-0" /> {error}
           </p>
           {attemptsLeft !== null && attemptsLeft > 0 && (
-            <p className="text-[#B8B8B8] text-xs pl-5">
+            <p className="text-fog text-xs pl-5">
               {attemptsLeft} attempt{attemptsLeft !== 1 ? "s" : ""} remaining before a 15-minute lockout.
             </p>
           )}
@@ -154,7 +154,7 @@ function LoginForm({ onSwitchToReset }: { onSwitchToReset: () => void }) {
         type="submit"
         disabled={login.isPending}
         data-testid="button-admin-login"
-        className="w-full bg-[#C6A15B] text-[#0E0E0E] py-4 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors disabled:opacity-50"
+        className="w-full bg-brand text-ink py-4 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors disabled:opacity-50"
       >
         {login.isPending ? "Signing in…" : "Sign In"}
       </button>
@@ -163,7 +163,7 @@ function LoginForm({ onSwitchToReset }: { onSwitchToReset: () => void }) {
         <button
           type="button"
           onClick={onSwitchToReset}
-          className="text-[#B8B8B8] text-xs hover:text-[#C6A15B] transition-colors"
+          className="text-fog text-xs hover:text-brand transition-colors"
         >
           Forgot password?
         </button>
@@ -219,14 +219,14 @@ function ResetForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
   if (status === "success") {
     return (
       <div className="text-center space-y-6">
-        <div className="border border-[#C6A15B]/30 bg-[#C6A15B]/10 px-6 py-5">
-          <p className="text-[#C6A15B] text-sm font-semibold mb-1">Password reset successfully</p>
-          <p className="text-[#B8B8B8] text-xs">You can now sign in with your new password.</p>
+        <div className="border border-brand/30 bg-brand/10 px-6 py-5">
+          <p className="text-brand text-sm font-semibold mb-1">Password reset successfully</p>
+          <p className="text-fog text-xs">You can now sign in with your new password.</p>
         </div>
         <button
           type="button"
           onClick={onSwitchToLogin}
-          className="w-full bg-[#C6A15B] text-[#0E0E0E] py-4 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors"
+          className="w-full bg-brand text-ink py-4 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors"
         >
           Back to Sign In
         </button>
@@ -240,10 +240,10 @@ function ResetForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
         <div className="border border-red-500/30 bg-red-500/10 px-6 py-6">
           <Lock size={28} className="text-red-400 mx-auto mb-3" />
           <p className="text-red-400 text-sm font-semibold mb-2">Too Many Attempts</p>
-          <p className="text-[#B8B8B8] text-xs">Too many reset attempts from this IP. Please try again in 1 hour.</p>
+          <p className="text-fog text-xs">Too many reset attempts from this IP. Please try again in 1 hour.</p>
         </div>
         <button type="button" onClick={onSwitchToLogin}
-          className="w-full border border-[#2A2A2A] text-[#B8B8B8] py-4 text-sm hover:border-[#C6A15B] transition-colors">
+          className="w-full border border-line text-fog py-4 text-sm hover:border-brand transition-colors">
           ← Back to Sign In
         </button>
       </div>
@@ -252,14 +252,14 @@ function ResetForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="border border-[#2A2A2A] bg-[#151515] px-4 py-3 mb-2">
-        <p className="text-[#B8B8B8] text-xs leading-relaxed">
+      <div className="border border-line bg-panel px-4 py-3 mb-2">
+        <p className="text-fog text-xs leading-relaxed">
           Enter the firm's secret phrase to reset the admin password without needing your current credentials.
         </p>
       </div>
 
       <div>
-        <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-3">Secret Phrase</label>
+        <label className="block text-fog text-xs uppercase tracking-widest mb-3">Secret Phrase</label>
         <input
           type="password"
           value={secretPhrase}
@@ -267,11 +267,11 @@ function ResetForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
           required
           autoComplete="off"
           placeholder="Enter the secret phrase"
-          className="w-full bg-[#151515] border border-[#2A2A2A] text-[#F7F4EE] px-4 py-4 focus:border-[#C6A15B] focus:outline-none transition-colors placeholder:text-[#555]"
+          className="w-full bg-panel border border-line text-paper px-4 py-4 focus:border-brand focus:outline-none transition-colors placeholder:text-fog/60"
         />
       </div>
       <div>
-        <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-3">New Password</label>
+        <label className="block text-fog text-xs uppercase tracking-widest mb-3">New Password</label>
         <input
           type="password"
           value={newPassword}
@@ -279,18 +279,18 @@ function ResetForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
           required
           autoComplete="new-password"
           placeholder="At least 6 characters"
-          className="w-full bg-[#151515] border border-[#2A2A2A] text-[#F7F4EE] px-4 py-4 focus:border-[#C6A15B] focus:outline-none transition-colors placeholder:text-[#555]"
+          className="w-full bg-panel border border-line text-paper px-4 py-4 focus:border-brand focus:outline-none transition-colors placeholder:text-fog/60"
         />
       </div>
       <div>
-        <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-3">Confirm New Password</label>
+        <label className="block text-fog text-xs uppercase tracking-widest mb-3">Confirm New Password</label>
         <input
           type="password"
           value={confirm}
           onChange={e => setConfirm(e.target.value)}
           required
           autoComplete="new-password"
-          className="w-full bg-[#151515] border border-[#2A2A2A] text-[#F7F4EE] px-4 py-4 focus:border-[#C6A15B] focus:outline-none transition-colors"
+          className="w-full bg-panel border border-line text-paper px-4 py-4 focus:border-brand focus:outline-none transition-colors"
         />
       </div>
 
@@ -301,13 +301,13 @@ function ResetForm({ onSwitchToLogin }: { onSwitchToLogin: () => void }) {
       )}
 
       <button type="submit"
-        className="w-full bg-[#C6A15B] text-[#0E0E0E] py-4 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors">
+        className="w-full bg-brand text-ink py-4 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors">
         Reset Password
       </button>
 
       <p className="text-center pt-2">
         <button type="button" onClick={onSwitchToLogin}
-          className="text-[#B8B8B8] text-xs hover:text-[#C6A15B] transition-colors">
+          className="text-fog text-xs hover:text-brand transition-colors">
           ← Back to Sign In
         </button>
       </p>

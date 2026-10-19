@@ -85,6 +85,13 @@ export const GetSiteSettingsResponse = zod.object({
   "seoCareersDescription": zod.string().optional(),
   "seoContactTitle": zod.string().optional(),
   "seoContactDescription": zod.string().optional(),
+  "themePrimary": zod.string().optional(),
+  "themePrimaryDark": zod.string().optional(),
+  "themeBackground": zod.string().optional(),
+  "themeSurface": zod.string().optional(),
+  "themeText": zod.string().optional(),
+  "themeMuted": zod.string().optional(),
+  "themeBorder": zod.string().optional(),
   "updatedAt": zod.string().optional()
 })
 
@@ -124,7 +131,14 @@ export const UpdateSiteSettingsBody = zod.object({
   "seoCareersTitle": zod.string().optional(),
   "seoCareersDescription": zod.string().optional(),
   "seoContactTitle": zod.string().optional(),
-  "seoContactDescription": zod.string().optional()
+  "seoContactDescription": zod.string().optional(),
+  "themePrimary": zod.string().optional(),
+  "themePrimaryDark": zod.string().optional(),
+  "themeBackground": zod.string().optional(),
+  "themeSurface": zod.string().optional(),
+  "themeText": zod.string().optional(),
+  "themeMuted": zod.string().optional(),
+  "themeBorder": zod.string().optional()
 })
 
 export const UpdateSiteSettingsResponse = zod.object({
@@ -161,6 +175,13 @@ export const UpdateSiteSettingsResponse = zod.object({
   "seoCareersDescription": zod.string().optional(),
   "seoContactTitle": zod.string().optional(),
   "seoContactDescription": zod.string().optional(),
+  "themePrimary": zod.string().optional(),
+  "themePrimaryDark": zod.string().optional(),
+  "themeBackground": zod.string().optional(),
+  "themeSurface": zod.string().optional(),
+  "themeText": zod.string().optional(),
+  "themeMuted": zod.string().optional(),
+  "themeBorder": zod.string().optional(),
   "updatedAt": zod.string().optional()
 })
 

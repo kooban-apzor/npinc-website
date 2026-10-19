@@ -3,9 +3,10 @@ import { useGetSiteSettings, useUpdateSiteSettings, getGetSiteSettingsQueryKey }
 import { useQueryClient } from "@tanstack/react-query";
 import AdminLayout from "@/components/AdminLayout";
 import { useToast } from "@/hooks/use-toast";
-import { Globe, Building2, Search } from "lucide-react";
+import { Globe, Building2, Search, Palette } from "lucide-react";
+import { DEFAULT_THEME, THEME_PRESETS, THEME_FIELDS, applyTheme, isValidHex, shiftLightness, type ThemeColors } from "@/lib/theme";
 
-type Tab = "homepage" | "contact" | "seo";
+type Tab = "homepage" | "contact" | "seo" | "colours";
 
 type FormState = {
   firmName: string;
@@ -40,6 +41,13 @@ type FormState = {
   seoCareersDescription: string;
   seoContactTitle: string;
   seoContactDescription: string;
+  themePrimary: string;
+  themePrimaryDark: string;
+  themeBackground: string;
+  themeSurface: string;
+  themeText: string;
+  themeMuted: string;
+  themeBorder: string;
 };
 
 const EMPTY: FormState = {
@@ -56,6 +64,7 @@ const EMPTY: FormState = {
   seoCalculatorTitle: "", seoCalculatorDescription: "",
   seoCareersTitle: "", seoCareersDescription: "",
   seoContactTitle: "", seoContactDescription: "",
+  ...DEFAULT_THEME,
 };
 
 interface FieldProps {
@@ -72,15 +81,15 @@ interface FieldProps {
 function Field({ label, hint, value, onChange, multiline, rows = 3, placeholder, maxHint }: FieldProps) {
   return (
     <div>
-      <label className="block text-[#F7F4EE] text-sm font-medium mb-1">{label}</label>
-      {hint && <p className="text-[#B8B8B8] text-xs mb-2">{hint}</p>}
+      <label className="block text-paper text-sm font-medium mb-1">{label}</label>
+      {hint && <p className="text-fog text-xs mb-2">{hint}</p>}
       {multiline ? (
         <textarea
           rows={rows}
           value={value}
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full bg-[#151515] border border-[#2A2A2A] text-[#F7F4EE] placeholder-[#555] px-4 py-3 focus:border-[#C6A15B] focus:outline-none resize-none text-sm"
+          className="w-full bg-panel border border-line text-paper placeholder-fog/60 px-4 py-3 focus:border-brand focus:outline-none resize-none text-sm"
         />
       ) : (
         <input
@@ -88,14 +97,55 @@ function Field({ label, hint, value, onChange, multiline, rows = 3, placeholder,
           value={value}
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full bg-[#151515] border border-[#2A2A2A] text-[#F7F4EE] placeholder-[#555] px-4 py-3 focus:border-[#C6A15B] focus:outline-none text-sm"
+          className="w-full bg-panel border border-line text-paper placeholder-fog/60 px-4 py-3 focus:border-brand focus:outline-none text-sm"
         />
       )}
       {maxHint != null && (
-        <p className={`text-xs mt-1 text-right ${value.length > maxHint ? "text-red-400" : "text-[#555]"}`}>
+        <p className={`text-xs mt-1 text-right ${value.length > maxHint ? "text-red-400" : "text-fog/60"}`}>
           {value.length} / {maxHint} chars {value.length > maxHint ? "(too long for Google)" : "(recommended max)"}
         </p>
       )}
+    </div>
+  );
+}
+
+interface ColourRowProps {
+  label: string;
+  hint: string;
+  value: string;
+  onChange: (v: string) => void;
+}
+
+function ColourRow({ label, hint, value, onChange }: ColourRowProps) {
+  const safe = isValidHex(value) ? value : "#000000";
+  return (
+    <div className="flex items-center gap-4">
+      <label
+        className="w-11 h-11 shrink-0 border border-line cursor-pointer overflow-hidden"
+        title="Click to pick a colour"
+      >
+        <input
+          type="color"
+          value={safe}
+          onChange={e => onChange(e.target.value)}
+          className="w-full h-full cursor-pointer border-0 p-0 bg-transparent"
+        />
+      </label>
+      <div className="flex-1 min-w-0">
+        <p className="text-paper text-sm font-medium">{label}</p>
+        <p className="text-fog text-xs">{hint}</p>
+      </div>
+      <input
+        type="text"
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        spellCheck={false}
+        maxLength={7}
+        aria-label={`${label} hex code`}
+        className={`w-24 shrink-0 bg-panel border text-paper px-3 py-2 text-sm font-mono uppercase focus:outline-none ${
+          isValidHex(value) ? "border-line focus:border-brand" : "border-red-500"
+        }`}
+      />
     </div>
   );
 }
@@ -110,8 +160,8 @@ function SeoPageSection({ label, titleKey, descKey, form, setForm }: {
   const title = form[titleKey];
   const desc = form[descKey];
   return (
-    <div className="border border-[#2A2A2A] p-6 space-y-4">
-      <h3 className="text-[#C6A15B] text-xs uppercase tracking-widest font-medium">{label}</h3>
+    <div className="border border-line p-6 space-y-4">
+      <h3 className="text-brand text-xs uppercase tracking-widest font-medium">{label}</h3>
       <Field
         label="Page Title"
         hint="Shown in the browser tab and Google results. Keep under 60 characters."
@@ -131,10 +181,10 @@ function SeoPageSection({ label, titleKey, descKey, form, setForm }: {
         maxHint={155}
       />
       {title && (
-        <div className="bg-[#0E0E0E] border border-[#2A2A2A] p-4 rounded">
-          <p className="text-xs text-[#555] uppercase tracking-widest mb-2">Google Preview</p>
-          <p className="text-[#8AB4F8] text-sm font-medium truncate">{title}</p>
-          {desc && <p className="text-[#B8B8B8] text-xs mt-1 leading-relaxed line-clamp-2">{desc}</p>}
+        <div className="bg-ink border border-line p-4 rounded">
+          <p className="text-xs text-fog/60 uppercase tracking-widest mb-2">Google Preview</p>
+          <p className="text-fog text-sm font-medium truncate">{title}</p>
+          {desc && <p className="text-fog text-xs mt-1 leading-relaxed line-clamp-2">{desc}</p>}
         </div>
       )}
     </div>
@@ -184,6 +234,13 @@ export default function AdminSiteSettings() {
       seoCareersDescription: settings.seoCareersDescription ?? "",
       seoContactTitle: settings.seoContactTitle ?? "",
       seoContactDescription: settings.seoContactDescription ?? "",
+      themePrimary: settings.themePrimary ?? DEFAULT_THEME.themePrimary,
+      themePrimaryDark: settings.themePrimaryDark ?? DEFAULT_THEME.themePrimaryDark,
+      themeBackground: settings.themeBackground ?? DEFAULT_THEME.themeBackground,
+      themeSurface: settings.themeSurface ?? DEFAULT_THEME.themeSurface,
+      themeText: settings.themeText ?? DEFAULT_THEME.themeText,
+      themeMuted: settings.themeMuted ?? DEFAULT_THEME.themeMuted,
+      themeBorder: settings.themeBorder ?? DEFAULT_THEME.themeBorder,
     });
   }, [settings]);
 
@@ -206,19 +263,40 @@ export default function AdminSiteSettings() {
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
     { id: "homepage", label: "Homepage", icon: <Globe size={15} /> },
     { id: "contact", label: "Contact & Firm", icon: <Building2 size={15} /> },
+    { id: "colours", label: "Colours", icon: <Palette size={15} /> },
     { id: "seo", label: "SEO", icon: <Search size={15} /> },
   ];
+
+  const themeForm = (k: keyof ThemeColors) => ({
+    value: form[k],
+    onChange: (v: string) => setColour(k, v),
+  });
+
+  const setColour = (key: keyof ThemeColors, value: string) => {
+    setForm(prev => {
+      const next = { ...prev, [key]: value.toUpperCase() };
+      // Keep the hover shade in step when the accent changes
+      if (key === "themePrimary" && isValidHex(value)) {
+        next.themePrimaryDark = shiftLightness(value, -10);
+      }
+      return next;
+    });
+  };
+
+  const applyPreset = (colors: ThemeColors) => setForm(prev => ({ ...prev, ...colors }));
+
+  const resetTheme = () => setForm(prev => ({ ...prev, ...DEFAULT_THEME }));
 
   return (
     <AdminLayout>
       <div className="p-8 md:p-12 max-w-3xl">
         <div className="mb-10">
-          <h1 className="text-3xl font-serif text-[#F7F4EE]">Site Settings</h1>
-          <p className="text-[#B8B8B8] mt-1">Manage your homepage hero, contact details, and search engine metadata — no technical knowledge needed.</p>
+          <h1 className="text-3xl font-serif text-paper">Site Settings</h1>
+          <p className="text-fog mt-1">Manage your homepage hero, contact details, and search engine metadata — no technical knowledge needed.</p>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-[#2A2A2A] mb-10">
+        <div className="flex border-b border-line mb-10">
           {tabs.map(t => (
             <button
               key={t.id}
@@ -226,8 +304,8 @@ export default function AdminSiteSettings() {
               onClick={() => setActiveTab(t.id)}
               className={`flex items-center gap-2 px-6 py-3 text-sm font-medium uppercase tracking-widest transition-colors border-b-2 -mb-px ${
                 activeTab === t.id
-                  ? "border-[#C6A15B] text-[#C6A15B]"
-                  : "border-transparent text-[#B8B8B8] hover:text-[#F7F4EE]"
+                  ? "border-brand text-brand"
+                  : "border-transparent text-fog hover:text-paper"
               }`}
             >
               {t.icon} {t.label}
@@ -241,7 +319,7 @@ export default function AdminSiteSettings() {
           {activeTab === "homepage" && (
             <div className="space-y-8">
               <div>
-                <p className="text-[#C6A15B] text-xs uppercase tracking-widest mb-6">Hero Section</p>
+                <p className="text-brand text-xs uppercase tracking-widest mb-6">Hero Section</p>
                 <div className="space-y-5">
                   <Field
                     label="Badge Text"
@@ -270,7 +348,7 @@ export default function AdminSiteSettings() {
                     {...f("heroImageUrl")}
                   />
                   {form.heroImageUrl && (
-                    <div className="border border-[#2A2A2A] overflow-hidden h-32">
+                    <div className="border border-line overflow-hidden h-32">
                       <img
                         src={form.heroImageUrl}
                         alt="Hero preview"
@@ -283,7 +361,7 @@ export default function AdminSiteSettings() {
               </div>
 
               <div>
-                <p className="text-[#C6A15B] text-xs uppercase tracking-widest mb-6">Call-to-Action Buttons</p>
+                <p className="text-brand text-xs uppercase tracking-widest mb-6">Call-to-Action Buttons</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <Field
                     label="Primary Button Text"
@@ -317,7 +395,7 @@ export default function AdminSiteSettings() {
           {activeTab === "contact" && (
             <div className="space-y-8">
               <div>
-                <p className="text-[#C6A15B] text-xs uppercase tracking-widest mb-6">Firm Identity</p>
+                <p className="text-brand text-xs uppercase tracking-widest mb-6">Firm Identity</p>
                 <div className="space-y-5">
                   <Field label="Firm Name" placeholder="Nike Pillay Inc" {...f("firmName")} />
                   <Field label="Tagline" hint="Shown in the footer and some headers." placeholder="Attorneys, Notaries & Conveyancers" {...f("tagline")} />
@@ -325,7 +403,7 @@ export default function AdminSiteSettings() {
                 </div>
               </div>
               <div>
-                <p className="text-[#C6A15B] text-xs uppercase tracking-widest mb-6">Contact Details</p>
+                <p className="text-brand text-xs uppercase tracking-widest mb-6">Contact Details</p>
                 <div className="space-y-5">
                   <Field label="Email Address" placeholder="nike@npinc.co.za" {...f("email")} />
                   <Field label="Phone Number" placeholder="+27 31 000 0000" {...f("phone")} />
@@ -334,7 +412,7 @@ export default function AdminSiteSettings() {
                 </div>
               </div>
               <div>
-                <p className="text-[#C6A15B] text-xs uppercase tracking-widest mb-6">Social Media Links</p>
+                <p className="text-brand text-xs uppercase tracking-widest mb-6">Social Media Links</p>
                 <div className="space-y-5">
                   <Field label="LinkedIn URL" placeholder="https://linkedin.com/company/..." {...f("linkedinUrl")} />
                   <Field label="Facebook URL" placeholder="https://facebook.com/..." {...f("facebookUrl")} />
@@ -344,11 +422,87 @@ export default function AdminSiteSettings() {
             </div>
           )}
 
+          {/* ── COLOURS TAB ── */}
+          {activeTab === "colours" && (
+            <div className="space-y-8">
+              <p className="text-fog text-sm leading-relaxed">
+                Change the look of your whole website here. Pick a ready-made style, or fine-tune each colour yourself.
+                Press <strong className="text-paper">Save Settings</strong> below and the new colours go live everywhere instantly.
+              </p>
+
+              {/* Presets */}
+              <div>
+                <p className="text-brand text-xs uppercase tracking-widest mb-4">One-click styles</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {THEME_PRESETS.map(p => (
+                    <button
+                      key={p.name}
+                      type="button"
+                      onClick={() => applyPreset({ ...p.colors })}
+                      className="text-left border border-line hover:border-brand transition-colors p-4 bg-panel"
+                      data-testid={`button-preset-${p.name.toLowerCase().replace(/\s+/g, "-")}`}
+                    >
+                      <div className="flex items-center gap-1.5 mb-3">
+                        {(Object.keys(p.colors) as (keyof ThemeColors)[]).map(k => (
+                          <span key={k} className="w-6 h-6 border border-black/30" style={{ backgroundColor: p.colors[k] }} />
+                        ))}
+                      </div>
+                      <p className="text-paper text-sm font-medium">{p.name}</p>
+                      <p className="text-fog text-xs mt-0.5">{p.blurb}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Individual colours */}
+              <div>
+                <p className="text-brand text-xs uppercase tracking-widest mb-4">Fine-tune colours</p>
+                <div className="space-y-5">
+                  {THEME_FIELDS.map(meta => (
+                    <ColourRow
+                      key={meta.key}
+                      label={meta.label}
+                      hint={meta.hint}
+                      {...themeForm(meta.key)}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Live preview */}
+              <div>
+                <p className="text-brand text-xs uppercase tracking-widest mb-4">Preview</p>
+                <div
+                  className="border p-6 space-y-4"
+                  style={{ backgroundColor: form.themeBackground, borderColor: form.themeBorder }}
+                >
+                  <p className="font-serif text-2xl" style={{ color: form.themeText }}>Trusted by Serious Business</p>
+                  <p className="text-sm" style={{ color: form.themeMuted }}>This is how secondary text will look across the site.</p>
+                  <div className="flex flex-wrap gap-3">
+                    <span className="px-6 py-3 text-sm font-semibold uppercase tracking-widest" style={{ backgroundColor: form.themePrimary, color: form.themeBackground }}>Gold button</span>
+                    <span className="px-6 py-3 text-sm font-semibold uppercase tracking-widest" style={{ backgroundColor: form.themePrimaryDark, color: form.themeBackground }}>Hover shade</span>
+                  </div>
+                  <div className="p-4" style={{ backgroundColor: form.themeSurface, border: `1px solid ${form.themeBorder}` }}>
+                    <p className="text-sm" style={{ color: form.themePrimary }}>Accent link and highlights →</p>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={resetTheme}
+                className="text-fog text-xs uppercase tracking-widest underline underline-offset-4 hover:text-paper transition-colors"
+              >
+                Reset to Classic Gold
+              </button>
+            </div>
+          )}
+
           {/* ── SEO TAB ── */}
           {activeTab === "seo" && (
             <div className="space-y-6">
-              <p className="text-[#B8B8B8] text-sm leading-relaxed">
-                These titles and descriptions control what Google shows when someone searches for your firm. They do <strong className="text-[#F7F4EE]">not</strong> appear on the page itself — they are only visible to search engines and in the browser tab.
+              <p className="text-fog text-sm leading-relaxed">
+                These titles and descriptions control what Google shows when someone searches for your firm. They do <strong className="text-paper">not</strong> appear on the page itself — they are only visible to search engines and in the browser tab.
               </p>
               <SeoPageSection label="Home Page" titleKey="seoHomeTitle" descKey="seoHomeDescription" form={form} setForm={setForm} />
               <SeoPageSection label="Our People" titleKey="seoPeopleTitle" descKey="seoPeopleDescription" form={form} setForm={setForm} />
@@ -360,12 +514,12 @@ export default function AdminSiteSettings() {
             </div>
           )}
 
-          <div className="mt-10 pt-6 border-t border-[#2A2A2A]">
+          <div className="mt-10 pt-6 border-t border-line">
             <button
               type="submit"
               disabled={update.isPending}
               data-testid="button-save-settings"
-              className="bg-[#C6A15B] text-[#0E0E0E] px-10 py-4 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors disabled:opacity-50"
+              className="bg-brand text-ink px-10 py-4 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors disabled:opacity-50"
             >
               {update.isPending ? "Saving..." : "Save Settings"}
             </button>

@@ -121,34 +121,34 @@ function PhotoUpload({ value, onChange }: { value: string; onChange: (url: strin
 
   return (
     <div>
-      <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Photo</label>
+      <label className="block text-fog text-xs uppercase tracking-widest mb-2">Photo</label>
       {value ? (
         <div className="flex items-start gap-4">
           <div className="relative shrink-0">
-            <img src={value} alt="Preview" className="w-24 h-24 object-cover grayscale border border-[#2A2A2A]" />
+            <img src={value} alt="Preview" className="w-24 h-24 object-cover grayscale border border-line" />
             {value.startsWith("data:") && (
-              <span className="absolute -top-1 -right-1 bg-[#C6A15B] text-[#0E0E0E] text-[9px] px-1 leading-tight uppercase tracking-widest">B&W</span>
+              <span className="absolute -top-1 -right-1 bg-brand text-ink text-[9px] px-1 leading-tight uppercase tracking-widest">B&W</span>
             )}
           </div>
           <div className="flex flex-col gap-2">
             <button type="button" onClick={() => fileRef.current?.click()} disabled={converting}
-              className="flex items-center gap-2 border border-[#2A2A2A] hover:border-[#C6A15B]/50 text-[#B8B8B8] hover:text-[#C6A15B] px-3 py-2 text-xs transition-colors disabled:opacity-50">
+              className="flex items-center gap-2 border border-line hover:border-brand/50 text-fog hover:text-brand px-3 py-2 text-xs transition-colors disabled:opacity-50">
               <Upload size={12} />{converting ? "Converting…" : "Replace photo"}
             </button>
             <button type="button" onClick={() => onChange("")}
-              className="flex items-center gap-2 border border-[#2A2A2A] hover:border-red-400/40 text-[#B8B8B8] hover:text-red-400 px-3 py-2 text-xs transition-colors">
+              className="flex items-center gap-2 border border-line hover:border-red-400/40 text-fog hover:text-red-400 px-3 py-2 text-xs transition-colors">
               <ImageOff size={12} />Remove photo
             </button>
           </div>
         </div>
       ) : (
-        <div className="border border-dashed border-[#2A2A2A] hover:border-[#C6A15B]/50 p-5 text-center cursor-pointer transition-colors"
+        <div className="border border-dashed border-line hover:border-brand/50 p-5 text-center cursor-pointer transition-colors"
           onClick={() => fileRef.current?.click()}>
-          {converting ? <p className="text-[#B8B8B8] text-sm">Converting to black & white…</p> : (
+          {converting ? <p className="text-fog text-sm">Converting to black & white…</p> : (
             <>
-              <Upload size={18} className="text-[#C6A15B] mx-auto mb-2" />
-              <p className="text-[#B8B8B8] text-sm">Click to upload a photo</p>
-              <p className="text-[#B8B8B8]/50 text-xs mt-1">Automatically converted to black & white</p>
+              <Upload size={18} className="text-brand mx-auto mb-2" />
+              <p className="text-fog text-sm">Click to upload a photo</p>
+              <p className="text-fog/50 text-xs mt-1">Automatically converted to black & white</p>
             </>
           )}
         </div>
@@ -318,15 +318,15 @@ export default function AdminPeople() {
 
   const statusBadge = (p: NonNullable<typeof people>[0]) => {
     if ((p as never as Record<string, unknown>).memberStatus === "just_joined") {
-      return <span className="text-[0.6rem] bg-[#C6A15B]/15 text-[#C6A15B] border border-[#C6A15B]/30 px-2 py-0.5 uppercase tracking-widest">Just Joined</span>;
+      return <span className="text-[0.6rem] bg-brand/15 text-brand border border-brand/30 px-2 py-0.5 uppercase tracking-widest">Just Joined</span>;
     }
     if (p.leftAt) {
       const lastDay = p.leftAt.slice(0, 10);
       const today = todayISO();
       if (today <= lastDay) {
-        return <span className="text-[0.6rem] bg-[#555]/20 text-[#B8B8B8] border border-[#555]/40 px-2 py-0.5 uppercase tracking-widest">Departing {lastDay}</span>;
+        return <span className="text-[0.6rem] bg-fog/20 text-fog border border-fog/40 px-2 py-0.5 uppercase tracking-widest">Departing {lastDay}</span>;
       }
-      return <span className="text-[0.6rem] bg-[#555]/20 text-[#B8B8B8] border border-[#555]/40 px-2 py-0.5 uppercase tracking-widest">Departed</span>;
+      return <span className="text-[0.6rem] bg-fog/20 text-fog border border-fog/40 px-2 py-0.5 uppercase tracking-widest">Departed</span>;
     }
     return null;
   };
@@ -336,41 +336,41 @@ export default function AdminPeople() {
       <div className="p-8 md:p-12">
         <div className="flex items-center justify-between mb-10">
           <div>
-            <h1 className="text-3xl font-serif text-[#F7F4EE]">People</h1>
-            <p className="text-[#B8B8B8] mt-1">Manage team members and profiles.</p>
+            <h1 className="text-3xl font-serif text-paper">People</h1>
+            <p className="text-fog mt-1">Manage team members and profiles.</p>
           </div>
           <button onClick={openCreate} data-testid="button-create-person"
-            className="flex items-center gap-2 bg-[#C6A15B] text-[#0E0E0E] px-5 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors">
+            className="flex items-center gap-2 bg-brand text-ink px-5 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors">
             <Plus size={16} /> Add Person
           </button>
         </div>
 
         {isLoading ? (
-          <div className="animate-pulse space-y-3">{[1,2,3].map(i => <div key={i} className="h-16 bg-[#151515] border border-[#2A2A2A]" />)}</div>
+          <div className="animate-pulse space-y-3">{[1,2,3].map(i => <div key={i} className="h-16 bg-panel border border-line" />)}</div>
         ) : (
           <div className="space-y-3">
             {(people ?? []).map(p => (
               <div key={p.id} data-testid={`row-person-${p.id}`}
-                className="flex items-center justify-between bg-[#151515] border border-[#2A2A2A] px-6 py-4">
+                className="flex items-center justify-between bg-panel border border-line px-6 py-4">
                 <div className="flex items-center gap-4">
                   {p.photoUrl ? (
-                    <img src={p.photoUrl} alt="" className="w-10 h-10 object-cover grayscale shrink-0 border border-[#2A2A2A]" />
+                    <img src={p.photoUrl} alt="" className="w-10 h-10 object-cover grayscale shrink-0 border border-line" />
                   ) : (
-                    <div className="w-10 h-10 bg-[#2A2A2A] shrink-0 flex items-center justify-center text-[#555]">
+                    <div className="w-10 h-10 bg-line shrink-0 flex items-center justify-center text-fog/60">
                       <ImageOff size={14} />
                     </div>
                   )}
                   <div>
                     <div className="flex items-center gap-3 mb-1">
-                      <h3 className="text-[#F7F4EE] font-serif">{p.firstName} {p.lastName}</h3>
+                      <h3 className="text-paper font-serif">{p.firstName} {p.lastName}</h3>
                       {statusBadge(p)}
                     </div>
-                    <p className="text-[#B8B8B8] text-xs">{ROLE_OPTIONS.find(r => r.value === normalizeRole(p.role))?.label ?? p.role} · #{p.sortOrder} · {p.isPublished ? <span className="text-green-400">Published</span> : <span className="text-red-400">Draft</span>}</p>
+                    <p className="text-fog text-xs">{ROLE_OPTIONS.find(r => r.value === normalizeRole(p.role))?.label ?? p.role} · #{p.sortOrder} · {p.isPublished ? <span className="text-green-400">Published</span> : <span className="text-red-400">Draft</span>}</p>
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <button onClick={() => openEdit(p)} data-testid={`button-edit-person-${p.id}`} className="text-[#B8B8B8] hover:text-[#C6A15B] p-2"><Pencil size={15} /></button>
-                  <button onClick={() => openDepartModal(p)} data-testid={`button-delete-person-${p.id}`} aria-label="Remove from team" title="Remove from team" className="text-[#B8B8B8] hover:text-red-400 p-2"><Trash2 size={15} /></button>
+                  <button onClick={() => openEdit(p)} data-testid={`button-edit-person-${p.id}`} className="text-fog hover:text-brand p-2"><Pencil size={15} /></button>
+                  <button onClick={() => openDepartModal(p)} data-testid={`button-delete-person-${p.id}`} aria-label="Remove from team" title="Remove from team" className="text-fog hover:text-red-400 p-2"><Trash2 size={15} /></button>
                 </div>
               </div>
             ))}
@@ -382,8 +382,8 @@ export default function AdminPeople() {
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
           <div className={adminModalPanelClass}>
             <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-serif text-[#F7F4EE]">{modal.mode === "create" ? "Add Person" : "Edit Person"}</h2>
-              <button onClick={() => setModal(null)} className="text-[#B8B8B8] hover:text-[#F7F4EE]"><X size={20} /></button>
+              <h2 className="text-2xl font-serif text-paper">{modal.mode === "create" ? "Add Person" : "Edit Person"}</h2>
+              <button onClick={() => setModal(null)} className="text-fog hover:text-paper"><X size={20} /></button>
             </div>
 
             <div className="space-y-5">
@@ -393,7 +393,7 @@ export default function AdminPeople() {
               {/* Row: Role + Sort Order */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Role</label>
+                  <label className="block text-fog text-xs uppercase tracking-widest mb-2">Role</label>
                   <select
                     value={PRESET_ROLE_VALUES.includes(normalizeRole(modal.form.role) as typeof PRESET_ROLE_VALUES[number]) ? normalizeRole(modal.form.role) : CUSTOM_ROLE_VALUE}
                     onChange={e => {
@@ -403,7 +403,7 @@ export default function AdminPeople() {
                         setForm({ role: e.target.value });
                       }
                     }}
-                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none"
+                    className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none"
                   >
                     {ROLE_OPTIONS.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
                     <option value={CUSTOM_ROLE_VALUE}>Custom…</option>
@@ -415,111 +415,111 @@ export default function AdminPeople() {
                       onChange={e => setForm({ role: e.target.value })}
                       placeholder="Enter custom role title"
                       autoFocus
-                      className="mt-2 w-full bg-[#0E0E0E] border border-[#C6A15B]/40 text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none placeholder:text-[#555]"
+                      className="mt-2 w-full bg-ink border border-brand/40 text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none placeholder:text-fog/60"
                     />
                   )}
                 </div>
                 <div>
-                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Display Order</label>
+                  <label className="block text-fog text-xs uppercase tracking-widest mb-2">Display Order</label>
                   <input type="number" value={modal.form.sortOrder}
                     onChange={e => setForm({ sortOrder: Number(e.target.value) })}
-                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
-                  <p className="text-[#555] text-xs mt-1">Lower number = appears earlier in the list</p>
+                    className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none" />
+                  <p className="text-fog/60 text-xs mt-1">Lower number = appears earlier in the list</p>
                 </div>
               </div>
 
               {/* Row: First Name + Last Name */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">First Name <span className="text-[#C6A15B]">*</span></label>
+                  <label className="block text-fog text-xs uppercase tracking-widest mb-2">First Name <span className="text-brand">*</span></label>
                   <input type="text" required value={modal.form.firstName} onChange={e => setForm({ firstName: e.target.value })}
-                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
+                    className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none" />
                 </div>
                 <div>
-                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Last Name <span className="text-[#C6A15B]">*</span></label>
+                  <label className="block text-fog text-xs uppercase tracking-widest mb-2">Last Name <span className="text-brand">*</span></label>
                   <input type="text" required value={modal.form.lastName} onChange={e => setForm({ lastName: e.target.value })}
-                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
+                    className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none" />
                 </div>
               </div>
 
               {/* Row: Title + Slug */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Title (Mr/Ms/Dr)</label>
+                  <label className="block text-fog text-xs uppercase tracking-widest mb-2">Title (Mr/Ms/Dr)</label>
                   <input type="text" value={modal.form.title} onChange={e => setForm({ title: e.target.value })}
-                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
+                    className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none" />
                 </div>
                 <div>
-                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Slug</label>
+                  <label className="block text-fog text-xs uppercase tracking-widest mb-2">Slug</label>
                   <input type="text" value={modal.form.slug} onChange={e => setForm({ slug: e.target.value })}
-                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
+                    className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none" />
                 </div>
               </div>
 
               {/* Row: Email + Phone */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Email</label>
+                  <label className="block text-fog text-xs uppercase tracking-widest mb-2">Email</label>
                   <input type="text" value={modal.form.email} onChange={e => setForm({ email: e.target.value })}
-                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
+                    className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none" />
                 </div>
                 <div>
-                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Phone</label>
+                  <label className="block text-fog text-xs uppercase tracking-widest mb-2">Phone</label>
                   <input type="text" value={modal.form.phone} onChange={e => setForm({ phone: e.target.value })}
-                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
+                    className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none" />
                 </div>
               </div>
 
               {/* Row: Qualifications + Admissions */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Qualifications</label>
+                  <label className="block text-fog text-xs uppercase tracking-widest mb-2">Qualifications</label>
                   <input type="text" value={modal.form.qualifications} onChange={e => setForm({ qualifications: e.target.value })}
-                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
+                    className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none" />
                 </div>
                 <div>
-                  <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Admissions</label>
+                  <label className="block text-fog text-xs uppercase tracking-widest mb-2">Admissions</label>
                   <input type="text" value={modal.form.admissions} onChange={e => setForm({ admissions: e.target.value })}
-                    className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none" />
+                    className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none" />
                 </div>
               </div>
 
               {/* Bio */}
               <div>
-                <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Bio</label>
+                <label className="block text-fog text-xs uppercase tracking-widest mb-2">Bio</label>
                 <textarea rows={4} value={modal.form.bio} onChange={e => setForm({ bio: e.target.value })}
-                  className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none resize-none" />
+                  className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none resize-none" />
               </div>
 
               {/* Practice Areas */}
               <div>
-                <label className="block text-[#B8B8B8] text-xs uppercase tracking-widest mb-2">Practice Areas <span className="normal-case text-[#555]">(comma-separated)</span></label>
+                <label className="block text-fog text-xs uppercase tracking-widest mb-2">Practice Areas <span className="normal-case text-fog/60">(comma-separated)</span></label>
                 <input type="text" value={modal.form.practiceAreas} onChange={e => setForm({ practiceAreas: e.target.value })}
-                  className="w-full bg-[#0E0E0E] border border-[#2A2A2A] text-[#F7F4EE] px-3 py-2 text-sm focus:border-[#C6A15B] focus:outline-none"
+                  className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none"
                   placeholder="e.g. Litigation, Labour, Corporate & Commercial" />
               </div>
 
               {/* Published */}
               <div className="flex items-center gap-3">
                 <input type="checkbox" id="published" checked={modal.form.isPublished}
-                  onChange={e => setForm({ isPublished: e.target.checked })} className="w-4 h-4 accent-[#C6A15B]" />
-                <label htmlFor="published" className="text-[#B8B8B8] text-sm">Published (visible on public site)</label>
+                  onChange={e => setForm({ isPublished: e.target.checked })} className="w-4 h-4 accent-brand" />
+                <label htmlFor="published" className="text-fog text-sm">Published (visible on public site)</label>
               </div>
 
               {/* ─── Staff Status ─── */}
-              <div className="border-t border-[#2A2A2A] pt-6">
-                <p className="text-[#C6A15B] text-xs uppercase tracking-widest mb-3">Staff Status</p>
-                <p className="text-[#B8B8B8] text-xs leading-relaxed mb-5">
+              <div className="border-t border-line pt-6">
+                <p className="text-brand text-xs uppercase tracking-widest mb-3">Staff Status</p>
+                <p className="text-fog text-xs leading-relaxed mb-5">
                   "Just Joined" shows a gold badge for 90 days. Staff leave the public team list the day after their last office day. Departure Staff Movements posts expire after 30 days; join posts after 90 days.
                 </p>
 
                 <div className="grid grid-cols-2 gap-4 mb-5">
                   <button type="button" onClick={markJoined}
-                    className="flex items-center justify-center gap-2 border border-[#C6A15B]/40 text-[#C6A15B] px-4 py-3 text-xs uppercase tracking-widest hover:bg-[#C6A15B]/10 transition-colors">
+                    className="flex items-center justify-center gap-2 border border-brand/40 text-brand px-4 py-3 text-xs uppercase tracking-widest hover:bg-brand/10 transition-colors">
                     <UserCheck size={14} /> Just Joined Today
                   </button>
                   <button type="button" onClick={markDeparted}
-                    className="flex items-center justify-center gap-2 border border-[#555]/40 text-[#B8B8B8] px-4 py-3 text-xs uppercase tracking-widest hover:bg-[#555]/10 transition-colors">
+                    className="flex items-center justify-center gap-2 border border-fog/40 text-fog px-4 py-3 text-xs uppercase tracking-widest hover:bg-fog/10 transition-colors">
                     <UserMinus size={14} /> Mark as Departed
                   </button>
                 </div>
@@ -541,20 +541,20 @@ export default function AdminPeople() {
 
                 {/* Draft article checkbox — appears only when a status button was clicked */}
                 {modal.draft.type && (
-                  <div className="bg-[#0E0E0E] border border-[#C6A15B]/20 px-4 py-4 flex items-start gap-3">
+                  <div className="bg-ink border border-brand/20 px-4 py-4 flex items-start gap-3">
                     <input
                       type="checkbox"
                       id="draft-article"
                       checked={modal.draft.enabled}
                       onChange={e => setDraft({ enabled: e.target.checked })}
-                      className="w-4 h-4 accent-[#C6A15B] mt-0.5 shrink-0"
+                      className="w-4 h-4 accent-brand mt-0.5 shrink-0"
                     />
                     <label htmlFor="draft-article" className="cursor-pointer">
-                      <span className="flex items-center gap-2 text-[#C6A15B] text-xs uppercase tracking-widest mb-1">
+                      <span className="flex items-center gap-2 text-brand text-xs uppercase tracking-widest mb-1">
                         <FileText size={12} />
                         Publish a Staff Movements insight
                       </span>
-                      <p className="text-[#B8B8B8] text-xs leading-relaxed">
+                      <p className="text-fog text-xs leading-relaxed">
                         {modal.draft.type === "joined"
                           ? `A pre-filled welcome post for ${modal.form.firstName || "…"} will go live on the public Insights page under Staff Movements.`
                           : `A pre-filled departure notice for ${modal.form.firstName || "…"} will go live on the public Insights page under Staff Movements.`}
@@ -567,11 +567,11 @@ export default function AdminPeople() {
 
             <div className="flex gap-4 mt-8">
               <button onClick={handleSave} data-testid="button-save-person"
-                className="bg-[#C6A15B] text-[#0E0E0E] px-10 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors">
+                className="bg-brand text-ink px-10 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors">
                 Save
               </button>
               <button onClick={() => setModal(null)}
-                className="border border-[#2A2A2A] text-[#B8B8B8] px-8 py-3 text-sm hover:border-[#C6A15B] transition-colors">
+                className="border border-line text-fog px-8 py-3 text-sm hover:border-brand transition-colors">
                 Cancel
               </button>
             </div>
@@ -582,12 +582,12 @@ export default function AdminPeople() {
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
           <div className={adminModalPanelClass}>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-serif text-[#F7F4EE]">
+              <h2 className="text-xl font-serif text-paper">
                 Remove {departModal.person.firstName} {departModal.person.lastName} from team
               </h2>
-              <button onClick={() => setDepartModal(null)} className="text-[#B8B8B8] hover:text-[#F7F4EE]"><X size={20} /></button>
+              <button onClick={() => setDepartModal(null)} className="text-fog hover:text-paper"><X size={20} /></button>
             </div>
-            <p className="text-[#B8B8B8] text-sm leading-relaxed mb-6">
+            <p className="text-fog text-sm leading-relaxed mb-6">
               They will remain on the public staff list through their last office day, then drop off automatically.
               Optionally publish a Staff Movements insight (visible for 30 days).
             </p>
@@ -598,20 +598,20 @@ export default function AdminPeople() {
                 onChange={v => setDepartModal(m => m && ({ ...m, leftAt: v }))}
                 required
               />
-              <div className="bg-[#0E0E0E] border border-[#C6A15B]/20 px-4 py-4 flex items-start gap-3">
+              <div className="bg-ink border border-brand/20 px-4 py-4 flex items-start gap-3">
                 <input
                   type="checkbox"
                   id="depart-publish-movement"
                   checked={departModal.publishMovement}
                   onChange={e => setDepartModal(m => m && ({ ...m, publishMovement: e.target.checked }))}
-                  className="w-4 h-4 accent-[#C6A15B] mt-0.5 shrink-0"
+                  className="w-4 h-4 accent-brand mt-0.5 shrink-0"
                 />
                 <label htmlFor="depart-publish-movement" className="cursor-pointer">
-                  <span className="flex items-center gap-2 text-[#C6A15B] text-xs uppercase tracking-widest mb-1">
+                  <span className="flex items-center gap-2 text-brand text-xs uppercase tracking-widest mb-1">
                     <FileText size={12} />
                     Publish a Staff Movements insight
                   </span>
-                  <p className="text-[#B8B8B8] text-xs leading-relaxed">
+                  <p className="text-fog text-xs leading-relaxed">
                     A pre-filled departure notice for {departModal.person.firstName} will go live on the public Insights page under Staff Movements.
                   </p>
                 </label>
@@ -622,11 +622,11 @@ export default function AdminPeople() {
                 onClick={handleConfirmDeparture}
                 data-testid="button-confirm-departure"
                 disabled={!departModal.leftAt || update.isPending}
-                className="bg-[#C6A15B] text-[#0E0E0E] px-8 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-[#9F7E3F] transition-colors disabled:opacity-50"
+                className="bg-brand text-ink px-8 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors disabled:opacity-50"
               >
                 Confirm departure
               </button>
-              <button onClick={() => setDepartModal(null)} className="border border-[#2A2A2A] text-[#B8B8B8] px-8 py-3 text-sm hover:border-[#C6A15B] transition-colors">
+              <button onClick={() => setDepartModal(null)} className="border border-line text-fog px-8 py-3 text-sm hover:border-brand transition-colors">
                 Cancel
               </button>
             </div>

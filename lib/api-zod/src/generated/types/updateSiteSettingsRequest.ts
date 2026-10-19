@@ -39,4 +39,11 @@ export interface UpdateSiteSettingsRequest {
   seoCareersDescription?: string;
   seoContactTitle?: string;
   seoContactDescription?: string;
+  themePrimary?: string;
+  themePrimaryDark?: string;
+  themeBackground?: string;
+  themeSurface?: string;
+  themeText?: string;
+  themeMuted?: string;
+  themeBorder?: string;
 }
