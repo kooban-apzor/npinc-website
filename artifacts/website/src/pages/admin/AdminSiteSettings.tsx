@@ -152,11 +152,11 @@ function formFromSettings(s: {
 }
 
 // Neat card wrapper for settings sections
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
+function Card({ title, children, className }: { title: string; children: React.ReactNode; className?: string }) {
   return (
-    <section className="bg-panel border border-line p-6 md:p-8">
-      <h2 className="text-brand text-xs uppercase tracking-widest mb-6">{title}</h2>
-      <div className="space-y-5">{children}</div>
+    <section className={`bg-panel border border-line p-5 md:p-6 ${className ?? ""}`}>
+      <h2 className="text-brand text-xs uppercase tracking-widest mb-5">{title}</h2>
+      <div className="space-y-4">{children}</div>
     </section>
   );
 }
@@ -429,12 +429,11 @@ export default function AdminSiteSettings() {
 
   return (
     <AdminLayout>
-      <div className="p-8 md:p-12 max-w-3xl">
+      <div className="p-6 md:p-10 max-w-6xl mx-auto">
         {/* Header with Save top-right */}
-        <div className="flex items-start justify-between gap-6 mb-10">
+        <div className="flex items-start justify-between gap-6 mb-8">
           <div>
-            <h1 className="text-3xl font-serif text-paper">Site Settings</h1>
-            <p className="text-fog mt-1">Manage your homepage hero, contact details, colours and search engine metadata — no technical knowledge needed.</p>
+            <h1 className="text-2xl md:text-3xl font-serif text-paper">Site Settings</h1>
           </div>
           <div className="flex flex-col items-end gap-2 shrink-0 pt-1">
             <button
@@ -453,7 +452,7 @@ export default function AdminSiteSettings() {
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-line mb-10">
+        <div className="flex flex-wrap border-b border-line mb-8">
           {tabs.map(t => (
             <button
               key={t.id}
@@ -470,13 +469,13 @@ export default function AdminSiteSettings() {
           ))}
         </div>
 
-        <div className="max-w-3xl">
+        <div>
         <form onSubmit={e => { e.preventDefault(); if (formDirty) setConfirmOpen(true); }} data-testid="form-site-settings">
 
           {/* ── HOMEPAGE TAB ── */}
           {activeTab === "homepage" && (
-            <div className="space-y-6">
-              <Card title="Hero Text">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card title="Hero Text" className="lg:col-span-2">
                 <Field
                   label="Badge Text"
                   hint="The small gold label shown above the main heading in the hero."
@@ -566,7 +565,7 @@ export default function AdminSiteSettings() {
 
           {/* ── CONTACT & FIRM TAB ── */}
           {activeTab === "contact" && (
-            <div className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card title="Firm Identity">
                 <Field label="Firm Name" placeholder="Nike Pillay Inc" {...f("firmName")} />
                 <Field label="Tagline" hint="Shown in the footer and some headers." placeholder="Attorneys, Notaries & Conveyancers" {...f("tagline")} />
@@ -578,7 +577,7 @@ export default function AdminSiteSettings() {
                 <Field label="Second Phone (optional)" placeholder="+27 82 000 0000" {...f("phone2")} />
                 <Field label="Office Address" hint="Shown in the footer and contact page." placeholder="Suite X, Building Name, Durban, South Africa" {...f("address")} />
               </Card>
-              <Card title="Social Media Links">
+              <Card title="Social Media Links" className="lg:col-span-2">
                 <Field label="LinkedIn URL" placeholder="https://linkedin.com/company/..." {...f("linkedinUrl")} />
                 <Field label="Facebook URL" placeholder="https://facebook.com/..." {...f("facebookUrl")} />
                 <Field label="Twitter / X URL" placeholder="https://twitter.com/..." {...f("twitterUrl")} />
@@ -588,10 +587,10 @@ export default function AdminSiteSettings() {
 
           {/* ── COLOURS TAB ── */}
           {activeTab === "colours" && (
-            <div className="space-y-6">
-              <p className="text-fog text-sm leading-relaxed">
-                Change the look of your whole website here. Pick a ready-made style, or fine-tune each colour yourself.
-                Colours preview live across this page — press <strong className="text-paper">Save Changes</strong> top-right and confirm to make them live everywhere.
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <p className="text-fog text-sm leading-relaxed lg:col-span-2">
+                Pick a ready-made style, or fine-tune each colour — everything previews live.
+                Press <strong className="text-paper">Save Changes</strong> top-right and confirm to go live.
               </p>
 
               <Card title="One-click styles">
@@ -629,7 +628,7 @@ export default function AdminSiteSettings() {
                 </div>
               </Card>
 
-              <Card title="Preview">
+              <Card title="Preview" className="lg:col-span-2">
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-fog text-xs">
                     {coloursDirty
@@ -673,9 +672,9 @@ export default function AdminSiteSettings() {
 
           {/* ── SEO TAB ── */}
           {activeTab === "seo" && (
-            <div className="space-y-6">
-              <p className="text-fog text-sm leading-relaxed">
-                These titles and descriptions control what Google shows when someone searches for your firm. They do <strong className="text-paper">not</strong> appear on the page itself — they are only visible to search engines and in the browser tab.
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <p className="text-fog text-sm leading-relaxed lg:col-span-2">
+                What Google shows for each page (not visible on the page itself).
               </p>
               <SeoPageSection label="Home Page" titleKey="seoHomeTitle" descKey="seoHomeDescription" form={form} setForm={setForm} />
               <SeoPageSection label="Our People" titleKey="seoPeopleTitle" descKey="seoPeopleDescription" form={form} setForm={setForm} />
