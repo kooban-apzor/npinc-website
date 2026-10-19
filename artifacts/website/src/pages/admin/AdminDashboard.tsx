@@ -1,15 +1,16 @@
 import { useGetAdminMe, useListServices, useListPeople, useListArticles, useListVacancies, useListCvSubmissions, useListContactEnquiries } from "@workspace/api-client-react";
 import AdminLayout from "@/components/AdminLayout";
+import { AdminPage, AdminLoading } from "@/components/admin/ui";
 import { useLocation } from "wouter";
 import { useEffect } from "react";
-import { Briefcase, Users, Newspaper, FileText, FileCheck, MessageSquare } from "lucide-react";
+import { Briefcase, Users, Newspaper, FileText, FileCheck, MessageSquare, Plus, ArrowRight } from "lucide-react";
 
 export default function AdminDashboard() {
   const { data: me, isError } = useGetAdminMe({ query: { queryKey: ['admin-me'], retry: false } });
-  const { data: services } = useListServices();
-  const { data: people } = useListPeople({});
-  const { data: articles } = useListArticles({});
-  const { data: vacancies } = useListVacancies();
+  const { data: services, isLoading: l1 } = useListServices();
+  const { data: people, isLoading: l2 } = useListPeople({});
+  const { data: articles, isLoading: l3 } = useListArticles({});
+  const { data: vacancies, isLoading: l4 } = useListVacancies();
   const { data: cvSubs } = useListCvSubmissions({ query: { queryKey: ['cv-submissions'], retry: false } });
   const { data: enquiries } = useListContactEnquiries({ query: { queryKey: ['contact-enquiries'], retry: false } });
   const [, setLocation] = useLocation();
@@ -27,53 +28,55 @@ export default function AdminDashboard() {
     { label: "Enquiries", value: enquiries?.length ?? 0, icon: MessageSquare, href: "/admin/enquiries" },
   ];
 
+  const loading = l1 || l2 || l3 || l4;
+
   return (
     <AdminLayout>
-      <div className="p-8 md:p-12">
-        <div className="mb-10">
-          <p className="text-brand text-xs uppercase tracking-[0.25em] mb-2">CMS Dashboard</p>
-          <h1 className="text-3xl font-serif text-paper" data-testid="text-admin-title">
-            Welcome{me ? `, ${me.username}` : ""}
-          </h1>
-          <p className="text-fog mt-2">Manage all content for the Nike Pillay Inc website.</p>
-        </div>
+      <AdminPage title={`Welcome${me ? `, ${me.username}` : ""}`}>
+        {loading ? <AdminLoading rows={4} /> : (
+          <>
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
+              {stats.map(({ label, value, icon: Icon, href }) => (
+                <a
+                  key={label}
+                  href={href}
+                  data-testid={`card-stat-${label.toLowerCase().replace(/\s+/g, "-")}`}
+                  className="group bg-panel border border-line hover:border-brand/40 transition-colors p-5 flex items-center gap-4"
+                >
+                  <span className="w-10 h-10 shrink-0 flex items-center justify-center border border-line group-hover:border-brand/40 transition-colors">
+                    <Icon size={18} className="text-brand" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-2xl font-serif text-paper leading-none">{value}</span>
+                    <span className="block text-fog text-xs uppercase tracking-widest mt-1 truncate">{label}</span>
+                  </span>
+                  <ArrowRight size={14} className="ml-auto text-fog/40 group-hover:text-brand shrink-0 transition-colors" />
+                </a>
+              ))}
+            </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-12">
-          {stats.map(({ label, value, icon: Icon, href }) => (
-            <a
-              key={label}
-              href={href}
-              data-testid={`card-stat-${label.toLowerCase().replace(/\s+/g, "-")}`}
-              className="bg-panel border border-line hover:border-brand/30 transition-colors p-6"
-            >
-              <Icon size={20} className="text-brand mb-4" />
-              <p className="text-3xl font-serif text-paper mb-1">{value}</p>
-              <p className="text-fog text-xs uppercase tracking-widest">{label}</p>
-            </a>
-          ))}
-        </div>
-
-        <div className="border border-line p-8">
-          <h2 className="text-lg font-serif text-paper mb-4">Quick Actions</h2>
-          <div className="flex flex-wrap gap-4">
-            {[
-              { label: "Add Article", href: "/admin/articles" },
-              { label: "Add Event", href: "/admin/events" },
-              { label: "Manage Team", href: "/admin/people" },
-              { label: "View Enquiries", href: "/admin/enquiries" },
-              { label: "Update Calculator Rates", href: "/admin/calculator-rates" },
-            ].map(({ label, href }) => (
-              <a
-                key={href}
-                href={href}
-                className="border border-line hover:border-brand text-fog hover:text-brand px-6 py-3 text-sm transition-colors"
-              >
-                {label}
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
+            <div className="border border-line p-5 md:p-6">
+              <h2 className="text-brand text-xs uppercase tracking-widest mb-4">Quick Actions</h2>
+              <div className="flex flex-wrap gap-3">
+                {[
+                  { label: "Article", href: "/admin/articles" },
+                  { label: "Event", href: "/admin/events" },
+                  { label: "Team Member", href: "/admin/people" },
+                  { label: "Vacancy", href: "/admin/vacancies" },
+                ].map(({ label, href }) => (
+                  <a
+                    key={href}
+                    href={href}
+                    className="flex items-center gap-2 border border-line hover:border-brand text-fog hover:text-brand px-4 py-2.5 text-xs uppercase tracking-widest transition-colors"
+                  >
+                    <Plus size={13} /> {label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+      </AdminPage>
     </AdminLayout>
   );
 }
