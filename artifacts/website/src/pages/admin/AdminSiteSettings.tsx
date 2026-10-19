@@ -67,6 +67,100 @@ const EMPTY: FormState = {
   ...DEFAULT_THEME,
 };
 
+function formFromSettings(s: {
+  firmName?: string | null;
+  tagline?: string | null;
+  heroBadgeText?: string | null;
+  heroHeading?: string | null;
+  heroSubheading?: string | null;
+  heroImageUrl?: string | null;
+  heroCtaPrimaryText?: string | null;
+  heroCtaPrimaryLink?: string | null;
+  heroCtaSecondaryText?: string | null;
+  heroCtaSecondaryLink?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  phone2?: string | null;
+  address?: string | null;
+  bbbeeLevel?: string | null;
+  linkedinUrl?: string | null;
+  facebookUrl?: string | null;
+  twitterUrl?: string | null;
+  seoHomeTitle?: string | null;
+  seoHomeDescription?: string | null;
+  seoPeopleTitle?: string | null;
+  seoPeopleDescription?: string | null;
+  seoServicesTitle?: string | null;
+  seoServicesDescription?: string | null;
+  seoInsightsTitle?: string | null;
+  seoInsightsDescription?: string | null;
+  seoCalculatorTitle?: string | null;
+  seoCalculatorDescription?: string | null;
+  seoCareersTitle?: string | null;
+  seoCareersDescription?: string | null;
+  seoContactTitle?: string | null;
+  seoContactDescription?: string | null;
+  themePrimary?: string | null;
+  themePrimaryDark?: string | null;
+  themeBackground?: string | null;
+  themeSurface?: string | null;
+  themeText?: string | null;
+  themeMuted?: string | null;
+  themeBorder?: string | null;
+}): FormState {
+  return {
+    firmName: s.firmName ?? "",
+    tagline: s.tagline ?? "",
+    heroBadgeText: s.heroBadgeText ?? "",
+    heroHeading: s.heroHeading ?? "",
+    heroSubheading: s.heroSubheading ?? "",
+    heroImageUrl: s.heroImageUrl ?? "",
+    heroCtaPrimaryText: s.heroCtaPrimaryText ?? "",
+    heroCtaPrimaryLink: s.heroCtaPrimaryLink ?? "",
+    heroCtaSecondaryText: s.heroCtaSecondaryText ?? "",
+    heroCtaSecondaryLink: s.heroCtaSecondaryLink ?? "",
+    email: s.email ?? "",
+    phone: s.phone ?? "",
+    phone2: s.phone2 ?? "",
+    address: s.address ?? "",
+    bbbeeLevel: s.bbbeeLevel ?? "",
+    linkedinUrl: s.linkedinUrl ?? "",
+    facebookUrl: s.facebookUrl ?? "",
+    twitterUrl: s.twitterUrl ?? "",
+    seoHomeTitle: s.seoHomeTitle ?? "",
+    seoHomeDescription: s.seoHomeDescription ?? "",
+    seoPeopleTitle: s.seoPeopleTitle ?? "",
+    seoPeopleDescription: s.seoPeopleDescription ?? "",
+    seoServicesTitle: s.seoServicesTitle ?? "",
+    seoServicesDescription: s.seoServicesDescription ?? "",
+    seoInsightsTitle: s.seoInsightsTitle ?? "",
+    seoInsightsDescription: s.seoInsightsDescription ?? "",
+    seoCalculatorTitle: s.seoCalculatorTitle ?? "",
+    seoCalculatorDescription: s.seoCalculatorDescription ?? "",
+    seoCareersTitle: s.seoCareersTitle ?? "",
+    seoCareersDescription: s.seoCareersDescription ?? "",
+    seoContactTitle: s.seoContactTitle ?? "",
+    seoContactDescription: s.seoContactDescription ?? "",
+    themePrimary: s.themePrimary ?? DEFAULT_THEME.themePrimary,
+    themePrimaryDark: s.themePrimaryDark ?? DEFAULT_THEME.themePrimaryDark,
+    themeBackground: s.themeBackground ?? DEFAULT_THEME.themeBackground,
+    themeSurface: s.themeSurface ?? DEFAULT_THEME.themeSurface,
+    themeText: s.themeText ?? DEFAULT_THEME.themeText,
+    themeMuted: s.themeMuted ?? DEFAULT_THEME.themeMuted,
+    themeBorder: s.themeBorder ?? DEFAULT_THEME.themeBorder,
+  };
+}
+
+// Neat card wrapper for settings sections
+function Card({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="bg-panel border border-line p-6 md:p-8">
+      <h2 className="text-brand text-xs uppercase tracking-widest mb-6">{title}</h2>
+      <div className="space-y-5">{children}</div>
+    </section>
+  );
+}
+
 interface FieldProps {
   label: string;
   hint?: string;
@@ -232,47 +326,7 @@ export default function AdminSiteSettings() {
 
   useEffect(() => {
     if (!settings) return;
-    setForm({
-      firmName: settings.firmName ?? "",
-      tagline: settings.tagline ?? "",
-      heroBadgeText: settings.heroBadgeText ?? "",
-      heroHeading: settings.heroHeading ?? "",
-      heroSubheading: settings.heroSubheading ?? "",
-      heroImageUrl: settings.heroImageUrl ?? "",
-      heroCtaPrimaryText: settings.heroCtaPrimaryText ?? "",
-      heroCtaPrimaryLink: settings.heroCtaPrimaryLink ?? "",
-      heroCtaSecondaryText: settings.heroCtaSecondaryText ?? "",
-      heroCtaSecondaryLink: settings.heroCtaSecondaryLink ?? "",
-      email: settings.email ?? "",
-      phone: settings.phone ?? "",
-      phone2: settings.phone2 ?? "",
-      address: settings.address ?? "",
-      bbbeeLevel: settings.bbbeeLevel ?? "",
-      linkedinUrl: settings.linkedinUrl ?? "",
-      facebookUrl: settings.facebookUrl ?? "",
-      twitterUrl: settings.twitterUrl ?? "",
-      seoHomeTitle: settings.seoHomeTitle ?? "",
-      seoHomeDescription: settings.seoHomeDescription ?? "",
-      seoPeopleTitle: settings.seoPeopleTitle ?? "",
-      seoPeopleDescription: settings.seoPeopleDescription ?? "",
-      seoServicesTitle: settings.seoServicesTitle ?? "",
-      seoServicesDescription: settings.seoServicesDescription ?? "",
-      seoInsightsTitle: settings.seoInsightsTitle ?? "",
-      seoInsightsDescription: settings.seoInsightsDescription ?? "",
-      seoCalculatorTitle: settings.seoCalculatorTitle ?? "",
-      seoCalculatorDescription: settings.seoCalculatorDescription ?? "",
-      seoCareersTitle: settings.seoCareersTitle ?? "",
-      seoCareersDescription: settings.seoCareersDescription ?? "",
-      seoContactTitle: settings.seoContactTitle ?? "",
-      seoContactDescription: settings.seoContactDescription ?? "",
-      themePrimary: settings.themePrimary ?? DEFAULT_THEME.themePrimary,
-      themePrimaryDark: settings.themePrimaryDark ?? DEFAULT_THEME.themePrimaryDark,
-      themeBackground: settings.themeBackground ?? DEFAULT_THEME.themeBackground,
-      themeSurface: settings.themeSurface ?? DEFAULT_THEME.themeSurface,
-      themeText: settings.themeText ?? DEFAULT_THEME.themeText,
-      themeMuted: settings.themeMuted ?? DEFAULT_THEME.themeMuted,
-      themeBorder: settings.themeBorder ?? DEFAULT_THEME.themeBorder,
-    });
+    setForm(formFromSettings(settings));
   }, [settings]);
 
   const f = (k: keyof FormState) => ({
@@ -280,12 +334,20 @@ export default function AdminSiteSettings() {
     onChange: (v: string) => setForm(prev => ({ ...prev, [k]: v })),
   });
 
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Serialize the whole form for dirty-checking (cheap: ~50 short strings)
+  const serializeForm = (s: FormState) => JSON.stringify(s);
+
+  const savedSnapshot = settings ? serializeForm(formFromSettings(settings)) : null;
+  const formDirty = savedSnapshot != null && serializeForm(form) !== savedSnapshot;
+
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const doSave = () => {
+    setConfirmOpen(false);
     update.mutate({ data: form as never }, {
       onSuccess: () => {
         qc.invalidateQueries({ queryKey: getGetSiteSettingsQueryKey() });
-        toast({ title: "Settings saved" });
+        toast({ title: "Settings saved — your site is updated." });
       },
       onError: () => toast({ title: "Error saving settings", variant: "destructive" }),
     });
@@ -368,9 +430,26 @@ export default function AdminSiteSettings() {
   return (
     <AdminLayout>
       <div className="p-8 md:p-12 max-w-3xl">
-        <div className="mb-10">
-          <h1 className="text-3xl font-serif text-paper">Site Settings</h1>
-          <p className="text-fog mt-1">Manage your homepage hero, contact details, and search engine metadata — no technical knowledge needed.</p>
+        {/* Header with Save top-right */}
+        <div className="flex items-start justify-between gap-6 mb-10">
+          <div>
+            <h1 className="text-3xl font-serif text-paper">Site Settings</h1>
+            <p className="text-fog mt-1">Manage your homepage hero, contact details, colours and search engine metadata — no technical knowledge needed.</p>
+          </div>
+          <div className="flex flex-col items-end gap-2 shrink-0 pt-1">
+            <button
+              type="button"
+              onClick={() => setConfirmOpen(true)}
+              disabled={update.isPending || !formDirty}
+              data-testid="button-save-settings"
+              className="bg-brand text-ink px-8 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors disabled:opacity-40"
+            >
+              {update.isPending ? "Saving..." : "Save Changes"}
+            </button>
+            <span className={`text-xs ${formDirty ? "text-brand" : "text-fog/60"}`}>
+              {formDirty ? "● Unsaved changes" : "All changes saved"}
+            </span>
+          </div>
         </div>
 
         {/* Tabs */}
@@ -391,71 +470,71 @@ export default function AdminSiteSettings() {
           ))}
         </div>
 
-        <form onSubmit={handleSave} data-testid="form-site-settings">
+        <div className="max-w-3xl">
+        <form onSubmit={e => { e.preventDefault(); if (formDirty) setConfirmOpen(true); }} data-testid="form-site-settings">
 
           {/* ── HOMEPAGE TAB ── */}
           {activeTab === "homepage" && (
-            <div className="space-y-8">
-              <div>
-                <p className="text-brand text-xs uppercase tracking-widest mb-6">Hero Section</p>
-                <div className="space-y-5">
-                  <Field
-                    label="Badge Text"
-                    hint="The small gold label shown above the main heading in the hero."
-                    placeholder="e.g. South African Commercial Law"
-                    {...f("heroBadgeText")}
-                  />
-                  <Field
-                    label="Main Heading"
-                    hint="The large headline visitors see first. Keep it short and punchy."
-                    placeholder="e.g. Trusted by Serious Business"
-                    {...f("heroHeading")}
-                  />
-                  <Field
-                    label="Subheading"
-                    hint="A sentence or two that expands on the headline."
-                    placeholder="e.g. Nike Pillay Inc delivers authoritative legal counsel..."
-                    multiline
-                    rows={3}
-                    {...f("heroSubheading")}
-                  />
-                  <Field
-                    label="Background Image"
-                    hint="The photo behind the hero, blended dark like a watermark. Click Browse to upload, or type a path like /npinc/hero-property.jpg."
-                    placeholder="/npinc/hero-property.jpg"
-                    {...f("heroImageUrl")}
-                  />
-                  <div className="flex items-center gap-3">
-                    <label className="inline-flex items-center gap-2 border border-line text-fog px-5 py-2.5 text-xs uppercase tracking-widest cursor-pointer hover:border-brand hover:text-brand transition-colors">
-                      <Upload size={13} /> {uploadingHero ? "Uploading…" : "Browse / Upload"}
-                      <input
-                        ref={heroFileRef}
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleHeroFile}
-                      />
-                    </label>
-                    {form.heroImageUrl && (
-                      <span className="text-fog/60 text-xs truncate">{form.heroImageUrl}</span>
-                    )}
-                  </div>
+            <div className="space-y-6">
+              <Card title="Hero Text">
+                <Field
+                  label="Badge Text"
+                  hint="The small gold label shown above the main heading in the hero."
+                  placeholder="e.g. South African Commercial Law"
+                  {...f("heroBadgeText")}
+                />
+                <Field
+                  label="Main Heading"
+                  hint="The large headline visitors see first. Keep it short and punchy."
+                  placeholder="e.g. Trusted by Serious Business"
+                  {...f("heroHeading")}
+                />
+                <Field
+                  label="Subheading"
+                  hint="A sentence or two that expands on the headline."
+                  placeholder="e.g. Nike Pillay Inc delivers authoritative legal counsel..."
+                  multiline
+                  rows={3}
+                  {...f("heroSubheading")}
+                />
+              </Card>
+
+              <Card title="Background Image">
+                <Field
+                  label="Image"
+                  hint="The photo behind the hero, blended dark like a watermark. Click Browse to upload, or type a path like /npinc/hero-property.jpg."
+                  placeholder="/npinc/hero-property.jpg"
+                  {...f("heroImageUrl")}
+                />
+                <div className="flex items-center gap-3">
+                  <label className="inline-flex items-center gap-2 border border-line text-fog px-5 py-2.5 text-xs uppercase tracking-widest cursor-pointer hover:border-brand hover:text-brand transition-colors">
+                    <Upload size={13} /> {uploadingHero ? "Uploading…" : "Browse / Upload"}
+                    <input
+                      ref={heroFileRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleHeroFile}
+                    />
+                  </label>
                   {form.heroImageUrl && (
-                    <div className="border border-line overflow-hidden">
-                      <img
-                        src={form.heroImageUrl}
-                        alt="Hero preview — darkened as it will appear on the site"
-                        className="w-full h-48 object-cover brightness-[0.35]"
-                        onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
-                      />
-                      <p className="text-fog/60 text-xs px-3 py-2">Preview with the site's dark watermark blend applied.</p>
-                    </div>
+                    <span className="text-fog/60 text-xs truncate">{form.heroImageUrl}</span>
                   )}
                 </div>
-              </div>
+                {form.heroImageUrl && (
+                  <div className="border border-line overflow-hidden">
+                    <img
+                      src={form.heroImageUrl}
+                      alt="Hero preview — darkened as it will appear on the site"
+                      className="w-full h-48 object-cover brightness-[0.35]"
+                      onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    />
+                    <p className="text-fog/60 text-xs px-3 py-2">Preview with the site's dark watermark blend applied.</p>
+                  </div>
+                )}
+              </Card>
 
-              <div>
-                <p className="text-brand text-xs uppercase tracking-widest mb-6">Call-to-Action Buttons</p>
+              <Card title="Call-to-Action Buttons">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <Field
                     label="Primary Button Text"
@@ -481,59 +560,48 @@ export default function AdminSiteSettings() {
                     {...f("heroCtaSecondaryLink")}
                   />
                 </div>
-              </div>
+              </Card>
             </div>
           )}
 
           {/* ── CONTACT & FIRM TAB ── */}
           {activeTab === "contact" && (
-            <div className="space-y-8">
-              <div>
-                <p className="text-brand text-xs uppercase tracking-widest mb-6">Firm Identity</p>
-                <div className="space-y-5">
-                  <Field label="Firm Name" placeholder="Nike Pillay Inc" {...f("firmName")} />
-                  <Field label="Tagline" hint="Shown in the footer and some headers." placeholder="Attorneys, Notaries & Conveyancers" {...f("tagline")} />
-                  <Field label="B-BBEE Level" placeholder="e.g. Level 1" {...f("bbbeeLevel")} />
-                </div>
-              </div>
-              <div>
-                <p className="text-brand text-xs uppercase tracking-widest mb-6">Contact Details</p>
-                <div className="space-y-5">
-                  <Field label="Email Address" placeholder="nike@npinc.co.za" {...f("email")} />
-                  <Field label="Phone Number" placeholder="+27 31 000 0000" {...f("phone")} />
-                  <Field label="Second Phone (optional)" placeholder="+27 82 000 0000" {...f("phone2")} />
-                  <Field label="Office Address" hint="Shown in the footer and contact page." placeholder="Suite X, Building Name, Durban, South Africa" {...f("address")} />
-                </div>
-              </div>
-              <div>
-                <p className="text-brand text-xs uppercase tracking-widest mb-6">Social Media Links</p>
-                <div className="space-y-5">
-                  <Field label="LinkedIn URL" placeholder="https://linkedin.com/company/..." {...f("linkedinUrl")} />
-                  <Field label="Facebook URL" placeholder="https://facebook.com/..." {...f("facebookUrl")} />
-                  <Field label="Twitter / X URL" placeholder="https://twitter.com/..." {...f("twitterUrl")} />
-                </div>
-              </div>
+            <div className="space-y-6">
+              <Card title="Firm Identity">
+                <Field label="Firm Name" placeholder="Nike Pillay Inc" {...f("firmName")} />
+                <Field label="Tagline" hint="Shown in the footer and some headers." placeholder="Attorneys, Notaries & Conveyancers" {...f("tagline")} />
+                <Field label="B-BBEE Level" placeholder="e.g. Level 1" {...f("bbbeeLevel")} />
+              </Card>
+              <Card title="Contact Details">
+                <Field label="Email Address" placeholder="nike@npinc.co.za" {...f("email")} />
+                <Field label="Phone Number" placeholder="+27 31 000 0000" {...f("phone")} />
+                <Field label="Second Phone (optional)" placeholder="+27 82 000 0000" {...f("phone2")} />
+                <Field label="Office Address" hint="Shown in the footer and contact page." placeholder="Suite X, Building Name, Durban, South Africa" {...f("address")} />
+              </Card>
+              <Card title="Social Media Links">
+                <Field label="LinkedIn URL" placeholder="https://linkedin.com/company/..." {...f("linkedinUrl")} />
+                <Field label="Facebook URL" placeholder="https://facebook.com/..." {...f("facebookUrl")} />
+                <Field label="Twitter / X URL" placeholder="https://twitter.com/..." {...f("twitterUrl")} />
+              </Card>
             </div>
           )}
 
           {/* ── COLOURS TAB ── */}
           {activeTab === "colours" && (
-            <div className="space-y-8">
+            <div className="space-y-6">
               <p className="text-fog text-sm leading-relaxed">
                 Change the look of your whole website here. Pick a ready-made style, or fine-tune each colour yourself.
-                Press <strong className="text-paper">Save Settings</strong> below and the new colours go live everywhere instantly.
+                Colours preview live across this page — press <strong className="text-paper">Save Changes</strong> top-right and confirm to make them live everywhere.
               </p>
 
-              {/* Presets */}
-              <div>
-                <p className="text-brand text-xs uppercase tracking-widest mb-4">One-click styles</p>
+              <Card title="One-click styles">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {THEME_PRESETS.map(p => (
                     <button
                       key={p.name}
                       type="button"
                       onClick={() => applyPreset({ ...p.colors })}
-                      className="text-left border border-line hover:border-brand transition-colors p-4 bg-panel"
+                      className="text-left border border-line hover:border-brand transition-colors p-4 bg-ink"
                       data-testid={`button-preset-${p.name.toLowerCase().replace(/\s+/g, "-")}`}
                     >
                       <div className="flex items-center gap-1.5 mb-3">
@@ -546,11 +614,9 @@ export default function AdminSiteSettings() {
                     </button>
                   ))}
                 </div>
-              </div>
+              </Card>
 
-              {/* Individual colours */}
-              <div>
-                <p className="text-brand text-xs uppercase tracking-widest mb-4">Fine-tune colours</p>
+              <Card title="Fine-tune colours">
                 <div className="space-y-5">
                   {THEME_FIELDS.map(meta => (
                     <ColourRow
@@ -561,27 +627,25 @@ export default function AdminSiteSettings() {
                     />
                   ))}
                 </div>
-              </div>
+              </Card>
 
-              {/* Live preview */}
-              <div>
+              <Card title="Preview">
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-brand text-xs uppercase tracking-widest">Preview</p>
+                  <p className="text-fog text-xs">
+                    {coloursDirty
+                      ? "You are previewing unsaved colours across this whole page — Save Changes to keep them, Discard preview to go back."
+                      : "Pick a style or tweak a colour above to preview it live across this page."}
+                  </p>
                   {coloursDirty && (
                     <button
                       type="button"
                       onClick={revertUnsavedColours}
-                      className="text-fog text-xs uppercase tracking-widest underline underline-offset-4 hover:text-paper transition-colors"
+                      className="text-fog text-xs uppercase tracking-widest underline underline-offset-4 hover:text-paper transition-colors shrink-0 ml-4"
                     >
-                      Discard preview
+                      Discard
                     </button>
                   )}
                 </div>
-                <p className="text-fog text-xs mb-4 -mt-2">
-                  {coloursDirty
-                    ? "You are previewing unsaved colours across this whole page — Save Settings to keep them, Discard preview to go back."
-                    : "Pick a style or tweak a colour above to preview it live across this page."}
-                </p>
                 <div
                   className="border p-6 space-y-4"
                   style={{ backgroundColor: form.themeBackground, borderColor: form.themeBorder }}
@@ -596,15 +660,14 @@ export default function AdminSiteSettings() {
                     <p className="text-sm" style={{ color: form.themePrimary }}>Accent link and highlights →</p>
                   </div>
                 </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={resetTheme}
-                className="text-fog text-xs uppercase tracking-widest underline underline-offset-4 hover:text-paper transition-colors"
-              >
-                Reset to Classic Gold
-              </button>
+                <button
+                  type="button"
+                  onClick={resetTheme}
+                  className="text-fog text-xs uppercase tracking-widest underline underline-offset-4 hover:text-paper transition-colors mt-4"
+                >
+                  Reset to Classic Gold
+                </button>
+              </Card>
             </div>
           )}
 
@@ -624,20 +687,43 @@ export default function AdminSiteSettings() {
             </div>
           )}
 
-          <div className="sticky bottom-0 mt-10 -mx-2 px-2 py-4 bg-ink/95 backdrop-blur border-t border-line flex items-center gap-4">
-            <button
-              type="submit"
-              disabled={update.isPending}
-              data-testid="button-save-settings"
-              className="bg-brand text-ink px-10 py-4 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors disabled:opacity-50"
-            >
-              {update.isPending ? "Saving..." : "Save Settings"}
-            </button>
-            {activeTab === "colours" && coloursDirty && (
-              <span className="text-fog text-xs">You have unsaved colour changes — they are previewing live.</span>
-            )}
+          <div className="hidden" aria-hidden="true">
+            <button type="submit" disabled tabIndex={-1}>Save Settings</button>
           </div>
         </form>
+        </div>
+
+        {/* ── Confirm-save dialog ── */}
+        {confirmOpen && (
+          <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={() => setConfirmOpen(false)}>
+            <div className="bg-panel border border-line p-8 w-full max-w-md" onClick={e => e.stopPropagation()}>
+              <h2 className="text-xl font-serif text-paper mb-3">Publish these changes?</h2>
+              <p className="text-fog text-sm leading-relaxed mb-6">
+                {activeTab === "colours"
+                  ? "Your new colours will go live across the whole website immediately."
+                  : "Your changes will go live on the website immediately."}
+              </p>
+              <div className="flex gap-4">
+                <button
+                  type="button"
+                  onClick={doSave}
+                  disabled={update.isPending}
+                  data-testid="button-confirm-save"
+                  className="bg-brand text-ink px-8 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors disabled:opacity-50"
+                >
+                  {update.isPending ? "Publishing..." : "Yes, publish"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmOpen(false)}
+                  className="border border-line text-fog px-8 py-3 text-sm hover:border-brand transition-colors"
+                >
+                  Keep editing
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </AdminLayout>
   );
