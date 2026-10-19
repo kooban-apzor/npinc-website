@@ -40,6 +40,27 @@ export function applyTheme(colors: Partial<ThemeColors>): void {
       root.style.setProperty(CSS_VAR_MAP[key], value);
     }
   });
+  // Keep the animated logo's gold glow in sync with the accent colour
+  const primary = colors.themePrimary;
+  if (isValidHex(primary)) {
+    const { h, s } = hexToHsl(primary);
+    root.style.setProperty("--theme-primary-glow", `hsla(${Math.round(h)}, ${Math.round(s)}%, 55%, 0.25)`);
+    root.style.setProperty("--theme-logo-filter", logoFilterFor(primary));
+  }
+}
+
+/**
+ * Approximate a hue-rotate filter that shifts the gold logo PNG toward the
+ * target accent colour. Returns "none" when already gold-ish so the original
+ * artwork renders untouched.
+ */
+export function logoFilterFor(hex: string): string {
+  if (!isValidHex(hex)) return "none";
+  const { h, s } = hexToHsl(hex);
+  const goldHue = 42;
+  let delta = Math.round(h - goldHue);
+  if (Math.abs(delta) < 12 && s > 25) return "none";
+  return `hue-rotate(${delta}deg) saturate(${s > 15 ? 1.1 : 0.9})`;
 }
 
 export function hexToHsl(hex: string): { h: number; s: number; l: number } {

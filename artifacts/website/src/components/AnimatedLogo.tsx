@@ -25,7 +25,7 @@ export function AnimatedLogo({ className }: AnimatedLogoProps) {
   if (prefersReducedMotion) {
     return (
       <div className={`aspect-square ${className ?? ""}`} role="img" aria-label="Nike Pillay Inc monogram" data-testid="img-logo-static">
-        <img src={logoPng} alt="Nike Pillay Inc" className="w-full h-full object-contain" />
+        <img src={logoPng} alt="Nike Pillay Inc" className="w-full h-full object-contain [filter:var(--theme-logo-filter,none)]" />
       </div>
     );
   }
@@ -48,7 +48,7 @@ export function AnimatedLogo({ className }: AnimatedLogoProps) {
         src={logoPng}
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-contain"
+        className="absolute inset-0 w-full h-full object-contain [filter:var(--theme-logo-filter,none)]"
         initial={{ opacity: 1 }}
         animate={{ opacity: PNG_OPACITY }}
         transition={transition(OP_TIMES)}
@@ -63,7 +63,7 @@ export function AnimatedLogo({ className }: AnimatedLogoProps) {
           viewBox="34 9 132 132"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="w-full h-full overflow-visible drop-shadow-[0_0_18px_rgba(198,161,91,0.25)]"
+          className="w-full h-full overflow-visible [filter:drop-shadow(0_0_18px_var(--theme-primary-glow,rgba(198,161,91,0.25)))]"
           aria-hidden="true"
         >
           <defs>
