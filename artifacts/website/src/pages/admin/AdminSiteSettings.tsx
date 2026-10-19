@@ -287,6 +287,53 @@ export default function AdminSiteSettings() {
 
   const resetTheme = () => setForm(prev => ({ ...prev, ...DEFAULT_THEME }));
 
+  const revertUnsavedColours = () => {
+    if (!settings) return;
+    setForm(prev => ({
+      ...prev,
+      themePrimary: settings.themePrimary ?? DEFAULT_THEME.themePrimary,
+      themePrimaryDark: settings.themePrimaryDark ?? DEFAULT_THEME.themePrimaryDark,
+      themeBackground: settings.themeBackground ?? DEFAULT_THEME.themeBackground,
+      themeSurface: settings.themeSurface ?? DEFAULT_THEME.themeSurface,
+      themeText: settings.themeText ?? DEFAULT_THEME.themeText,
+      themeMuted: settings.themeMuted ?? DEFAULT_THEME.themeMuted,
+      themeBorder: settings.themeBorder ?? DEFAULT_THEME.themeBorder,
+    }));
+  };
+
+  const coloursDirty = (Object.keys(DEFAULT_THEME) as (keyof ThemeColors)[]).some(
+    k => (form[k] ?? "").toUpperCase() !== ((settings?.[k] ?? DEFAULT_THEME[k]) ?? "").toUpperCase(),
+  );
+
+  // Live site-wide preview: while on the Colours tab, apply the unsaved form
+  // colours to the whole page so the user sees the real site change before saving.
+  // Restores the saved theme when leaving the tab or unmounting.
+  const formTheme = {
+    themePrimary: form.themePrimary,
+    themePrimaryDark: form.themePrimaryDark,
+    themeBackground: form.themeBackground,
+    themeSurface: form.themeSurface,
+    themeText: form.themeText,
+    themeMuted: form.themeMuted,
+    themeBorder: form.themeBorder,
+  };
+  useEffect(() => {
+    if (activeTab !== "colours") return;
+    applyTheme(formTheme);
+    return () => {
+      if (!settings) return;
+      applyTheme({
+        themePrimary: settings.themePrimary ?? undefined,
+        themePrimaryDark: settings.themePrimaryDark ?? undefined,
+        themeBackground: settings.themeBackground ?? undefined,
+        themeSurface: settings.themeSurface ?? undefined,
+        themeText: settings.themeText ?? undefined,
+        themeMuted: settings.themeMuted ?? undefined,
+        themeBorder: settings.themeBorder ?? undefined,
+      });
+    };
+  });
+
   return (
     <AdminLayout>
       <div className="p-8 md:p-12 max-w-3xl">
@@ -471,7 +518,23 @@ export default function AdminSiteSettings() {
 
               {/* Live preview */}
               <div>
-                <p className="text-brand text-xs uppercase tracking-widest mb-4">Preview</p>
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-brand text-xs uppercase tracking-widest">Preview</p>
+                  {coloursDirty && (
+                    <button
+                      type="button"
+                      onClick={revertUnsavedColours}
+                      className="text-fog text-xs uppercase tracking-widest underline underline-offset-4 hover:text-paper transition-colors"
+                    >
+                      Discard preview
+                    </button>
+                  )}
+                </div>
+                <p className="text-fog text-xs mb-4 -mt-2">
+                  {coloursDirty
+                    ? "You are previewing unsaved colours across this whole page — Save Settings to keep them, Discard preview to go back."
+                    : "Pick a style or tweak a colour above to preview it live across this page."}
+                </p>
                 <div
                   className="border p-6 space-y-4"
                   style={{ backgroundColor: form.themeBackground, borderColor: form.themeBorder }}
