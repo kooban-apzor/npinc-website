@@ -339,7 +339,7 @@ export default function AdminPeople() {
         ) : (people ?? []).length === 0 ? (
           <AdminEmpty message="No team members yet." />
         ) : (
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             {(people ?? []).map(p => (
               <div key={p.id} data-testid={`row-person-${p.id}`}
                 className="flex items-center justify-between gap-3 bg-panel border border-line px-5 py-4">

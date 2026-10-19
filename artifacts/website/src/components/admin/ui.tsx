@@ -76,7 +76,7 @@ export function AdminRow({ testId, title, meta, published, onEdit, editTestId, o
 /* ─── Two-column grid for compact lists (halves scroll on wide screens) ─── */
 
 export function AdminGrid({ children }: { children: ReactNode }) {
-  return <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">{children}</div>;
+  return <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">{children}</div>;
 }
 
 /* ─── Loading / empty states ─── */
