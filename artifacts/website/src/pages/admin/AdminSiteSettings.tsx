@@ -429,11 +429,11 @@ export default function AdminSiteSettings() {
 
   return (
     <AdminLayout>
-      <div className="p-6 md:p-10 max-w-6xl mx-auto">
+      <div className="p-4 sm:p-6 md:p-10 max-w-6xl mx-auto">
         {/* Header with Save top-right */}
-        <div className="flex items-start justify-between gap-6 mb-8">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-serif text-paper">Site Settings</h1>
+        <div className="flex flex-wrap items-start justify-between gap-4 mb-6 md:mb-8">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-serif text-paper">Site Settings</h1>
           </div>
           <div className="flex flex-col items-end gap-2 shrink-0 pt-1">
             <button
@@ -452,7 +452,7 @@ export default function AdminSiteSettings() {
         </div>
 
         {/* Tabs */}
-        <div className="flex flex-wrap border-b border-line mb-8">
+        <div className="flex flex-wrap gap-x-1 border-b border-line mb-6 md:mb-8 overflow-x-auto">
           {tabs.map(t => (
             <button
               key={t.id}

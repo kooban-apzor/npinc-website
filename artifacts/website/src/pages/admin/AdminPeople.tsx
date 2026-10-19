@@ -376,7 +376,7 @@ export default function AdminPeople() {
               <PhotoUpload value={modal.form.photoUrl} onChange={url => setForm({ photoUrl: url })} />
 
               {/* Row: Role + Sort Order */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-fog text-xs uppercase tracking-widest mb-2">Role</label>
                   <select
@@ -414,7 +414,7 @@ export default function AdminPeople() {
               </div>
 
               {/* Row: First Name + Last Name */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-fog text-xs uppercase tracking-widest mb-2">First Name <span className="text-brand">*</span></label>
                   <input type="text" required value={modal.form.firstName} onChange={e => setForm({ firstName: e.target.value })}
@@ -428,7 +428,7 @@ export default function AdminPeople() {
               </div>
 
               {/* Row: Title + Slug */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-fog text-xs uppercase tracking-widest mb-2">Title (Mr/Ms/Dr)</label>
                   <input type="text" value={modal.form.title} onChange={e => setForm({ title: e.target.value })}
@@ -442,7 +442,7 @@ export default function AdminPeople() {
               </div>
 
               {/* Row: Email + Phone */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-fog text-xs uppercase tracking-widest mb-2">Email</label>
                   <input type="text" value={modal.form.email} onChange={e => setForm({ email: e.target.value })}
@@ -456,7 +456,7 @@ export default function AdminPeople() {
               </div>
 
               {/* Row: Qualifications + Admissions */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-fog text-xs uppercase tracking-widest mb-2">Qualifications</label>
                   <input type="text" value={modal.form.qualifications} onChange={e => setForm({ qualifications: e.target.value })}
@@ -498,7 +498,7 @@ export default function AdminPeople() {
                   "Just Joined" shows a gold badge for 90 days. Staff leave the public team list the day after their last office day. Departure Staff Movements posts expire after 30 days; join posts after 90 days.
                 </p>
 
-                <div className="grid grid-cols-2 gap-4 mb-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
                   <button type="button" onClick={markJoined}
                     className="flex items-center justify-center gap-2 border border-brand/40 text-brand px-4 py-3 text-xs uppercase tracking-widest hover:bg-brand/10 transition-colors">
                     <UserCheck size={14} /> Just Joined Today
@@ -509,7 +509,7 @@ export default function AdminPeople() {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                   <AdminDateField
                     label="Join Date"
                     value={modal.form.joinedAt}

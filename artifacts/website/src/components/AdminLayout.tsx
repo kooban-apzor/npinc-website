@@ -1,10 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useGetAdminMe, useAdminLogout } from "@workspace/api-client-react";
 import {
   LayoutDashboard, FileText, Users, Newspaper, Calendar,
   Trophy, Briefcase, FileCheck, FolderOpen, Calculator,
-  MessageSquare, Settings, LogOut, ChevronRight
+  MessageSquare, Settings, LogOut, ChevronRight, Menu, X
 } from "lucide-react";
 
 const navItems = [
@@ -33,6 +33,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const { data: me, isError } = useGetAdminMe({ query: { queryKey: ['admin-me'], retry: false, staleTime: Infinity, refetchOnWindowFocus: false } });
   const logout = useAdminLogout();
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [navOpen, setNavOpen] = useState(false);
 
   // Silently go home when the server says the session is no longer valid
   useEffect(() => {
@@ -68,14 +69,30 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <div className="min-h-screen flex bg-ink">
-      {/* Sidebar */}
-      <aside className="w-64 bg-panel border-r border-line flex flex-col shrink-0" data-testid="admin-sidebar">
+      {/* Mobile top bar */}
+      <div className="lg:hidden fixed top-0 inset-x-0 z-40 flex items-center justify-between bg-panel border-b border-line px-4 py-3">
+        <p className="text-brand text-xs uppercase tracking-widest">NP Inc Admin</p>
+        <button onClick={() => setNavOpen(o => !o)} aria-label={navOpen ? "Close menu" : "Open menu"} className="text-fog hover:text-paper p-1">
+          {navOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
+      </div>
+
+      {/* Sidebar — drawer on mobile, fixed column on lg+ */}
+      {navOpen && (
+        <div className="lg:hidden fixed inset-0 bg-black/60 z-40" onClick={() => setNavOpen(false)} />
+      )}
+      <aside
+        className={`bg-panel border-r border-line flex-col shrink-0 z-50 flex
+          fixed inset-y-0 left-0 w-64 transform transition-transform lg:static lg:transform-none
+          ${navOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
+        data-testid="admin-sidebar"
+      >
         <div className="px-6 py-6 border-b border-line">
           <p className="text-brand text-xs uppercase tracking-widest mb-1">NP Inc Admin</p>
           {me && <p className="text-fog text-sm">{me.username}</p>}
         </div>
 
-        <nav className="flex-1 py-4 overflow-y-auto">
+        <nav className="flex-1 py-4 overflow-y-auto" onClick={() => setNavOpen(false)}>
           {navItems.map(({ href, label, icon: Icon }) => {
             const active = location === href || (href !== "/admin" && location.startsWith(href));
             return (
@@ -116,7 +133,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 min-w-0 overflow-auto pt-14 lg:pt-0">
         {children}
       </div>
     </div>

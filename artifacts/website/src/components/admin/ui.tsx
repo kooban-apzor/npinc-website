@@ -13,10 +13,10 @@ export function AdminPage({ title, count, countLabel, actionLabel, onAction, act
   children: ReactNode;
 }) {
   return (
-    <div className="p-6 md:p-10 max-w-6xl mx-auto">
-      <div className="flex items-center justify-between gap-4 mb-8">
+    <div className="p-4 sm:p-6 md:p-10 max-w-6xl mx-auto">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6 md:mb-8">
         <div className="flex items-baseline gap-3 min-w-0">
-          <h1 className="text-2xl md:text-3xl font-serif text-paper truncate">{title}</h1>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-serif text-paper truncate">{title}</h1>
           {count !== undefined && (
             <span className="text-fog text-sm shrink-0">{count} {countLabel ?? (count === 1 ? "item" : "items")}</span>
           )}
