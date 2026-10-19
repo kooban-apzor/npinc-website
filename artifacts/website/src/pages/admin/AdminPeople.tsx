@@ -8,7 +8,7 @@ import AdminDateField from "@/components/admin/AdminDateField";
 import AdminLayout from "@/components/AdminLayout";
 import { AdminPage, AdminLoading, AdminEmpty, AdminModal, mutationError } from "@/components/admin/ui";
 import { createStaffMovementArticlePayload, todayISO, type StaffMovementForm } from "@/lib/staff-movements";
-import { UserCheck, UserMinus, Upload, ImageOff, FileText } from "lucide-react";
+import { Pencil, Trash2, UserCheck, UserMinus, Upload, ImageOff, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const ROLE_OPTIONS = [
