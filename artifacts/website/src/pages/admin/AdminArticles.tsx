@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useAdminListArticles, useCreateArticle, useUpdateArticle, useDeleteArticle, getAdminListArticlesQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { adminModalPanelClass } from "@/components/admin-panel-classes";
 import AdminLayout from "@/components/AdminLayout";
 import AdminDateField from "@/components/admin/AdminDateField";
-import { Plus, Pencil, Trash2, X } from "lucide-react";
+import { AdminPage, AdminRow, AdminGrid, AdminLoading, AdminEmpty, AdminModal, ConfirmDialog, AdminField, AdminSelect, AdminCheck, mutationError } from "@/components/admin/ui";
 import { useToast } from "@/hooks/use-toast";
 
 const CATS = ["LegalUpdate", "FirmNews", "StaffMovement", "Notice", "Event", "Award", "Career"];
@@ -19,80 +18,79 @@ export default function AdminArticles() {
   const qc = useQueryClient();
   const { toast } = useToast();
   const [modal, setModal] = useState<{ mode: "create" | "edit"; id?: number; form: Form } | null>(null);
+  const [deleting, setDeleting] = useState<number | null>(null);
 
   const invalidate = () => qc.invalidateQueries({ queryKey: getAdminListArticlesQueryKey() });
+  const saving = create.isPending || update.isPending;
   const openCreate = () => setModal({ mode: "create", form: { ...empty } });
   const openEdit = (a: NonNullable<typeof articles>[0]) => setModal({
     mode: "edit", id: a.id,
     form: { slug: a.slug, title: a.title, category: a.category, summary: a.summary ?? "", content: a.content ?? "", author: a.author ?? "", publishedAt: a.publishedAt ? new Date(a.publishedAt).toISOString().split("T")[0]! : "", isPublished: a.isPublished ?? false }
   });
+
   const handleSave = () => {
     if (!modal) return;
     const data = { ...modal.form, publishedAt: modal.form.publishedAt || undefined } as never;
+    const done = (msg: string) => { invalidate(); setModal(null); toast({ title: msg }); };
+    const fail = (err: unknown) => toast({ title: mutationError(err), variant: "destructive" });
     if (modal.mode === "create") {
-      create.mutate({ data }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Article created" }); }, onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); } });
+      create.mutate({ data }, { onSuccess: () => done("Article created"), onError: fail });
     } else {
-      update.mutate({ id: modal.id!, data }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Article updated" }); }, onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); } });
+      update.mutate({ id: modal.id!, data }, { onSuccess: () => done("Article updated"), onError: fail });
     }
   };
-  const handleDelete = (id: number) => {
-    if (!confirm("Delete this article?")) return;
-    remove.mutate({ id }, { onSuccess: () => { invalidate(); toast({ title: "Deleted" }); }, onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); } });
+
+  const confirmDelete = () => {
+    if (deleting == null) return;
+    remove.mutate({ id: deleting }, {
+      onSuccess: () => { invalidate(); setDeleting(null); toast({ title: "Deleted" }); },
+      onError: (err: unknown) => { setDeleting(null); toast({ title: mutationError(err), variant: "destructive" }); },
+    });
   };
+
+  const set = (patch: Partial<Form>) => setModal(m => m && ({ ...m, form: { ...m.form, ...patch } }));
 
   return (
     <AdminLayout>
-      <div className="p-8 md:p-12">
-        <div className="flex items-center justify-between mb-10">
-          <div><h1 className="text-3xl font-serif text-paper">Insights / Articles</h1><p className="text-fog mt-1">Manage legal updates, firm news and publications.</p></div>
-          <button onClick={openCreate} data-testid="button-create-article" className="flex items-center gap-2 bg-brand text-ink px-5 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors"><Plus size={16} /> Add Article</button>
-        </div>
-        {isLoading ? <div className="animate-pulse space-y-3">{[1,2,3].map(i => <div key={i} className="h-16 bg-panel border border-line" />)}</div> : (
-          <div className="space-y-3">
+      <AdminPage title="Insights / Articles" count={articles?.length} countLabel="articles" actionLabel="Add Article" onAction={openCreate} actionTestId="button-create-article">
+        {isLoading ? <AdminLoading rows={4} /> : (articles ?? []).length === 0 ? <AdminEmpty message="No articles yet." /> : (
+          <AdminGrid>
             {(articles ?? []).map(a => (
-              <div key={a.id} data-testid={`row-article-${a.id}`} className="flex items-center justify-between bg-panel border border-line px-6 py-4">
-                <div><h3 className="text-paper font-serif">{a.title}</h3><p className="text-fog text-xs mt-1">{a.category} · {a.isPublished ? <span className="text-green-400">Published</span> : <span className="text-red-400">Draft</span>}</p></div>
-                <div className="flex gap-3">
-                  <button onClick={() => openEdit(a)} data-testid={`button-edit-article-${a.id}`} className="text-fog hover:text-brand p-2"><Pencil size={15} /></button>
-                  <button onClick={() => handleDelete(a.id)} data-testid={`button-delete-article-${a.id}`} className="text-fog hover:text-red-400 p-2"><Trash2 size={15} /></button>
-                </div>
-              </div>
+              <AdminRow key={a.id} testId={`row-article-${a.id}`} title={a.title}
+                meta={a.category} published={a.isPublished ?? undefined}
+                onEdit={() => openEdit(a)} editTestId={`button-edit-article-${a.id}`}
+                onDelete={() => setDeleting(a.id)} deleteTestId={`button-delete-article-${a.id}`} />
             ))}
-          </div>
+          </AdminGrid>
         )}
-      </div>
+      </AdminPage>
+
       {modal && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className={adminModalPanelClass}>
-            <div className="flex items-center justify-between mb-6"><h2 className="text-xl font-serif text-paper">{modal.mode === "create" ? "Add Article" : "Edit Article"}</h2><button onClick={() => setModal(null)} className="text-fog hover:text-paper"><X size={20} /></button></div>
-            <div className="space-y-4">
-              {[{ l: "Slug", k: "slug" }, { l: "Title", k: "title" }, { l: "Summary", k: "summary", ta: true }, { l: "Content", k: "content", ta: true }, { l: "Author", k: "author" }].map(({ l, k, ta }) => (
-                <div key={k}>
-                  <label className="block text-fog text-xs uppercase tracking-widest mb-2">{l}</label>
-                  {ta ? <textarea rows={4} value={(modal.form as never)[k]} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, [k]: e.target.value } }))} className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none resize-none" />
-                  : <input type="text" value={(modal.form as never)[k]} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, [k]: e.target.value } }))} className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none" />}
-                </div>
-              ))}
-              <AdminDateField
-                label="Published At"
-                value={modal.form.publishedAt}
-                onChange={v => setModal(m => m && ({ ...m, form: { ...m.form, publishedAt: v } }))}
-                onClear={() => setModal(m => m && ({ ...m, form: { ...m.form, publishedAt: "" } }))}
-              />
-              <div>
-                <label className="block text-fog text-xs uppercase tracking-widest mb-2">Category</label>
-                <select value={modal.form.category} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, category: e.target.value } }))} className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none">
-                  {CATS.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </div>
-              <div className="flex items-center gap-3"><input type="checkbox" checked={modal.form.isPublished} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, isPublished: e.target.checked } }))} className="w-4 h-4 accent-brand" /><span className="text-fog text-sm">Published</span></div>
-            </div>
-            <div className="flex gap-4 mt-8">
-              <button onClick={handleSave} data-testid="button-save-article" className="bg-brand text-ink px-8 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors">Save</button>
-              <button onClick={() => setModal(null)} className="border border-line text-fog px-8 py-3 text-sm hover:border-brand transition-colors">Cancel</button>
-            </div>
+        <AdminModal title={modal.mode === "create" ? "Add Article" : "Edit Article"}
+          onClose={() => setModal(null)} onSave={handleSave} saving={saving} saveTestId="button-save-article" wide>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <AdminField label="Slug" value={modal.form.slug} onChange={v => set({ slug: v })} />
+            <AdminField label="Title" value={modal.form.title} onChange={v => set({ title: v })} />
           </div>
-        </div>
+          <AdminField label="Summary" value={modal.form.summary} onChange={v => set({ summary: v })} textarea rows={2} />
+          <AdminField label="Content" value={modal.form.content} onChange={v => set({ content: v })} textarea rows={6} />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <AdminField label="Author" value={modal.form.author} onChange={v => set({ author: v })} />
+            <AdminSelect label="Category" value={modal.form.category} onChange={v => set({ category: v })} options={CATS.map(c => ({ value: c, label: c }))} />
+            <div className="flex items-end pb-1"><AdminCheck id="art-pub" label="Published" checked={modal.form.isPublished} onChange={v => set({ isPublished: v })} /></div>
+          </div>
+          <AdminDateField
+            label="Published At"
+            value={modal.form.publishedAt}
+            onChange={v => set({ publishedAt: v })}
+            onClear={() => set({ publishedAt: "" })}
+          />
+        </AdminModal>
+      )}
+
+      {deleting != null && (
+        <ConfirmDialog title="Delete this article?" message="It will be removed from the public site immediately."
+          onConfirm={confirmDelete} onCancel={() => setDeleting(null)} pending={remove.isPending} />
       )}
     </AdminLayout>
   );

@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useAdminListEvents, useCreateEvent, useUpdateEvent, useDeleteEvent, getAdminListEventsQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { adminModalPanelClass } from "@/components/admin-panel-classes";
 import AdminLayout from "@/components/AdminLayout";
 import AdminDateField from "@/components/admin/AdminDateField";
-import { Plus, Pencil, Trash2, X } from "lucide-react";
+import { AdminPage, AdminRow, AdminGrid, AdminLoading, AdminEmpty, AdminModal, ConfirmDialog, AdminField, AdminCheck, mutationError } from "@/components/admin/ui";
 import { useToast } from "@/hooks/use-toast";
 
 type Form = { slug: string; title: string; description: string; location: string; eventDate: string; eventEndDate: string; registrationUrl: string; isPublished: boolean };
@@ -18,78 +17,75 @@ export default function AdminEvents() {
   const qc = useQueryClient();
   const { toast } = useToast();
   const [modal, setModal] = useState<{ mode: "create" | "edit"; id?: number; form: Form } | null>(null);
+  const [deleting, setDeleting] = useState<number | null>(null);
 
   const invalidate = () => qc.invalidateQueries({ queryKey: getAdminListEventsQueryKey() });
+  const saving = create.isPending || update.isPending;
   const openCreate = () => setModal({ mode: "create", form: { ...empty } });
-  const openEdit = (e: NonNullable<typeof events>[0]) => setModal({ mode: "edit", id: e.id, form: { slug: e.slug, title: e.title, description: e.description ?? "", location: e.location ?? "", eventDate: e.eventDate?.slice(0, 10) ?? e.eventDate, eventEndDate: e.eventEndDate ? e.eventEndDate.slice(0, 10) : "", registrationUrl: e.registrationUrl ?? "", isPublished: e.isPublished ?? false } });
+  const openEdit = (e: NonNullable<typeof events>[0]) => setModal({
+    mode: "edit", id: e.id,
+    form: { slug: e.slug, title: e.title, description: e.description ?? "", location: e.location ?? "", eventDate: e.eventDate?.slice(0, 10) ?? e.eventDate, eventEndDate: e.eventEndDate ? e.eventEndDate.slice(0, 10) : "", registrationUrl: e.registrationUrl ?? "", isPublished: e.isPublished ?? false }
+  });
+
   const handleSave = () => {
     if (!modal) return;
     const data = { ...modal.form, eventEndDate: modal.form.eventEndDate || undefined, registrationUrl: modal.form.registrationUrl || undefined } as never;
+    const done = (msg: string) => { invalidate(); setModal(null); toast({ title: msg }); };
+    const fail = (err: unknown) => toast({ title: mutationError(err), variant: "destructive" });
     if (modal.mode === "create") {
-      create.mutate({ data }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Event created" }); }, onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); } });
+      create.mutate({ data }, { onSuccess: () => done("Event created"), onError: fail });
     } else {
-      update.mutate({ id: modal.id!, data }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Event updated" }); }, onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); } });
+      update.mutate({ id: modal.id!, data }, { onSuccess: () => done("Event updated"), onError: fail });
     }
   };
-  const handleDelete = (id: number) => {
-    if (!confirm("Delete this event?")) return;
-    remove.mutate({ id }, { onSuccess: () => { invalidate(); toast({ title: "Deleted" }); }, onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); } });
+
+  const confirmDelete = () => {
+    if (deleting == null) return;
+    remove.mutate({ id: deleting }, {
+      onSuccess: () => { invalidate(); setDeleting(null); toast({ title: "Deleted" }); },
+      onError: (err: unknown) => { setDeleting(null); toast({ title: mutationError(err), variant: "destructive" }); },
+    });
   };
+
+  const set = (patch: Partial<Form>) => setModal(m => m && ({ ...m, form: { ...m.form, ...patch } }));
 
   return (
     <AdminLayout>
-      <div className="p-8 md:p-12">
-        <div className="flex items-center justify-between mb-10">
-          <div><h1 className="text-3xl font-serif text-paper">Events</h1><p className="text-fog mt-1">Manage upcoming events and conferences.</p></div>
-          <button onClick={openCreate} data-testid="button-create-event" className="flex items-center gap-2 bg-brand text-ink px-5 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors"><Plus size={16} /> Add Event</button>
-        </div>
-        {isLoading ? <div className="animate-pulse space-y-3">{[1,2].map(i => <div key={i} className="h-16 bg-panel border border-line" />)}</div> : (
-          <div className="space-y-3">
+      <AdminPage title="Events" count={events?.length} actionLabel="Add Event" onAction={openCreate} actionTestId="button-create-event">
+        {isLoading ? <AdminLoading /> : (events ?? []).length === 0 ? <AdminEmpty message="No events yet." /> : (
+          <AdminGrid>
             {(events ?? []).map(e => (
-              <div key={e.id} data-testid={`row-event-${e.id}`} className="flex items-center justify-between bg-panel border border-line px-6 py-4">
-                <div><h3 className="text-paper font-serif">{e.title}</h3><p className="text-fog text-xs mt-1">{e.eventDate}{e.location ? ` · ${e.location}` : ""} · {e.isPublished ? <span className="text-green-400">Published</span> : <span className="text-red-400">Draft</span>}</p></div>
-                <div className="flex gap-3">
-                  <button onClick={() => openEdit(e)} data-testid={`button-edit-event-${e.id}`} className="text-fog hover:text-brand p-2"><Pencil size={15} /></button>
-                  <button onClick={() => handleDelete(e.id)} data-testid={`button-delete-event-${e.id}`} className="text-fog hover:text-red-400 p-2"><Trash2 size={15} /></button>
-                </div>
-              </div>
+              <AdminRow key={e.id} testId={`row-event-${e.id}`} title={e.title}
+                meta={[e.eventDate, e.location].filter(Boolean).join(" · ")} published={e.isPublished ?? undefined}
+                onEdit={() => openEdit(e)} editTestId={`button-edit-event-${e.id}`}
+                onDelete={() => setDeleting(e.id)} deleteTestId={`button-delete-event-${e.id}`} />
             ))}
-          </div>
+          </AdminGrid>
         )}
-      </div>
+      </AdminPage>
+
       {modal && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className={adminModalPanelClass}>
-            <div className="flex items-center justify-between mb-6"><h2 className="text-xl font-serif text-paper">{modal.mode === "create" ? "Add Event" : "Edit Event"}</h2><button onClick={() => setModal(null)}><X size={20} className="text-fog" /></button></div>
-            <div className="space-y-4">
-              {[{ l: "Slug", k: "slug" }, { l: "Title", k: "title" }, { l: "Description", k: "description", ta: true }, { l: "Location", k: "location" }, { l: "Registration URL", k: "registrationUrl" }].map(({ l, k, ta }) => (
-                <div key={k}>
-                  <label className="block text-fog text-xs uppercase tracking-widest mb-2">{l}</label>
-                  {ta ? <textarea rows={3} value={(modal.form as never)[k]} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, [k]: e.target.value } }))} className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none resize-none" />
-                  : <input type="text" value={(modal.form as never)[k]} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, [k]: e.target.value } }))} className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none" />}
-                </div>
-              ))}
-              <div className="grid grid-cols-2 gap-4">
-                <AdminDateField
-                  label="Event Date"
-                  value={modal.form.eventDate}
-                  onChange={v => setModal(m => m && ({ ...m, form: { ...m.form, eventDate: v } }))}
-                />
-                <AdminDateField
-                  label="End Date"
-                  value={modal.form.eventEndDate}
-                  onChange={v => setModal(m => m && ({ ...m, form: { ...m.form, eventEndDate: v } }))}
-                  onClear={() => setModal(m => m && ({ ...m, form: { ...m.form, eventEndDate: "" } }))}
-                />
-              </div>
-              <div className="flex items-center gap-3"><input type="checkbox" checked={modal.form.isPublished} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, isPublished: e.target.checked } }))} className="w-4 h-4 accent-brand" /><span className="text-fog text-sm">Published</span></div>
-            </div>
-            <div className="flex gap-4 mt-8">
-              <button onClick={handleSave} data-testid="button-save-event" className="bg-brand text-ink px-8 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors">Save</button>
-              <button onClick={() => setModal(null)} className="border border-line text-fog px-8 py-3 text-sm hover:border-brand transition-colors">Cancel</button>
-            </div>
+        <AdminModal title={modal.mode === "create" ? "Add Event" : "Edit Event"}
+          onClose={() => setModal(null)} onSave={handleSave} saving={saving} saveTestId="button-save-event" wide>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <AdminField label="Slug" value={modal.form.slug} onChange={v => set({ slug: v })} />
+            <AdminField label="Title" value={modal.form.title} onChange={v => set({ title: v })} />
           </div>
-        </div>
+          <AdminField label="Description" value={modal.form.description} onChange={v => set({ description: v })} textarea />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <AdminField label="Location" value={modal.form.location} onChange={v => set({ location: v })} />
+            <AdminField label="Registration URL" value={modal.form.registrationUrl} onChange={v => set({ registrationUrl: v })} />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <AdminDateField label="Event Date" value={modal.form.eventDate} onChange={v => set({ eventDate: v })} />
+            <AdminDateField label="End Date" value={modal.form.eventEndDate} onChange={v => set({ eventEndDate: v })} onClear={() => set({ eventEndDate: "" })} />
+            <div className="flex items-end pb-1"><AdminCheck id="ev-pub" label="Published" checked={modal.form.isPublished} onChange={v => set({ isPublished: v })} /></div>
+          </div>
+        </AdminModal>
+      )}
+
+      {deleting != null && (
+        <ConfirmDialog title="Delete this event?" onConfirm={confirmDelete} onCancel={() => setDeleting(null)} pending={remove.isPending} />
       )}
     </AdminLayout>
   );

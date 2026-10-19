@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useAdminListAwards, useCreateAward, useUpdateAward, useDeleteAward, getAdminListAwardsQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { adminModalPanelClass } from "@/components/admin-panel-classes";
 import AdminLayout from "@/components/AdminLayout";
-import { Plus, Pencil, Trash2, X } from "lucide-react";
+import { AdminPage, AdminRow, AdminGrid, AdminLoading, AdminEmpty, AdminModal, ConfirmDialog, AdminField, mutationError } from "@/components/admin/ui";
 import { useToast } from "@/hooks/use-toast";
 
 type Form = { title: string; awardingBody: string; year: string; description: string; sortOrder: number };
@@ -17,63 +16,67 @@ export default function AdminAwards() {
   const qc = useQueryClient();
   const { toast } = useToast();
   const [modal, setModal] = useState<{ mode: "create" | "edit"; id?: number; form: Form } | null>(null);
+  const [deleting, setDeleting] = useState<number | null>(null);
 
   const invalidate = () => qc.invalidateQueries({ queryKey: getAdminListAwardsQueryKey() });
+  const saving = create.isPending || update.isPending;
   const openCreate = () => setModal({ mode: "create", form: { ...empty } });
-  const openEdit = (a: NonNullable<typeof awards>[0]) => setModal({ mode: "edit", id: a.id, form: { title: a.title, awardingBody: a.awardingBody ?? "", year: a.year ?? "", description: a.description ?? "", sortOrder: a.sortOrder ?? 0 } });
+  const openEdit = (a: NonNullable<typeof awards>[0]) => setModal({
+    mode: "edit", id: a.id,
+    form: { title: a.title, awardingBody: a.awardingBody ?? "", year: a.year ?? "", description: a.description ?? "", sortOrder: a.sortOrder ?? 0 }
+  });
+
   const handleSave = () => {
     if (!modal) return;
+    const done = (msg: string) => { invalidate(); setModal(null); toast({ title: msg }); };
+    const fail = (err: unknown) => toast({ title: mutationError(err), variant: "destructive" });
     if (modal.mode === "create") {
-      create.mutate({ data: modal.form as never }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Award created" }); }, onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); } });
+      create.mutate({ data: modal.form as never }, { onSuccess: () => done("Award created"), onError: fail });
     } else {
-      update.mutate({ id: modal.id!, data: modal.form as never }, { onSuccess: () => { invalidate(); setModal(null); toast({ title: "Award updated" }); }, onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); } });
+      update.mutate({ id: modal.id!, data: modal.form as never }, { onSuccess: () => done("Award updated"), onError: fail });
     }
   };
-  const handleDelete = (id: number) => {
-    if (!confirm("Delete this award?")) return;
-    remove.mutate({ id }, { onSuccess: () => { invalidate(); toast({ title: "Deleted" }); }, onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); } });
+
+  const confirmDelete = () => {
+    if (deleting == null) return;
+    remove.mutate({ id: deleting }, {
+      onSuccess: () => { invalidate(); setDeleting(null); toast({ title: "Deleted" }); },
+      onError: (err: unknown) => { setDeleting(null); toast({ title: mutationError(err), variant: "destructive" }); },
+    });
   };
+
+  const set = (patch: Partial<Form>) => setModal(m => m && ({ ...m, form: { ...m.form, ...patch } }));
 
   return (
     <AdminLayout>
-      <div className="p-8 md:p-12">
-        <div className="flex items-center justify-between mb-10">
-          <div><h1 className="text-3xl font-serif text-paper">Awards</h1><p className="text-fog mt-1">Manage awards and recognition.</p></div>
-          <button onClick={openCreate} data-testid="button-create-award" className="flex items-center gap-2 bg-brand text-ink px-5 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors"><Plus size={16} /> Add Award</button>
-        </div>
-        {isLoading ? <div className="animate-pulse space-y-3">{[1,2,3].map(i => <div key={i} className="h-16 bg-panel border border-line" />)}</div> : (
-          <div className="space-y-3">
+      <AdminPage title="Awards" count={awards?.length} actionLabel="Add Award" onAction={openCreate} actionTestId="button-create-award">
+        {isLoading ? <AdminLoading /> : (awards ?? []).length === 0 ? <AdminEmpty message="No awards yet." /> : (
+          <AdminGrid>
             {(awards ?? []).map(a => (
-              <div key={a.id} data-testid={`row-award-${a.id}`} className="flex items-center justify-between bg-panel border border-line px-6 py-4">
-                <div><h3 className="text-paper font-serif">{a.title}</h3><p className="text-fog text-xs mt-1">{a.awardingBody} · {a.year}</p></div>
-                <div className="flex gap-3">
-                  <button onClick={() => openEdit(a)} data-testid={`button-edit-award-${a.id}`} className="text-fog hover:text-brand p-2"><Pencil size={15} /></button>
-                  <button onClick={() => handleDelete(a.id)} data-testid={`button-delete-award-${a.id}`} className="text-fog hover:text-red-400 p-2"><Trash2 size={15} /></button>
-                </div>
-              </div>
+              <AdminRow key={a.id} testId={`row-award-${a.id}`} title={a.title}
+                meta={[a.awardingBody, a.year].filter(Boolean).join(" · ")}
+                onEdit={() => openEdit(a)} editTestId={`button-edit-award-${a.id}`}
+                onDelete={() => setDeleting(a.id)} deleteTestId={`button-delete-award-${a.id}`} />
             ))}
-          </div>
+          </AdminGrid>
         )}
-      </div>
+      </AdminPage>
+
       {modal && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className={adminModalPanelClass}>
-            <div className="flex items-center justify-between mb-6"><h2 className="text-xl font-serif text-paper">{modal.mode === "create" ? "Add Award" : "Edit Award"}</h2><button onClick={() => setModal(null)}><X size={20} className="text-fog" /></button></div>
-            <div className="space-y-4">
-              {[{ l: "Title", k: "title" }, { l: "Awarding Body", k: "awardingBody" }, { l: "Year", k: "year" }, { l: "Description", k: "description", ta: true }, { l: "Sort Order", k: "sortOrder", num: true }].map(({ l, k, ta, num }) => (
-                <div key={k}>
-                  <label className="block text-fog text-xs uppercase tracking-widest mb-2">{l}</label>
-                  {ta ? <textarea rows={3} value={(modal.form as never)[k]} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, [k]: e.target.value } }))} className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none resize-none" />
-                  : <input type={num ? "number" : "text"} value={(modal.form as never)[k]} onChange={e => setModal(m => m && ({ ...m, form: { ...m.form, [k]: num ? Number(e.target.value) : e.target.value } }))} className="w-full bg-ink border border-line text-paper px-3 py-2 text-sm focus:border-brand focus:outline-none" />}
-                </div>
-              ))}
-            </div>
-            <div className="flex gap-4 mt-8">
-              <button onClick={handleSave} data-testid="button-save-award" className="bg-brand text-ink px-8 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors">Save</button>
-              <button onClick={() => setModal(null)} className="border border-line text-fog px-8 py-3 text-sm hover:border-brand transition-colors">Cancel</button>
-            </div>
+        <AdminModal title={modal.mode === "create" ? "Add Award" : "Edit Award"}
+          onClose={() => setModal(null)} onSave={handleSave} saving={saving} saveTestId="button-save-award">
+          <AdminField label="Title" value={modal.form.title} onChange={v => set({ title: v })} />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="md:col-span-2"><AdminField label="Awarding Body" value={modal.form.awardingBody} onChange={v => set({ awardingBody: v })} /></div>
+            <AdminField label="Year" value={modal.form.year} onChange={v => set({ year: v })} />
           </div>
-        </div>
+          <AdminField label="Description" value={modal.form.description} onChange={v => set({ description: v })} textarea />
+          <AdminField label="Sort Order" type="number" value={modal.form.sortOrder} onChange={v => set({ sortOrder: Number(v) })} />
+        </AdminModal>
+      )}
+
+      {deleting != null && (
+        <ConfirmDialog title="Delete this award?" onConfirm={confirmDelete} onCancel={() => setDeleting(null)} pending={remove.isPending} />
       )}
     </AdminLayout>
   );

@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useListCvSubmissions, useDeleteCvSubmission, getListCvSubmissionsQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import AdminLayout from "@/components/AdminLayout";
+import { AdminPage, AdminGrid, AdminLoading, AdminEmpty, ConfirmDialog, mutationError } from "@/components/admin/ui";
 import { Trash2, Mail, Phone, User, Paperclip, Download, Printer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -103,28 +105,28 @@ export default function AdminCvSubmissions() {
   const qc = useQueryClient();
   const { toast } = useToast();
 
-  const handleDelete = (id: number) => {
-    if (!confirm("Delete this CV submission?")) return;
-    remove.mutate({ id }, {
-      onSuccess: () => { qc.invalidateQueries({ queryKey: getListCvSubmissionsQueryKey() }); toast({ title: "Deleted" }); },
-      onError: (err: unknown) => { const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); }
+  const [deleting, setDeleting] = useState<number | null>(null);
+
+  const handleDelete = (id: number) => setDeleting(id);
+
+  const confirmDelete = () => {
+    if (deleting == null) return;
+    remove.mutate({ id: deleting }, {
+      onSuccess: () => { qc.invalidateQueries({ queryKey: getListCvSubmissionsQueryKey() }); setDeleting(null); toast({ title: "Deleted" }); },
+      onError: (err: unknown) => { setDeleting(null); toast({ title: mutationError(err), variant: "destructive" }); }
     });
   };
 
   return (
     <AdminLayout>
-      <div className="p-8 md:p-12">
-        <div className="mb-10">
-          <h1 className="text-3xl font-serif text-paper">CV Submissions</h1>
-          <p className="text-fog mt-1">{submissions?.length ?? 0} submission(s) received.</p>
-        </div>
+      <AdminPage title="CV Submissions" count={submissions?.length} countLabel={submissions?.length === 1 ? "application" : "applications"}>
 
         {isLoading ? (
-          <div className="animate-pulse space-y-3">{[1,2,3].map(i => <div key={i} className="h-24 bg-panel border border-line" />)}</div>
+          <AdminLoading />
         ) : (submissions ?? []).length === 0 ? (
-          <div className="border border-line p-16 text-center text-fog">No submissions yet.</div>
+          <AdminEmpty message="No submissions yet." />
         ) : (
-          <div className="space-y-4">
+          <AdminGrid>
             {(submissions ?? []).map(s => {
               const attachments = (s.attachments ?? []) as Attachment[];
               return (
@@ -202,9 +204,14 @@ export default function AdminCvSubmissions() {
                 </div>
               );
             })}
-          </div>
+          </AdminGrid>
         )}
-      </div>
+      </AdminPage>
+
+      {deleting != null && (
+        <ConfirmDialog title="Delete this application?" message="The submission and its attachments will be permanently removed."
+          onConfirm={confirmDelete} onCancel={() => setDeleting(null)} pending={remove.isPending} />
+      )}
     </AdminLayout>
   );
 }

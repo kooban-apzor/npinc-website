@@ -4,11 +4,11 @@ import {
   useCreateArticle, getListArticlesQueryKey, getListPeopleQueryKey,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { adminModalPanelClass } from "@/components/admin-panel-classes";
 import AdminDateField from "@/components/admin/AdminDateField";
 import AdminLayout from "@/components/AdminLayout";
+import { AdminPage, AdminLoading, AdminEmpty, AdminModal, mutationError } from "@/components/admin/ui";
 import { createStaffMovementArticlePayload, todayISO, type StaffMovementForm } from "@/lib/staff-movements";
-import { Plus, Pencil, Trash2, X, UserCheck, UserMinus, Upload, ImageOff, FileText } from "lucide-react";
+import { UserCheck, UserMinus, Upload, ImageOff, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const ROLE_OPTIONS = [
@@ -270,12 +270,12 @@ export default function AdminPeople() {
     if (modal.mode === "create") {
       create.mutate({ data: data as never }, {
         onSuccess: () => { afterSave(); toast({ title: "Person created" }); },
-        onError: (err: unknown) => { const msg = (err as { data?: { error?: string } })?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); }
+        onError: (err: unknown) => { const msg = mutationError(err); toast({ title: msg, variant: "destructive" }); }
       });
     } else {
       update.mutate({ id: modal.id!, data: data as never }, {
         onSuccess: () => { afterSave(); toast({ title: "Person updated" }); },
-        onError: (err: unknown) => { const msg = (err as { data?: { error?: string } })?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); }
+        onError: (err: unknown) => { const msg = mutationError(err); toast({ title: msg, variant: "destructive" }); }
       });
     }
   };
@@ -311,7 +311,7 @@ export default function AdminPeople() {
             );
           }
         },
-        onError: (err: unknown) => { const msg = (err as { data?: { error?: string } })?.data?.error ?? "Operation failed"; toast({ title: msg, variant: "destructive" }); },
+        onError: (err: unknown) => { const msg = mutationError(err); toast({ title: msg, variant: "destructive" }); },
       },
     );
   };
@@ -333,26 +333,17 @@ export default function AdminPeople() {
 
   return (
     <AdminLayout>
-      <div className="p-8 md:p-12">
-        <div className="flex items-center justify-between mb-10">
-          <div>
-            <h1 className="text-3xl font-serif text-paper">People</h1>
-            <p className="text-fog mt-1">Manage team members and profiles.</p>
-          </div>
-          <button onClick={openCreate} data-testid="button-create-person"
-            className="flex items-center gap-2 bg-brand text-ink px-5 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors">
-            <Plus size={16} /> Add Person
-          </button>
-        </div>
-
+      <AdminPage title="People" count={people?.length} countLabel={people?.length === 1 ? "member" : "members"} actionLabel="Add Person" onAction={openCreate} actionTestId="button-create-person">
         {isLoading ? (
-          <div className="animate-pulse space-y-3">{[1,2,3].map(i => <div key={i} className="h-16 bg-panel border border-line" />)}</div>
+          <AdminLoading rows={4} />
+        ) : (people ?? []).length === 0 ? (
+          <AdminEmpty message="No team members yet." />
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
             {(people ?? []).map(p => (
               <div key={p.id} data-testid={`row-person-${p.id}`}
-                className="flex items-center justify-between bg-panel border border-line px-6 py-4">
-                <div className="flex items-center gap-4">
+                className="flex items-center justify-between gap-3 bg-panel border border-line px-5 py-4">
+                <div className="flex items-center gap-4 min-w-0">
                   {p.photoUrl ? (
                     <img src={p.photoUrl} alt="" className="w-10 h-10 object-cover grayscale shrink-0 border border-line" />
                   ) : (
@@ -360,33 +351,27 @@ export default function AdminPeople() {
                       <ImageOff size={14} />
                     </div>
                   )}
-                  <div>
+                  <div className="min-w-0">
                     <div className="flex items-center gap-3 mb-1">
-                      <h3 className="text-paper font-serif">{p.firstName} {p.lastName}</h3>
+                      <h3 className="text-paper font-serif truncate">{p.firstName} {p.lastName}</h3>
                       {statusBadge(p)}
                     </div>
-                    <p className="text-fog text-xs">{ROLE_OPTIONS.find(r => r.value === normalizeRole(p.role))?.label ?? p.role} · #{p.sortOrder} · {p.isPublished ? <span className="text-green-400">Published</span> : <span className="text-red-400">Draft</span>}</p>
+                    <p className="text-fog text-xs truncate">{ROLE_OPTIONS.find(r => r.value === normalizeRole(p.role))?.label ?? p.role} · #{p.sortOrder} · {p.isPublished ? <span className="text-green-400">Published</span> : <span className="text-red-400">Draft</span>}</p>
                   </div>
                 </div>
-                <div className="flex gap-3">
-                  <button onClick={() => openEdit(p)} data-testid={`button-edit-person-${p.id}`} className="text-fog hover:text-brand p-2"><Pencil size={15} /></button>
+                <div className="flex gap-1 shrink-0">
+                  <button onClick={() => openEdit(p)} data-testid={`button-edit-person-${p.id}`} aria-label="Edit" title="Edit" className="text-fog hover:text-brand p-2"><Pencil size={15} /></button>
                   <button onClick={() => openDepartModal(p)} data-testid={`button-delete-person-${p.id}`} aria-label="Remove from team" title="Remove from team" className="text-fog hover:text-red-400 p-2"><Trash2 size={15} /></button>
                 </div>
               </div>
             ))}
           </div>
         )}
-      </div>
+      </AdminPage>
 
       {modal && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className={adminModalPanelClass}>
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-serif text-paper">{modal.mode === "create" ? "Add Person" : "Edit Person"}</h2>
-              <button onClick={() => setModal(null)} className="text-fog hover:text-paper"><X size={20} /></button>
-            </div>
-
-            <div className="space-y-5">
+        <AdminModal title={modal.mode === "create" ? "Add Person" : "Edit Person"}
+          onClose={() => setModal(null)} onSave={handleSave} saving={create.isPending || update.isPending} saveTestId="button-save-person" wide>
               {/* Photo */}
               <PhotoUpload value={modal.form.photoUrl} onChange={url => setForm({ photoUrl: url })} />
 
@@ -563,36 +548,18 @@ export default function AdminPeople() {
                   </div>
                 )}
               </div>
-            </div>
 
-            <div className="flex gap-4 mt-8">
-              <button onClick={handleSave} data-testid="button-save-person"
-                className="bg-brand text-ink px-10 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors">
-                Save
-              </button>
-              <button onClick={() => setModal(null)}
-                className="border border-line text-fog px-8 py-3 text-sm hover:border-brand transition-colors">
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
+        </AdminModal>
       )}
       {departModal && (
-        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-          <div className={adminModalPanelClass}>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-serif text-paper">
-                Remove {departModal.person.firstName} {departModal.person.lastName} from team
-              </h2>
-              <button onClick={() => setDepartModal(null)} className="text-fog hover:text-paper"><X size={20} /></button>
-            </div>
-            <p className="text-fog text-sm leading-relaxed mb-6">
-              They will remain on the public staff list through their last office day, then drop off automatically.
-              Optionally publish a Staff Movements insight (visible for 30 days).
-            </p>
-            <div className="space-y-5">
-              <AdminDateField
+        <AdminModal title={`Remove ${departModal.person.firstName} ${departModal.person.lastName} from team`}
+          onClose={() => setDepartModal(null)} onSave={handleConfirmDeparture}
+          saveLabel="Confirm departure" saveTestId="button-confirm-departure" saving={update.isPending}>
+          <p className="text-fog text-sm leading-relaxed">
+            They will remain on the public staff list through their last office day, then drop off automatically.
+            Optionally publish a Staff Movements insight (visible for 30 days).
+          </p>
+          <AdminDateField
                 label="Last Office Day"
                 value={departModal.leftAt}
                 onChange={v => setDepartModal(m => m && ({ ...m, leftAt: v }))}
@@ -611,27 +578,12 @@ export default function AdminPeople() {
                     <FileText size={12} />
                     Publish a Staff Movements insight
                   </span>
-                  <p className="text-fog text-xs leading-relaxed">
-                    A pre-filled departure notice for {departModal.person.firstName} will go live on the public Insights page under Staff Movements.
-                  </p>
-                </label>
-              </div>
-            </div>
-            <div className="flex gap-4 mt-8">
-              <button
-                onClick={handleConfirmDeparture}
-                data-testid="button-confirm-departure"
-                disabled={!departModal.leftAt || update.isPending}
-                className="bg-brand text-ink px-8 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-brand-deep transition-colors disabled:opacity-50"
-              >
-                Confirm departure
-              </button>
-              <button onClick={() => setDepartModal(null)} className="border border-line text-fog px-8 py-3 text-sm hover:border-brand transition-colors">
-                Cancel
-              </button>
-            </div>
+                <p className="text-fog text-xs leading-relaxed">
+                  A pre-filled departure notice for {departModal.person.firstName} will go live on the public Insights page under Staff Movements.
+                </p>
+              </label>
           </div>
-        </div>
+        </AdminModal>
       )}
     </AdminLayout>
   );
